@@ -1,8 +1,8 @@
 package com.doorxii.ludus.data.models.equipment
 
-class Equipment(
+open class Equipment(
     val name: String,
-    val type: String,
+    val type: EquipmentType,
     val attackBonus: Double,
     val defenceBonus: Double
 ) {

@@ -1,5 +1,6 @@
 package com.doorxii.ludus.data.models.beings
 
+import android.util.Log
 import com.doorxii.ludus.data.models.equipment.Equipment
 
 
@@ -11,14 +12,15 @@ class Gladiator(
     val speed: Double,
     val technique: Double,
     val morale: Double,
-    val health: Double,
+    var health: Double,
     val stamina: Double,
     val bloodlust: Double,
-    var attack: Double,
-    var defence: Double,
-    var equipment: MutableList<Equipment>
+    var equipment: List<Equipment>
 
 ) : Human(name, age, height) {
+
+    var attack = calculateAttack()
+    var defence = calculateDefence()
 
 
     fun calculateAttack(): Double {
@@ -43,8 +45,8 @@ class Gladiator(
             total += item.attackBonus
         }
 
-
-        return 10.0
+        Log.d(TAG, "getEquipmentAttackBonus: $total")
+        return total
     }
 
     fun getEquipmentDefenceBonus(): Double {
@@ -52,8 +54,8 @@ class Gladiator(
         for (item in equipment){
             total += item.defenceBonus
         }
-
-        return 25.0
+        Log.d(TAG, "getEquipmentDefenceBonus: $total")
+        return total
     }
 
     fun updateHealth() {
@@ -62,6 +64,10 @@ class Gladiator(
 
     fun updateMorale() {
 
+    }
+
+    companion object {
+        private const val TAG = "Gladiator"
     }
 
 }
