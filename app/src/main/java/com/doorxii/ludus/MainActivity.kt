@@ -45,3 +45,30 @@ fun GreetingPreview() {
         Greeting("Android")
     }
 }
+
+
+//Notes
+//
+//Main
+//
+//Strength
+//Speed
+//Endurance
+//Technique
+//Morale
+//Health
+//Stamina
+//
+//Other
+//Height
+//Weapon proficiency
+//Fears
+//Bloodlust
+//
+//
+//Attack =
+//Defense =
+//
+//Health update =
+//
+//Morale update =
