@@ -17,7 +17,7 @@ class Gladiator(
     val bloodlust: Double,
     var equipment: List<Equipment>
 
-) : Human(name, age, height, health) {
+) : Human(name, age, height) {
 
     var attack = calculateAttack()
     var defence = calculateDefence()

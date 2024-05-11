@@ -1,5 +1,7 @@
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
@@ -14,61 +16,47 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.doorxii.ludus.actions.combatactions.CombatActions
 
 class ActionChoiceDialog() {
-    val combatActions = listOf("Basic Attack", "Tired Attack", "Wait")
+
+    companion object {
+        fun makeChoice(choice: CombatActions?) {
+
+        }
+    }
 }
 
 @Composable
 @Preview
-fun AlertDialogWithDropdownMenu() {
-    var showDialog by remember { mutableStateOf(true) }
-    var selectedOption by remember { mutableStateOf("") }
-
-
-
-    if (showDialog) {
-
-        AlertDialog(
-            onDismissRequest = { showDialog = false },
-            title = { Text("Select an Option") },
-            text = {
-                DropdownMenu(
-                    expanded = selectedOption.isEmpty(),
-                    onDismissRequest = { },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    DropdownMenuItem(text = { Text("A") }, onClick = { selectedOption = "A" })
-                    DropdownMenuItem(text = { Text("B") }, onClick = { selectedOption = "B" })
-                    DropdownMenuItem(text = { Text("C") }, onClick = { selectedOption = "C" })
-                }
-            },
-            confirmButton = {
-                Button(
-                    onClick = { showDialog = false }
-                ) {
-                    Text("OK")
-                }
-            }
-        )
+fun CombatDropDownAndButton() {
+    var expanded by remember { mutableStateOf(false) }
+    val combatActions = listOf(CombatActions.BASIC_ATTACK, CombatActions.TIRED_ATTACK, CombatActions.WAIT)
+    var choice: CombatActions? by remember {
+        mutableStateOf(null)
     }
-}
-}
+    var buttontext: String by remember { mutableStateOf("Action Choice") }
 
-@Composable
-fun DropDownMenuCombatActions(selectedOption: String){
-    val combatActions = listOf("Basic Attack", "Tired Attack", "Wait")
+    Row {
+        Button(onClick = { expanded = true }) {
+            Text(buttontext)
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            for (action in combatActions) {
+                DropdownMenuItem(text = { Text(action.name) }, onClick = {
+                    choice = action
+                    buttontext = action.name
+                    expanded = false
+                })
+            }
+        }
 
-    var option = selectedOption
-
-    DropdownMenu(
-        expanded = selectedOption.isEmpty(),
-        onDismissRequest = { },
-        modifier = Modifier.fillMaxWidth()
-    ) {
-
-        for (action in combatActions) {
-            DropdownMenuItem(text = { Text(action) }, onClick = { option = action})
+        Button(onClick = { ActionChoiceDialog.makeChoice(choice) }){
+            Text("Submit")
         }
     }
 }

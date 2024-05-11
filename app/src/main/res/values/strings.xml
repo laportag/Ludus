@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Ludus</string>
+    <string name="title_activity_combat">CombatActivity</string>
 </resources>

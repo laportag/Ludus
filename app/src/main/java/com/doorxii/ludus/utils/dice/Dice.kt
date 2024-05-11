@@ -1,6 +1,6 @@
 package com.doorxii.ludus.utils.dice
 
-class Dice {
+object Dice {
     fun roll(numberofDice: Int, diceType: DiceTypes): List<Int>{
         val diceSize = when(diceType){
             DiceTypes.D6 -> 6

@@ -12,43 +12,58 @@ import com.doorxii.ludus.actions.combatactions.Wait
 import com.doorxii.ludus.data.models.beings.Gladiator
 
 class Combat(
-    gladiatorA: Gladiator, gladiatorB: Gladiator
+    gladiatorList:List<Gladiator>
 ) {
-
-    val gladiatorA = gladiatorA
-    val gladiatorB = gladiatorB
     var round: Int = 0
-    var gladiatorList = listOf(gladiatorA, gladiatorB)
+    var gladiatorList = gladiatorList
+    var userChoice: CombatAction? = null
+    var enemyChoice: CombatAction? = null
+    var isComplete = false
 
-
-    fun init() {
+    fun simCombat() {
         Log.d(TAG, "Combat started")
-        var round = 1
-
-
-        // run rounds until one dies
-        while (gladiatorList.size > 1) {
-
-            newRound(gladiatorA, gladiatorB, selectRoundAction(CombatActions.BASIC_ATTACK), selectRoundAction(CombatActions.BASIC_DEFEND))
-
-        }
-        // balances the increment in the final round
-        round--
-        Log.d(TAG, "Combat over, ${gladiatorList[0].name} won in $round rounds")
-    }
-
-    fun chooseActionLoop(){
-        lateinit var choice: CombatActions
-        var inputGiven: Boolean = false
-        while (!inputGiven) {
-            choice = uiActionChooser()
-            if (choice != null) {
-                inputGiven = true
+        while (!isComplete) {
+            userChoice = CombatBehaviour.basicActionPicker(gladiatorList[0])
+            enemyChoice = CombatBehaviour.basicActionPicker(gladiatorList[1])
+            newRound(gladiatorList[0],gladiatorList[1], userChoice!!, enemyChoice!!)
+//            gladiatorList = checkAlive()
+            if (gladiatorList.size == 1) {
+                Log.d(TAG, "Combat over, ${gladiatorList[0].name} won in $round rounds")
+                isComplete = true
             }
         }
     }
 
-    fun newRound(gladA: Gladiator, gladB: Gladiator, actionA: CombatAction, actionB: CombatAction) {
+    fun playCombat(){
+        Log.d(TAG, "Combat started")
+        while (!isComplete) {
+//            userChoice =
+            enemyChoice = CombatBehaviour.basicActionPicker(gladiatorList[1])
+            newRound(gladiatorList[0],gladiatorList[1], userChoice!!, enemyChoice!!)
+        }
+    }
+
+    fun checkAlive(): List<Gladiator> {
+        if (gladiatorList.all { it.isAlive() }) {
+            gladiatorList = listOf(gladiatorList[0], gladiatorList[1])
+            return gladiatorList
+        }
+        else if (gladiatorList[0].isAlive()) {
+            gladiatorList = listOf(gladiatorList[0])
+            Log.d(TAG, "Combat over, ${gladiatorList[0].name} won in $round rounds")
+            isComplete = true
+            return gladiatorList
+        }
+        else {
+            gladiatorList = listOf(gladiatorList[1])
+            Log.d(TAG, "Combat over, ${gladiatorList[1].name} won in $round rounds")
+            isComplete = true
+            return gladiatorList
+        }
+    }
+
+    fun newRound(gladA: Gladiator, gladB: Gladiator, actionA: CombatAction, actionB: CombatAction): List<Gladiator> {
+        round++
         gladiatorList = CombatRound(
             gladA,
             gladB,
@@ -56,23 +71,21 @@ class Combat(
             actionB,
             round
         ).initiateRound()
-        round++
+        return gladiatorList
     }
 
-    fun selectRoundAction(choice: CombatActions): CombatAction {
+    fun enumToAction(choice: CombatActions): CombatAction {
         return when (choice) {
             CombatActions.BASIC_ATTACK -> BasicAttack()
-            CombatActions.BASIC_DEFEND -> TiredAttack()
+            CombatActions.TIRED_ATTACK -> TiredAttack()
             CombatActions.WAIT -> Wait()
         }
     }
 
-    fun uiActionChooser(): CombatActions {
-        return CombatActions.WAIT
-    }
-
     companion object {
         const val TAG = "Combat"
-
+        fun init(gladiatorList: List<Gladiator>): Combat {
+            return Combat(gladiatorList)
+        }
     }
 }

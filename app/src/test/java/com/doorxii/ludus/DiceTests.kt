@@ -1,6 +1,6 @@
 package com.doorxii.ludus
 
-class DiceTests {
+object DiceTests {
 
     fun testroll() {
 

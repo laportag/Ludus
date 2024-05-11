@@ -8,7 +8,6 @@ import com.doorxii.ludus.utils.dice.DiceTypes
 class BasicAttack : CombatAction {
 
     override val staminaCost: Double = 15.0
-    private val dice = Dice()
 
     override fun act(aggressor: Gladiator, defender: Gladiator): List<Gladiator> {
         Log.d(TAG, "Basic attack: ${aggressor.name} vs ${defender.name}")
@@ -18,16 +17,16 @@ class BasicAttack : CombatAction {
 
         val defenderDamageTaken: Double = when (combatDifference) {
             in 0.0..10.0 -> {
-                dice.totalRolls(dice.roll(2, DiceTypes.D6), dice.calculateModifier(2.0))
+                Dice.totalRolls(Dice.roll(2, DiceTypes.D6), Dice.calculateModifier(2.0))
             }
             in 10.0..20.0 -> {
-                dice.totalRolls(dice.roll(3, DiceTypes.D6), dice.calculateModifier(2.0))
+                Dice.totalRolls(Dice.roll(3, DiceTypes.D6), Dice.calculateModifier(2.0))
             }
             in 20.0..30.0 -> {
-                dice.totalRolls(dice.roll(4, DiceTypes.D6), dice.calculateModifier(2.0))
+                Dice.totalRolls(Dice.roll(4, DiceTypes.D6), Dice.calculateModifier(2.0))
             }
             else -> {
-                dice.totalRolls(dice.roll(5, DiceTypes.D6), dice.calculateModifier(2.0))
+                Dice.totalRolls(Dice.roll(5, DiceTypes.D6), Dice.calculateModifier(2.0))
             }
         }
         reduceStamina(aggressor)
