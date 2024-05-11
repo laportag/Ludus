@@ -2,11 +2,13 @@ package com.doorxii.ludus
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.Button
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -99,29 +101,15 @@ fun GreetingPreview() {
     }
 }
 
-
-//Notes
-//
-//Main
-//
-//Strength
-//Speed
-//Endurance
-//Technique
-//Morale
-//Health
-//Stamina
-//
-//Other
-//Height
-//Weapon proficiency
-//Fears
-//Bloodlust
-//
-//
-//Attack =
-//Defense =
-//
-//Health update =
-//
-//Morale update =
+@Composable
+fun CombatActionButtons(){
+    Button(onClick = { /*TODO*/ }) {
+        Text("BasicAttack")
+    }
+    Button(onClick = { /*TODO*/ }) {
+        Text("TiredAttack")
+    }
+    Button(onClick = { /*TODO*/ }) {
+        Text("Wait")
+    }
+}

@@ -15,8 +15,8 @@ class Dice {
         return rollResultList
     }
 
-    fun totalRolls(rollList: List<Int>, modifier: Int): Int{
-        var rollTotal = 0
+    fun totalRolls(rollList: List<Int>, modifier: Double): Double{
+        var rollTotal = 0.0
         for (roll in rollList){
             rollTotal += roll
         }
@@ -24,9 +24,9 @@ class Dice {
         return rollTotal
     }
 
-    fun calculateModifier(): Int{
-        val modifierTotal = 0
-
+    fun calculateModifier(modifier: Double): Double{
+        var modifierTotal = 0.0
+        modifierTotal += modifier
 
         return modifierTotal
     }
