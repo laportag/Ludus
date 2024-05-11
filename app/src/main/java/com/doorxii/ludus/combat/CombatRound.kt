@@ -1,7 +1,7 @@
 package com.doorxii.ludus.combat
 
 import android.util.Log
-import com.doorxii.ludus.actions.CombatAction
+import com.doorxii.ludus.actions.combatactions.CombatAction
 import com.doorxii.ludus.data.models.beings.Gladiator
 
 class CombatRound(

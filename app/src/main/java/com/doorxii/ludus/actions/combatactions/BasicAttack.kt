@@ -1,9 +1,12 @@
-package com.doorxii.ludus.actions
+package com.doorxii.ludus.actions.combatactions
 
 import android.util.Log
 import com.doorxii.ludus.data.models.beings.Gladiator
 
 class BasicAttack: CombatAction {
+
+    override val staminaCost: Double = 15.0
+
     override fun act(aggressor: Gladiator, defender: Gladiator): List<Gladiator> {
         Log.d(TAG, "Basic attack: ${aggressor.name} vs ${defender.name}")
 
@@ -16,6 +19,7 @@ class BasicAttack: CombatAction {
             in 20.0..30.0 -> 20.0
             else -> 25.0
         }
+        reduceStamina(aggressor)
         Log.d(TAG, "${defender.name} damage taken: $defenderDamageTaken")
         defender.health -= defenderDamageTaken
         Log.d(TAG, "${defender.name} health: ${defender.health}")

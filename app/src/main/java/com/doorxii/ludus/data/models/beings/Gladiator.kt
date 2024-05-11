@@ -13,7 +13,7 @@ class Gladiator(
     val speed: Double,
     val technique: Double,
     val morale: Double,
-    val stamina: Double,
+    var stamina: Double,
     val bloodlust: Double,
     var equipment: List<Equipment>
 
