@@ -8,16 +8,16 @@ class Gladiator(
     name: String,
     age: Double,
     height: Double,
+    health: Double,
     val strength: Double,
     val speed: Double,
     val technique: Double,
     val morale: Double,
-    var health: Double,
     val stamina: Double,
     val bloodlust: Double,
     var equipment: List<Equipment>
 
-) : Human(name, age, height) {
+) : Human(name, age, height, health) {
 
     var attack = calculateAttack()
     var defence = calculateDefence()

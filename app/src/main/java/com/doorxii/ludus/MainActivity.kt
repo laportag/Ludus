@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.doorxii.ludus.actions.BasicAttack
+import com.doorxii.ludus.combat.Combat
 import com.doorxii.ludus.combat.CombatRound
 import com.doorxii.ludus.data.models.beings.Gladiator
 import com.doorxii.ludus.data.models.equipment.Equipment
@@ -69,9 +70,7 @@ class MainActivity : ComponentActivity() {
         Log.d(TAG, "Titus attack: ${titus.attack} defence: ${titus.defence}")
         Log.d(TAG, "Joseph attack: ${joseph.attack} defence: ${joseph.defence}")
 
-        val roundResult = CombatRound(titus, joseph, BasicAttack(), BasicAttack()).initiateRound()
-        titus = roundResult[0]
-        joseph = roundResult[1]
+        Combat(titus, joseph).init()
     }
 
 

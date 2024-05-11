@@ -8,14 +8,16 @@ class CombatRound(
     gladiatorA: Gladiator,
     gladiatorB: Gladiator,
     actionA: CombatAction,
-    actionB: CombatAction
+    actionB: CombatAction,
+    round: Int
 ) {
 
     // Each round has 2 actions, one for each gladiator
-    val gladiatorA = gladiatorA
-    val gladiatorB = gladiatorB
+    var gladiatorA = gladiatorA
+    var gladiatorB = gladiatorB
     val actionA = actionA
     val actionB = actionB
+    val round = round
 
     fun determineBeginner(gladiatorA: Gladiator, gladiatorB: Gladiator): Gladiator {
         val beginner: Gladiator
@@ -42,21 +44,65 @@ class CombatRound(
     }
 
     fun initiateRound(): List<Gladiator> {
+        Log.d(TAG, "Initiating round $round: ${gladiatorA.name} health: ${gladiatorA.health} vs ${gladiatorB.name} health: ${gladiatorB.health}")
         if (determineBeginner(gladiatorA, gladiatorB) == gladiatorA) {
-            actionA.initiateCombatAction(gladiatorA, gladiatorB)
-            actionB.initiateCombatAction(gladiatorB, gladiatorA)
+
+            Log.d(TAG, "Gladiator A goes first")
+            val actionARes = actionA.act(gladiatorA, gladiatorB)
+            updateGladiators(actionARes)
+
+            if (!gladiatorB.isAlive()){
+                return listOf(gladiatorA)
+            }
+            else if (!gladiatorA.isAlive()){
+                return listOf(gladiatorB)
+            }
+
+            val actionBRes = actionB.act(gladiatorB, gladiatorA)
+            updateGladiators(actionBRes)
+
+            if (!gladiatorA.isAlive()){
+                return listOf(gladiatorB)
+            }
+            else if (!gladiatorB.isAlive()){
+                return listOf(gladiatorA)
+            }
 
         } else {
-            actionB.initiateCombatAction(gladiatorB, gladiatorA)
-            actionA.initiateCombatAction(gladiatorA, gladiatorB)
+            Log.d(TAG, "Gladiator B goes first")
+            val actionBRes = actionB.act(gladiatorB, gladiatorA)
+            updateGladiators(actionBRes)
+
+            if (!gladiatorA.isAlive()){
+                return listOf(gladiatorB)
+            }
+            else if (!gladiatorB.isAlive()){
+                return listOf(gladiatorA)
+            }
+
+            val actionARes = actionA.act(gladiatorA, gladiatorB)
+            updateGladiators(actionARes)
+
+            if (!gladiatorB.isAlive()){
+                return listOf(gladiatorA)
+            }
+            else if (!gladiatorA.isAlive()){
+                return listOf(gladiatorB)
+            }
         }
 
         Log.d(
             TAG,
-            "Combat results: ${gladiatorA.name} health: ${gladiatorA.health} vs ${gladiatorB.name} health: ${gladiatorB.health}"
+            "Combat round result: ${gladiatorA.name} health: ${gladiatorA.health} vs ${gladiatorB.name} health: ${gladiatorB.health}"
         )
         return listOf(gladiatorA, gladiatorB)
     }
+
+    fun updateGladiators(gladiators: List<Gladiator>) {
+        gladiatorA = gladiators[0]
+        gladiatorB = gladiators[1]
+    }
+
 
     companion object {
         private const val TAG = "CombatRound"
