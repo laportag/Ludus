@@ -1,6 +1,6 @@
 package com.doorxii.ludus
 
-import CombatDropDownAndButton
+//import CombatDropDownAndButton
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -10,7 +10,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -20,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.doorxii.ludus.actions.combatactions.CombatActions
 import com.doorxii.ludus.combat.Combat
 import com.doorxii.ludus.data.models.beings.Gladiator
 import com.doorxii.ludus.data.models.equipment.Equipment
@@ -44,6 +48,13 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun HomeScreen() {
         var battleText: String by remember { mutableStateOf("") }
+        var expanded by remember { mutableStateOf(false) }
+        val combatActions = listOf(CombatActions.BASIC_ATTACK, CombatActions.TIRED_ATTACK, CombatActions.WAIT)
+        var choice: CombatActions? by remember {
+            mutableStateOf(null)
+        }
+        var buttontext: String by remember { mutableStateOf("Action Choice") }
+
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -57,7 +68,28 @@ class MainActivity : ComponentActivity() {
                 Button(onClick = { battleText = testSim()!! }) { Text("Sim")}
                 Button(onClick = { testReset() }) { Text("Reset")}
             }
-            CombatDropDownAndButton()
+            Row {
+                Button(onClick = { expanded = true }) {
+                    Text(buttontext)
+                }
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    for (action in combatActions) {
+                        DropdownMenuItem(text = { Text(action.name) }, onClick = {
+                            choice = action
+                            buttontext = action.name
+                            expanded = false
+                        })
+                    }
+                }
+
+                Button(onClick = { battleText = submitCombatAction(choice!!)!! }){
+                    Text("Submit")
+                }
+            }
         }
 
 
@@ -77,12 +109,16 @@ class MainActivity : ComponentActivity() {
 
     fun testCombat() {
 
-
         Log.d(TAG, "Titus attack: ${titus.attack} defence: ${titus.defence}")
         Log.d(TAG, "Joseph attack: ${joseph.attack} defence: ${joseph.defence}")
 
         combat = Combat.init(listOf(titus, joseph))
 
+    }
+
+    fun submitCombatAction(choice: CombatActions): String? {
+        combat?.playCombatRound(choice)
+        return combat?.combatReport
     }
 
 

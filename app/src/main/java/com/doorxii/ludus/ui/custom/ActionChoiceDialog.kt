@@ -27,36 +27,3 @@ class ActionChoiceDialog() {
     }
 }
 
-@Composable
-@Preview
-fun CombatDropDownAndButton() {
-    var expanded by remember { mutableStateOf(false) }
-    val combatActions = listOf(CombatActions.BASIC_ATTACK, CombatActions.TIRED_ATTACK, CombatActions.WAIT)
-    var choice: CombatActions? by remember {
-        mutableStateOf(null)
-    }
-    var buttontext: String by remember { mutableStateOf("Action Choice") }
-
-    Row {
-        Button(onClick = { expanded = true }) {
-            Text(buttontext)
-        }
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            for (action in combatActions) {
-                DropdownMenuItem(text = { Text(action.name) }, onClick = {
-                    choice = action
-                    buttontext = action.name
-                    expanded = false
-                })
-            }
-        }
-
-        Button(onClick = { ActionChoiceDialog.makeChoice(choice) }){
-            Text("Submit")
-        }
-    }
-}

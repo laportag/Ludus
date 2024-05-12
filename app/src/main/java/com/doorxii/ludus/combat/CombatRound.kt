@@ -49,10 +49,6 @@ class CombatRound(
         roundReport += "$str\n"
     }
 
-    fun getReport(): String{
-        return roundReport
-    }
-
     fun run(): List<Gladiator> {
         appendReport("Initiating round $round: ${gladiatorA.name} health: ${gladiatorA.health} vs ${gladiatorB.name} health: ${gladiatorB.health}")
         if (determineBeginner(gladiatorA, gladiatorB) == gladiatorA) {

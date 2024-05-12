@@ -18,10 +18,10 @@ class Combat(
     var userChoice: CombatAction? = null
     var enemyChoice: CombatAction? = null
     var isComplete = false
-    var combatReport = ""
+    var combatReport = "Combat: ${gladiatorList[0].name} vs ${gladiatorList[1].name}\n"
 
     fun simCombat(): String {
-        appendReport("Sim Combat started: ${gladiatorList[0].name} vs ${gladiatorList[1].name}")
+        appendReport("Sim Combat started")
         while (!isComplete) {
             userChoice = CombatBehaviour.basicActionPicker(gladiatorList[0])
             enemyChoice = CombatBehaviour.basicActionPicker(gladiatorList[1])
@@ -43,13 +43,13 @@ class Combat(
         combatReport += "$str\n"
     }
 
-    fun playCombat(){
-        appendReport("Combat started: ${gladiatorList[0].name} vs ${gladiatorList[1].name}")
-        while (!isComplete) {
-//            userChoice =
-            enemyChoice = CombatBehaviour.basicActionPicker(gladiatorList[1])
-            newRound(gladiatorList[0],gladiatorList[1], userChoice!!, enemyChoice!!)
-        }
+    fun playCombatRound(choice: CombatActions): String{
+        userChoice = enumToAction(choice)
+        enemyChoice = CombatBehaviour.basicActionPicker(gladiatorList[1])
+        newRound(gladiatorList[0],gladiatorList[1], userChoice!!, enemyChoice!!)
+        round = CombatRound.init(gladiatorList[0],gladiatorList[1], userChoice!!, enemyChoice!!, roundNumber)
+
+        return combatReport
     }
 
     fun newRound(gladA: Gladiator, gladB: Gladiator, actionA: CombatAction, actionB: CombatAction): List<Gladiator> {
