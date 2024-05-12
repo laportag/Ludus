@@ -18,6 +18,7 @@ class CombatRound(
     val actionA = actionA
     val actionB = actionB
     val round = round
+    var roundReport: String = ""
 
     fun determineBeginner(gladiatorA: Gladiator, gladiatorB: Gladiator): Gladiator {
         val beginner: Gladiator
@@ -43,11 +44,20 @@ class CombatRound(
         return beginner
     }
 
-    fun initiateRound(): List<Gladiator> {
-        Log.d(TAG, "Initiating round $round: ${gladiatorA.name} health: ${gladiatorA.health} vs ${gladiatorB.name} health: ${gladiatorB.health}")
+    fun appendReport(str: String){
+        Log.d(TAG, str)
+        roundReport += "$str\n"
+    }
+
+    fun getReport(): String{
+        return roundReport
+    }
+
+    fun run(): List<Gladiator> {
+        appendReport("Initiating round $round: ${gladiatorA.name} health: ${gladiatorA.health} vs ${gladiatorB.name} health: ${gladiatorB.health}")
         if (determineBeginner(gladiatorA, gladiatorB) == gladiatorA) {
 
-            Log.d(TAG, "Gladiator A goes first")
+            appendReport("Gladiator A goes first")
             val actionARes = actionA.act(gladiatorA, gladiatorB)
             updateGladiators(actionARes)
 
@@ -69,7 +79,7 @@ class CombatRound(
             }
 
         } else {
-            Log.d(TAG, "Gladiator B goes first")
+            appendReport("Gladiator B goes first")
             val actionBRes = actionB.act(gladiatorB, gladiatorA)
             updateGladiators(actionBRes)
 
@@ -91,9 +101,7 @@ class CombatRound(
             }
         }
 
-        Log.d(
-            TAG,
-            "Combat round result: ${gladiatorA.name} health: ${gladiatorA.health} vs ${gladiatorB.name} health: ${gladiatorB.health}"
+        appendReport("Combat round result: ${gladiatorA.name} health: ${gladiatorA.health} vs ${gladiatorB.name} health: ${gladiatorB.health}"
         )
         return listOf(gladiatorA, gladiatorB)
     }
@@ -106,5 +114,12 @@ class CombatRound(
 
     companion object {
         private const val TAG = "CombatRound"
+        fun init(gladiatorA: Gladiator,
+                 gladiatorB: Gladiator,
+                 actionA: CombatAction,
+                 actionB: CombatAction,
+                 round: Int): CombatRound {
+            return CombatRound(gladiatorA, gladiatorB, actionA, actionB, round)
+        }
     }
 }

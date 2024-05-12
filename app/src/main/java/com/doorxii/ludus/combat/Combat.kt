@@ -1,8 +1,6 @@
 package com.doorxii.ludus.combat
 
-import android.app.AlertDialog
 import android.util.Log
-import androidx.compose.runtime.Composable
 import com.doorxii.ludus.actions.CombatBehaviour
 import com.doorxii.ludus.actions.combatactions.BasicAttack
 import com.doorxii.ludus.actions.combatactions.TiredAttack
@@ -14,28 +12,39 @@ import com.doorxii.ludus.data.models.beings.Gladiator
 class Combat(
     gladiatorList:List<Gladiator>
 ) {
-    var round: Int = 0
+    var round: CombatRound? = null
+    var roundNumber: Int = 0
     var gladiatorList = gladiatorList
     var userChoice: CombatAction? = null
     var enemyChoice: CombatAction? = null
     var isComplete = false
+    var combatReport = ""
 
-    fun simCombat() {
-        Log.d(TAG, "Combat started")
+    fun simCombat(): String {
+        appendReport("Sim Combat started: ${gladiatorList[0].name} vs ${gladiatorList[1].name}")
         while (!isComplete) {
             userChoice = CombatBehaviour.basicActionPicker(gladiatorList[0])
             enemyChoice = CombatBehaviour.basicActionPicker(gladiatorList[1])
             newRound(gladiatorList[0],gladiatorList[1], userChoice!!, enemyChoice!!)
-//            gladiatorList = checkAlive()
+
+
+
             if (gladiatorList.size == 1) {
-                Log.d(TAG, "Combat over, ${gladiatorList[0].name} won in $round rounds")
+                appendReport("Combat over, ${gladiatorList[0].name} won in $roundNumber rounds")
                 isComplete = true
+
             }
         }
+        return combatReport
+    }
+
+    fun appendReport(str: String){
+        Log.d(TAG, str)
+        combatReport += "$str\n"
     }
 
     fun playCombat(){
-        Log.d(TAG, "Combat started")
+        appendReport("Combat started: ${gladiatorList[0].name} vs ${gladiatorList[1].name}")
         while (!isComplete) {
 //            userChoice =
             enemyChoice = CombatBehaviour.basicActionPicker(gladiatorList[1])
@@ -43,34 +52,12 @@ class Combat(
         }
     }
 
-    fun checkAlive(): List<Gladiator> {
-        if (gladiatorList.all { it.isAlive() }) {
-            gladiatorList = listOf(gladiatorList[0], gladiatorList[1])
-            return gladiatorList
-        }
-        else if (gladiatorList[0].isAlive()) {
-            gladiatorList = listOf(gladiatorList[0])
-            Log.d(TAG, "Combat over, ${gladiatorList[0].name} won in $round rounds")
-            isComplete = true
-            return gladiatorList
-        }
-        else {
-            gladiatorList = listOf(gladiatorList[1])
-            Log.d(TAG, "Combat over, ${gladiatorList[1].name} won in $round rounds")
-            isComplete = true
-            return gladiatorList
-        }
-    }
-
     fun newRound(gladA: Gladiator, gladB: Gladiator, actionA: CombatAction, actionB: CombatAction): List<Gladiator> {
-        round++
-        gladiatorList = CombatRound(
-            gladA,
-            gladB,
-            actionA,
-            actionB,
-            round
-        ).initiateRound()
+        roundNumber++
+        appendReport("Round $roundNumber: ${gladA.name}:${actionA.name} vs ${gladB.name}: ${actionB.name}")
+        round = CombatRound.init(gladA, gladB, actionA, actionB, roundNumber)
+        gladiatorList = round!!.run()
+        appendReport(round!!.roundReport)
         return gladiatorList
     }
 

@@ -7,6 +7,7 @@ import com.doorxii.ludus.utils.dice.DiceTypes
 
 class BasicAttack : CombatAction {
 
+    override val name: String = "Basic Attack"
     override val staminaCost: Double = 15.0
 
     override fun act(aggressor: Gladiator, defender: Gladiator): List<Gladiator> {
@@ -36,6 +37,8 @@ class BasicAttack : CombatAction {
 
         return listOf(aggressor, defender)
     }
+
+
 
     companion object {
         const val TAG = "BasicAttack"

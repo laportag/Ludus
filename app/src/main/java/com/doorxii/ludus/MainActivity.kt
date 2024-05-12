@@ -13,6 +13,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,7 +43,7 @@ class MainActivity : ComponentActivity() {
     @Preview
     @Composable
     fun HomeScreen() {
-        val battleText: String = ""
+        var battleText: String by remember { mutableStateOf("") }
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -50,7 +54,7 @@ class MainActivity : ComponentActivity() {
 
             Row {
                 Button(onClick = { testCombat() }) { Text("Play")}
-                Button(onClick = { testSim() }) { Text("Sim")}
+                Button(onClick = { battleText = testSim()!! }) { Text("Sim")}
                 Button(onClick = { testReset() }) { Text("Reset")}
             }
             CombatDropDownAndButton()
@@ -61,9 +65,9 @@ class MainActivity : ComponentActivity() {
 
     }
 
-    fun testSim(){
+    fun testSim(): String? {
         combat = Combat.init(listOf(titus, joseph))
-        combat?.simCombat()
+        return combat?.simCombat()
     }
 
     fun testReset(){

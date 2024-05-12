@@ -4,6 +4,7 @@ import com.doorxii.ludus.data.models.beings.Gladiator
 
 class Wait: CombatAction {
 
+    override val name: String = "Wait"
     override val staminaCost: Double = -20.0
     override fun act(aggressor: Gladiator, defender: Gladiator): List<Gladiator> {
         reduceStamina(aggressor)
