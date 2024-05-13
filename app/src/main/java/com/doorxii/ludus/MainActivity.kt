@@ -38,8 +38,8 @@ class MainActivity : ComponentActivity() {
 
     private var combat: Combat? = null
 
-    private var isStartGameUIVisible: Boolean = true
-    private var isActionUIVisible: Boolean = false
+    private var isStartGameUIEnabled: Boolean = true
+    private var isActionUIEnabled: Boolean = false
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,7 +48,7 @@ class MainActivity : ComponentActivity() {
         setContent {
 
             LudusTheme {
-                    HomeScreen()
+                HomeScreen()
 //
             }
         }
@@ -67,6 +67,8 @@ class MainActivity : ComponentActivity() {
         }
         var buttonText: String by remember { mutableStateOf("Action Choice") }
         val scrollState = rememberScrollState()
+        var isActionUIEnabledRemember: Boolean by remember { mutableStateOf(isActionUIEnabled) }
+        var isStartGameUIEnabledRemember: Boolean by remember { mutableStateOf(isStartGameUIEnabled) }
 
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -78,18 +80,35 @@ class MainActivity : ComponentActivity() {
             Text("Titus vs Joseph")
 
             Row {
-                Button(onClick = { testCombat() }, enabled = isStartGameUIVisible) { Text("Play") }
                 Button(
-                    onClick = { battleText = testSim()!! },
-                    enabled = isStartGameUIVisible
+                    onClick = {
+                        combat = startGame()
+                        isActionUIEnabledRemember = true
+                        isStartGameUIEnabledRemember = false
+                    },
+                    enabled = isStartGameUIEnabledRemember
+                ) {
+                    Text("Play")
+                }
+
+                Button(
+                    onClick = {
+                        isActionUIEnabledRemember = false
+                        isStartGameUIEnabledRemember = false
+                        battleText = testSim()!!
+                    },
+                    enabled = isStartGameUIEnabledRemember
                 ) { Text("Sim") }
+
                 Button(onClick = {
                     battleText = ""
+                    isActionUIEnabledRemember = false
+                    isStartGameUIEnabledRemember = true
                     testReset()
                 }) { Text("Reset") }
             }
             Row {
-                Button(onClick = { expanded = true }, enabled = isActionUIVisible) {
+                Button(onClick = { expanded = true }, enabled = isActionUIEnabledRemember) {
                     Text(buttonText)
                 }
                 DropdownMenu(
@@ -108,7 +127,7 @@ class MainActivity : ComponentActivity() {
 
                 Button(
                     onClick = { battleText = submitCombatAction(choice!!)!! },
-                    enabled = isActionUIVisible
+                    enabled = isActionUIEnabledRemember
                 ) {
                     Text("Submit")
                 }
@@ -157,29 +176,36 @@ class MainActivity : ComponentActivity() {
         )
 
         combat = Combat.init(listOf(marcus, joseph))
-        isStartGameUIVisible = false
+//        isStartGameUIEnabled = false
+//        isActionUIEnabled = false
         return combat?.simCombat()
     }
 
     private fun testReset() {
         combat = null
-        isStartGameUIVisible = true
-        isActionUIVisible = false
+//        isStartGameUIEnabled = true
+//        isActionUIEnabled = false
     }
 
 
-    private fun testCombat() {
-
-        Log.d(TAG, "Titus attack: ${titus.attack} defence: ${titus.defence}")
-        Log.d(TAG, "Joseph attack: ${joseph.attack} defence: ${joseph.defence}")
-
+    private fun startGame(): Combat {
         combat = Combat.init(listOf(titus, joseph))
-        isStartGameUIVisible = false
-        isActionUIVisible = true
+        Log.d(TAG, "startGame: ${combat?.combatReport}")
+//        isStartGameUIEnabled = false
+//        isActionUIEnabled = true
+        return combat!!
     }
 
     private fun submitCombatAction(choice: CombatActions): String? {
-        combat?.playCombatRound(choice)
+        if (combat!!.isComplete) {
+            Log.d(TAG, "Combat over")
+//            isActionUIEnabled = false
+        } else {
+            if (combat?.isComplete == true) {
+                isActionUIEnabled = false
+            }
+            combat?.playCombatRound(choice)
+        }
         return combat?.combatReport
     }
 

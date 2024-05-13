@@ -10,13 +10,13 @@ import com.doorxii.ludus.actions.combatactions.Wait
 import com.doorxii.ludus.data.models.animal.Gladiator
 
 class Combat(
-    private var gladiatorList: List<Gladiator>
+    var gladiatorList: List<Gladiator>
 ) {
     private var round: CombatRound? = null
     private var roundNumber: Int = 0
     private var userChoice: CombatAction? = null
     private var enemyChoice: CombatAction? = null
-    private var isComplete = false
+    var isComplete = false
     var combatReport = "Combat: ${gladiatorList[0].name} vs ${gladiatorList[1].name}\n"
 
     fun simCombat(): String {
@@ -24,7 +24,7 @@ class Combat(
         while (!isComplete) {
             userChoice = CombatBehaviour.basicActionPicker(gladiatorList[0])
             enemyChoice = CombatBehaviour.basicActionPicker(gladiatorList[1])
-            newRound(gladiatorList[0], gladiatorList[1], userChoice!!, enemyChoice!!)
+            runNewRound(gladiatorList[0], gladiatorList[1], userChoice!!, enemyChoice!!)
 
 
 
@@ -43,14 +43,24 @@ class Combat(
     }
 
     fun playCombatRound(choice: CombatActions): String {
-        userChoice = enumToAction(choice)
-        enemyChoice = CombatBehaviour.basicActionPicker(gladiatorList[1])
-        newRound(gladiatorList[0], gladiatorList[1], userChoice!!, enemyChoice!!)
-        round = CombatRound.init(gladiatorList[0], gladiatorList[1], roundNumber)
+        if (gladiatorList.size > 2){
+            return combatReport
+        } else {
+
+            userChoice = enumToAction(choice)
+            enemyChoice = CombatBehaviour.basicActionPicker(gladiatorList[1])
+            runNewRound(gladiatorList[0], gladiatorList[1], userChoice!!, enemyChoice!!)
+            if (gladiatorList.size == 1) {
+                appendReport("Combat over, ${gladiatorList[0].name} won in $roundNumber rounds")
+                isComplete = true
+            }
+//            round = CombatRound.init(gladiatorList[0], gladiatorList[1], roundNumber)
+        }
+
         return combatReport
     }
 
-    private fun newRound(
+    private fun runNewRound(
         gladA: Gladiator,
         gladB: Gladiator,
         actionA: CombatAction,
