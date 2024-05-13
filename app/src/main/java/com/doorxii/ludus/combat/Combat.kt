@@ -7,7 +7,7 @@ import com.doorxii.ludus.actions.combatactions.TiredAttack
 import com.doorxii.ludus.actions.combatactions.CombatAction
 import com.doorxii.ludus.actions.combatactions.CombatActions
 import com.doorxii.ludus.actions.combatactions.Wait
-import com.doorxii.ludus.data.models.beings.Gladiator
+import com.doorxii.ludus.data.models.animal.Gladiator
 
 class Combat(
     private var gladiatorList: List<Gladiator>

@@ -1,4 +1,4 @@
-package com.doorxii.ludus.data.models.beings
+package com.doorxii.ludus.data.models.animal
 
 import android.util.Log
 import com.doorxii.ludus.actions.combatactions.CombatAction
@@ -10,13 +10,13 @@ class Gladiator(
     age: Double,
     height: Double,
     health: Double,
+    var morale: Double,
+    var stamina: Double,
     val strength: Double,
     val speed: Double,
     val technique: Double,
-    val morale: Double,
-    var stamina: Double,
     val bloodlust: Double,
-    var equipment: List<Equipment>,
+    var equipment: Equipment,
     var humanControlled: Boolean = false,
 
     ) : Human(name, age, height) {
@@ -43,30 +43,19 @@ class Gladiator(
     }
 
     private fun getEquipmentAttackBonus(): Double {
-        var total = 0.0
-        for (item in equipment) {
-            total += item.attackBonus
-        }
-
+        val total = equipment.getAttackBonus()
         Log.d(TAG, "getEquipmentAttackBonus: $total")
         return total
     }
 
     private fun getEquipmentDefenceBonus(): Double {
-        var total = 0.0
-        for (item in equipment) {
-            total += item.defenceBonus
-        }
+        val total = equipment.getDefenceBonus()
         Log.d(TAG, "getEquipmentDefenceBonus: $total")
         return total
     }
 
-    fun updateHealth() {
-
-    }
-
-    fun updateMorale() {
-
+    fun updateMorale(morale: Double) {
+        this.morale = morale
     }
 
     companion object {

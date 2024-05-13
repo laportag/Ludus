@@ -1,7 +1,7 @@
 package com.doorxii.ludus.actions.combatactions
 
 import android.util.Log
-import com.doorxii.ludus.data.models.beings.Gladiator
+import com.doorxii.ludus.data.models.animal.Gladiator
 import com.doorxii.ludus.utils.dice.Dice
 import com.doorxii.ludus.utils.dice.DiceTypes
 

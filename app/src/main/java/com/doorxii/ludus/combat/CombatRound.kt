@@ -1,7 +1,7 @@
 package com.doorxii.ludus.combat
 
 import android.util.Log
-import com.doorxii.ludus.data.models.beings.Gladiator
+import com.doorxii.ludus.data.models.animal.Gladiator
 
 class CombatRound(
     // Each round has 2 actions, one for each gladiator

@@ -1,10 +1,7 @@
 package com.doorxii.ludus
 
-import android.annotation.SuppressLint
-import android.app.Activity
 import android.os.Bundle
 import android.util.Log
-import android.view.Window
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -13,17 +10,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MaterialTheme.colorScheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
@@ -34,18 +26,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.core.view.WindowCompat
 import com.doorxii.ludus.actions.combatactions.CombatActions
 import com.doorxii.ludus.combat.Combat
-import com.doorxii.ludus.data.models.beings.Gladiator
+import com.doorxii.ludus.data.models.animal.Gladiator
 import com.doorxii.ludus.data.models.equipment.Equipment
-import com.doorxii.ludus.data.models.equipment.Gladius
+import com.doorxii.ludus.data.models.equipment.weapon.Gladius
 import com.doorxii.ludus.ui.theme.LudusTheme
 
 class MainActivity : ComponentActivity() {
@@ -62,18 +48,8 @@ class MainActivity : ComponentActivity() {
         setContent {
 
             LudusTheme {
-//                Scaffold(
-//                    topBar = { TopAppBar(title = { Text("Ludus") }) },
-//                    modifier = Modifier.padding(5.dp),
-//                    bottomBar = {
-//                        BottomAppBar {
-//                            // Bottom app bar content
-//                        }
-//                    },
-//
-//                    ) {
                     HomeScreen()
-//                }
+//
             }
         }
     }
@@ -160,7 +136,7 @@ class MainActivity : ComponentActivity() {
             morale = 100.0,
             health = 100.0,
             stamina = 100.0,
-            equipment = listOf<Equipment>(Gladius()),
+            equipment = Equipment(Gladius()),
             bloodlust = 60.0,
             height = 160.0,
             humanControlled = true
@@ -175,7 +151,7 @@ class MainActivity : ComponentActivity() {
             morale = 800.0,
             health = 100.0,
             stamina = 100.0,
-            equipment = listOf<Equipment>(Gladius()),
+            equipment = Equipment(),
             bloodlust = 60.0,
             height = 160.0,
         )
@@ -220,7 +196,7 @@ class MainActivity : ComponentActivity() {
             morale = 100.0,
             health = 100.0,
             stamina = 100.0,
-            equipment = listOf<Equipment>(Gladius()),
+            equipment = Equipment(Gladius()),
             bloodlust = 60.0,
             height = 160.0,
             humanControlled = true
@@ -235,7 +211,7 @@ class MainActivity : ComponentActivity() {
             morale = 800.0,
             health = 100.0,
             stamina = 100.0,
-            equipment = listOf<Equipment>(Gladius()),
+            equipment = Equipment(),
             bloodlust = 60.0,
             height = 160.0,
         )

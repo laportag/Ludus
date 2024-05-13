@@ -1,4 +1,4 @@
-package com.doorxii.ludus.data.models.beings
+package com.doorxii.ludus.data.models.animal
 
 import android.util.Log
 
@@ -7,7 +7,7 @@ open class Human(
     val age: Double,
     val height: Double
 
-) {
+): Animal() {
 
     var health: Double = 100.0
         set(value) {
@@ -27,6 +27,11 @@ open class Human(
             return true
         }
     }
+
+    fun updateHealth(health: Double) {
+        this.health = health
+    }
+
 
     companion object {
         const val TAG = "Human"

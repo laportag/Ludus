@@ -1,7 +1,7 @@
 package com.doorxii.ludus.actions.combatactions
 
 import com.doorxii.ludus.actions.Action
-import com.doorxii.ludus.data.models.beings.Gladiator
+import com.doorxii.ludus.data.models.animal.Gladiator
 
 interface CombatAction: Action {
 
