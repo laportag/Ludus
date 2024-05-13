@@ -1,6 +1,7 @@
 package com.doorxii.ludus.data.models.beings
 
 import android.util.Log
+import com.doorxii.ludus.actions.combatactions.CombatAction
 import com.doorxii.ludus.data.models.equipment.Equipment
 
 
@@ -15,15 +16,17 @@ class Gladiator(
     val morale: Double,
     var stamina: Double,
     val bloodlust: Double,
-    var equipment: List<Equipment>
+    var equipment: List<Equipment>,
+    var humanControlled: Boolean = false,
 
-) : Human(name, age, height) {
+    ) : Human(name, age, height) {
 
     var attack = calculateAttack()
     var defence = calculateDefence()
 
+    var action: CombatAction? = null
 
-    fun calculateAttack(): Double {
+    private fun calculateAttack(): Double {
         val fatigue = 100 - ((morale + stamina) / 200)
         val power = (strength + speed + technique / 3) + (bloodlust / 50)
         val total = power + getEquipmentAttackBonus() - fatigue
@@ -31,7 +34,7 @@ class Gladiator(
         return attack
     }
 
-    fun calculateDefence(): Double {
+    private fun calculateDefence(): Double {
         val fatigue = 100 - ((morale + stamina) / 200)
         val power = (strength + speed + technique / 3)
         val total = power + getEquipmentDefenceBonus() - fatigue
@@ -39,9 +42,9 @@ class Gladiator(
         return defence
     }
 
-    fun getEquipmentAttackBonus(): Double {
+    private fun getEquipmentAttackBonus(): Double {
         var total = 0.0
-        for (item in equipment){
+        for (item in equipment) {
             total += item.attackBonus
         }
 
@@ -49,9 +52,9 @@ class Gladiator(
         return total
     }
 
-    fun getEquipmentDefenceBonus(): Double {
+    private fun getEquipmentDefenceBonus(): Double {
         var total = 0.0
-        for (item in equipment){
+        for (item in equipment) {
             total += item.defenceBonus
         }
         Log.d(TAG, "getEquipmentDefenceBonus: $total")

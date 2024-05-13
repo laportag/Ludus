@@ -1,108 +1,100 @@
 package com.doorxii.ludus.combat
 
 import android.util.Log
-import com.doorxii.ludus.actions.combatactions.CombatAction
 import com.doorxii.ludus.data.models.beings.Gladiator
 
 class CombatRound(
-    gladiatorA: Gladiator,
-    gladiatorB: Gladiator,
-    actionA: CombatAction,
-    actionB: CombatAction,
-    round: Int
+    // Each round has 2 actions, one for each gladiator
+    private var gladiatorA: Gladiator, private var gladiatorB: Gladiator, private val round: Int
 ) {
 
-    // Each round has 2 actions, one for each gladiator
-    var gladiatorA = gladiatorA
-    var gladiatorB = gladiatorB
-    val actionA = actionA
-    val actionB = actionB
-    val round = round
+    private lateinit var beginner: Gladiator
     var roundReport: String = ""
 
-    fun determineBeginner(gladiatorA: Gladiator, gladiatorB: Gladiator): Gladiator {
+    private fun determineBeginner(): Gladiator {
         val beginner: Gladiator
         if (gladiatorA.speed > gladiatorB.speed) {
             beginner = gladiatorA
         } else if (gladiatorA.speed < gladiatorB.speed) {
             beginner = gladiatorB
         } else {
-            if (gladiatorA.attack > gladiatorB.attack) {
-                beginner = gladiatorA
+            beginner = if (gladiatorA.attack > gladiatorB.attack) {
+                gladiatorA
             } else if (gladiatorA.attack < gladiatorB.attack) {
-                beginner = gladiatorB
+                gladiatorB
             } else {
                 if (gladiatorA.age < gladiatorB.age) {
-                    beginner = gladiatorA
+                    gladiatorA
                 } else if (gladiatorA.age > gladiatorB.age) {
-                    beginner = gladiatorB
+                    gladiatorB
                 } else {
-                    beginner = gladiatorA
+                    gladiatorA
                 }
             }
         }
         return beginner
     }
 
-    fun appendReport(str: String){
+    private fun appendReport(str: String) {
         Log.d(TAG, str)
         roundReport += "$str\n"
     }
 
     fun run(): List<Gladiator> {
+        beginner = determineBeginner()
+
         appendReport("Initiating round $round: ${gladiatorA.name} health: ${gladiatorA.health} vs ${gladiatorB.name} health: ${gladiatorB.health}")
-        if (determineBeginner(gladiatorA, gladiatorB) == gladiatorA) {
+        if (beginner == gladiatorA) {
 
             appendReport("Gladiator A goes first")
-            val actionARes = actionA.act(gladiatorA, gladiatorB)
-            updateGladiators(actionARes)
 
-            if (!gladiatorB.isAlive()){
+            // Gladiator A action
+            updateGladiators(gladiatorA.action?.act(gladiatorA, gladiatorB)!!)
+
+            if (!gladiatorB.isAlive()) {
                 return listOf(gladiatorA)
-            }
-            else if (!gladiatorA.isAlive()){
+            } else if (!gladiatorA.isAlive()) {
                 return listOf(gladiatorB)
             }
 
-            val actionBRes = actionB.act(gladiatorB, gladiatorA)
-            updateGladiators(actionBRes)
+            // Gladiator B action
+            updateGladiators(gladiatorB.action?.act(gladiatorB, gladiatorA)!!)
 
-            if (!gladiatorA.isAlive()){
+            if (!gladiatorA.isAlive()) {
                 return listOf(gladiatorB)
-            }
-            else if (!gladiatorB.isAlive()){
+            } else if (!gladiatorB.isAlive()) {
                 return listOf(gladiatorA)
             }
 
         } else {
             appendReport("Gladiator B goes first")
-            val actionBRes = actionB.act(gladiatorB, gladiatorA)
-            updateGladiators(actionBRes)
 
-            if (!gladiatorA.isAlive()){
+            // Gladiator B action
+            updateGladiators(gladiatorB.action?.act(gladiatorB, gladiatorA)!!)
+
+            if (!gladiatorA.isAlive()) {
                 return listOf(gladiatorB)
-            }
-            else if (!gladiatorB.isAlive()){
+            } else if (!gladiatorB.isAlive()) {
                 return listOf(gladiatorA)
             }
 
-            val actionARes = actionA.act(gladiatorA, gladiatorB)
-            updateGladiators(actionARes)
+            // Gladiator A action
+            updateGladiators(gladiatorA.action?.act(gladiatorA, gladiatorB)!!)
 
-            if (!gladiatorB.isAlive()){
+            if (!gladiatorB.isAlive()) {
                 return listOf(gladiatorA)
-            }
-            else if (!gladiatorA.isAlive()){
+            } else if (!gladiatorA.isAlive()) {
                 return listOf(gladiatorB)
             }
         }
 
-        appendReport("Combat round result: ${gladiatorA.name} health: ${gladiatorA.health} vs ${gladiatorB.name} health: ${gladiatorB.health}"
+        appendReport(
+            "Combat round result: ${gladiatorA.name} health: ${gladiatorA.health} vs ${gladiatorB.name} health: ${gladiatorB.health}"
         )
         return listOf(gladiatorA, gladiatorB)
     }
 
-    fun updateGladiators(gladiators: List<Gladiator>) {
+    private fun updateGladiators(gladiators: List<Gladiator>) {
         gladiatorA = gladiators[0]
         gladiatorB = gladiators[1]
     }
@@ -110,12 +102,10 @@ class CombatRound(
 
     companion object {
         private const val TAG = "CombatRound"
-        fun init(gladiatorA: Gladiator,
-                 gladiatorB: Gladiator,
-                 actionA: CombatAction,
-                 actionB: CombatAction,
-                 round: Int): CombatRound {
-            return CombatRound(gladiatorA, gladiatorB, actionA, actionB, round)
+        fun init(
+            gladiatorA: Gladiator, gladiatorB: Gladiator, round: Int
+        ): CombatRound {
+            return CombatRound(gladiatorA, gladiatorB, round)
         }
     }
 }

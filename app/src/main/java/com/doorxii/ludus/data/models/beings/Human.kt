@@ -1,7 +1,6 @@
 package com.doorxii.ludus.data.models.beings
 
 import android.util.Log
-import android.widget.NumberPicker.OnValueChangeListener
 
 open class Human(
     val name: String,
@@ -9,6 +8,7 @@ open class Human(
     val height: Double
 
 ) {
+
     var health: Double = 100.0
         set(value) {
             field = if (value < 0.0) {
@@ -19,16 +19,16 @@ open class Human(
         }
 
 
-fun isAlive(): Boolean {
-    if (health <= 0) {
-        Log.d(TAG, "$name is dead")
-        return false
-    } else {
-        return true
+    fun isAlive(): Boolean {
+        if (health <= 0) {
+            Log.d(TAG, "$name is dead")
+            return false
+        } else {
+            return true
+        }
     }
-}
 
-companion object {
-    const val TAG = "Human"
-}
+    companion object {
+        const val TAG = "Human"
+    }
 }

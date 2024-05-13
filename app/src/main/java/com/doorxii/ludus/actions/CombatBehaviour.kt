@@ -8,12 +8,16 @@ import com.doorxii.ludus.data.models.beings.Gladiator
 
 object CombatBehaviour {
 
-    fun basicActionPicker(gladiator: Gladiator): CombatAction{
+    fun basicActionPicker(gladiator: Gladiator): CombatAction {
         return when {
             gladiator.stamina < 10 -> Wait()
             gladiator.stamina < 20 -> TiredAttack()
             else -> BasicAttack()
         }
+    }
+
+    fun waitActionPicker(): CombatAction {
+        return Wait()
     }
 
 

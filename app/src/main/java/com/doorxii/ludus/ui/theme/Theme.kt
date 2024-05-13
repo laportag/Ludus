@@ -2,14 +2,21 @@ package com.doorxii.ludus.ui.theme
 
 import android.app.Activity
 import android.os.Build
+import android.view.Window
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
         primary = Purple80,
@@ -33,6 +40,7 @@ private val LightColorScheme = lightColorScheme(
     */
 )
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LudusTheme(
         darkTheme: Boolean = isSystemInDarkTheme(),
@@ -45,14 +53,20 @@ fun LudusTheme(
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
 
-    MaterialTheme(
-            colorScheme = colorScheme,
-            typography = Typography,
-            content = content
-    )
+    MaterialTheme(colorScheme = colorScheme, typography = Typography) {
+
+
+//        val window: Window = (LocalContext.current as Activity).window
+//
+//        WindowCompat.setDecorFitsSystemWindows(window, true)
+//        window.statusBarColor = MaterialTheme.colorScheme.primary.toArgb()
+//        window.navigationBarColor = Color.Transparent.toArgb()
+//
+//        TopAppBar(title = { Text("Ludus") })
+        content()
+    }
 }

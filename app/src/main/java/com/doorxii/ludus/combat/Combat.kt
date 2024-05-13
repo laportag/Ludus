@@ -10,14 +10,13 @@ import com.doorxii.ludus.actions.combatactions.Wait
 import com.doorxii.ludus.data.models.beings.Gladiator
 
 class Combat(
-    gladiatorList:List<Gladiator>
+    private var gladiatorList: List<Gladiator>
 ) {
-    var round: CombatRound? = null
-    var roundNumber: Int = 0
-    var gladiatorList = gladiatorList
-    var userChoice: CombatAction? = null
-    var enemyChoice: CombatAction? = null
-    var isComplete = false
+    private var round: CombatRound? = null
+    private var roundNumber: Int = 0
+    private var userChoice: CombatAction? = null
+    private var enemyChoice: CombatAction? = null
+    private var isComplete = false
     var combatReport = "Combat: ${gladiatorList[0].name} vs ${gladiatorList[1].name}\n"
 
     fun simCombat(): String {
@@ -25,7 +24,7 @@ class Combat(
         while (!isComplete) {
             userChoice = CombatBehaviour.basicActionPicker(gladiatorList[0])
             enemyChoice = CombatBehaviour.basicActionPicker(gladiatorList[1])
-            newRound(gladiatorList[0],gladiatorList[1], userChoice!!, enemyChoice!!)
+            newRound(gladiatorList[0], gladiatorList[1], userChoice!!, enemyChoice!!)
 
 
 
@@ -38,30 +37,45 @@ class Combat(
         return combatReport
     }
 
-    fun appendReport(str: String){
+    private fun appendReport(str: String) {
         Log.d(TAG, str)
         combatReport += "$str\n"
     }
 
-    fun playCombatRound(choice: CombatActions): String{
+    fun playCombatRound(choice: CombatActions): String {
         userChoice = enumToAction(choice)
         enemyChoice = CombatBehaviour.basicActionPicker(gladiatorList[1])
-        newRound(gladiatorList[0],gladiatorList[1], userChoice!!, enemyChoice!!)
-        round = CombatRound.init(gladiatorList[0],gladiatorList[1], userChoice!!, enemyChoice!!, roundNumber)
-
+        newRound(gladiatorList[0], gladiatorList[1], userChoice!!, enemyChoice!!)
+        round = CombatRound.init(gladiatorList[0], gladiatorList[1], roundNumber)
         return combatReport
     }
 
-    fun newRound(gladA: Gladiator, gladB: Gladiator, actionA: CombatAction, actionB: CombatAction): List<Gladiator> {
+    private fun newRound(
+        gladA: Gladiator,
+        gladB: Gladiator,
+        actionA: CombatAction,
+        actionB: CombatAction
+    ): List<Gladiator> {
         roundNumber++
-        appendReport("Round $roundNumber: ${gladA.name}:${actionA.name} vs ${gladB.name}: ${actionB.name}")
-        round = CombatRound.init(gladA, gladB, actionA, actionB, roundNumber)
+        gladA.action = actionA
+        gladB.action = actionB
+        appendReport("Round $roundNumber: ${gladA.name}:${gladA.action?.name} vs ${gladB.name}: ${gladB.action?.name}")
+
+        round = CombatRound.init(gladA, gladB, roundNumber)
         gladiatorList = round!!.run()
+
         appendReport(round!!.roundReport)
+        nullGladiatorActions()
         return gladiatorList
     }
 
-    fun enumToAction(choice: CombatActions): CombatAction {
+    private fun nullGladiatorActions() {
+        for (gladiator in gladiatorList) {
+            gladiator.action = null
+        }
+    }
+
+    private fun enumToAction(choice: CombatActions): CombatAction {
         return when (choice) {
             CombatActions.BASIC_ATTACK -> BasicAttack()
             CombatActions.TIRED_ATTACK -> TiredAttack()
