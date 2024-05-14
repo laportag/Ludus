@@ -5,9 +5,10 @@ import android.util.Log
 open class Human(
     val name: String,
     val age: Double,
-    val height: Double
+    val height: Double,
+    id: Int
 
-): Animal() {
+): Animal(id) {
 
     var health: Double = 100.0
         set(value) {
@@ -20,7 +21,7 @@ open class Human(
 
 
     fun isAlive(): Boolean {
-        if (health <= 0) {
+        if (health < 0) {
             Log.d(TAG, "$name is dead")
             return false
         } else {

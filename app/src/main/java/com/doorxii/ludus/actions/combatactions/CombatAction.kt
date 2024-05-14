@@ -6,8 +6,7 @@ import com.doorxii.ludus.data.models.animal.Gladiator
 interface CombatAction: Action {
 
     val staminaCost: Double
-
-    fun act(aggressor: Gladiator, defender: Gladiator): List<Gladiator>
+    fun act(gladiatorList: List<Gladiator>): CombatActionResult
 
     fun reduceStamina(aggressor: Gladiator){
         aggressor.stamina -= staminaCost

@@ -24,7 +24,7 @@ class Combat(
         while (!isComplete) {
             userChoice = CombatBehaviour.basicActionPicker(gladiatorList[0])
             enemyChoice = CombatBehaviour.basicActionPicker(gladiatorList[1])
-            runNewRound(gladiatorList[0], gladiatorList[1], userChoice!!, enemyChoice!!)
+            runNewRound(gladiatorList, userChoice!!, enemyChoice!!)
 
 
 
@@ -48,8 +48,10 @@ class Combat(
         } else {
 
             userChoice = enumToAction(choice)
-            enemyChoice = CombatBehaviour.basicActionPicker(gladiatorList[1])
-            runNewRound(gladiatorList[0], gladiatorList[1], userChoice!!, enemyChoice!!)
+            enemyChoice = CombatBehaviour.waitActionPicker()
+
+
+            runNewRound(gladiatorList, userChoice!!, enemyChoice!!)
             if (gladiatorList.size == 1) {
                 appendReport("Combat over, ${gladiatorList[0].name} won in $roundNumber rounds")
                 isComplete = true
@@ -61,18 +63,18 @@ class Combat(
     }
 
     private fun runNewRound(
-        gladA: Gladiator,
-        gladB: Gladiator,
+        gladiatorList: List<Gladiator>,
         actionA: CombatAction,
         actionB: CombatAction
     ): List<Gladiator> {
+        var gladiatorList = gladiatorList
         roundNumber++
-        gladA.action = actionA
-        gladB.action = actionB
-        appendReport("Round $roundNumber: ${gladA.name}:${gladA.action?.name} vs ${gladB.name}: ${gladB.action?.name}")
+        gladiatorList[0].action = actionA
+        gladiatorList[1].action = actionB
+        appendReport("Round $roundNumber: ${gladiatorList[0].name}:${gladiatorList[0].action?.name} vs ${gladiatorList[1].name}: ${gladiatorList[1].action?.name}")
 
-        round = CombatRound.init(gladA, gladB, roundNumber)
-        gladiatorList = round!!.run()
+        round = CombatRound.init(gladiatorList, roundNumber)
+        gladiatorList = round!!.run(gladiatorList)
 
         appendReport(round!!.roundReport)
         nullGladiatorActions()

@@ -9,11 +9,10 @@ class BasicAttack : CombatAction {
 
     override val name: String = "Basic Attack"
     override val staminaCost: Double = 15.0
+    override fun act(gladiatorList: List<Gladiator>): CombatActionResult {
+        Log.d(TAG, "Basic attack: ${gladiatorList[0].name} vs ${gladiatorList[1].name}")
 
-    override fun act(aggressor: Gladiator, defender: Gladiator): List<Gladiator> {
-        Log.d(TAG, "Basic attack: ${aggressor.name} vs ${defender.name}")
-
-        val combatDifference = aggressor.attack - defender.defence
+        val combatDifference = gladiatorList[0].attack - gladiatorList[1].defence
         Log.d(TAG, "Combat difference: $combatDifference")
 
         val defenderDamageTaken: Double = when (combatDifference) {
@@ -30,15 +29,13 @@ class BasicAttack : CombatAction {
                 Dice.totalRolls(Dice.roll(5, DiceTypes.D6), Dice.calculateModifier(2.0))
             }
         }
-        reduceStamina(aggressor)
-        Log.d(TAG, "${defender.name} damage taken: $defenderDamageTaken")
-        defender.health -= defenderDamageTaken
-        Log.d(TAG, "${defender.name} health: ${defender.health}")
-
-        return listOf(aggressor, defender)
+        return CombatActionResult(
+            gladiatorList[0],
+            gladiatorList[1],
+            defenderDamageTaken,
+            staminaCost
+        )
     }
-
-
 
     companion object {
         const val TAG = "BasicAttack"

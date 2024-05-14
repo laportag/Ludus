@@ -41,7 +41,6 @@ class MainActivity : ComponentActivity() {
     private var isStartGameUIEnabled: Boolean = true
     private var isActionUIEnabled: Boolean = false
 
-    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -49,7 +48,6 @@ class MainActivity : ComponentActivity() {
 
             LudusTheme {
                 HomeScreen()
-//
             }
         }
     }
@@ -141,7 +139,6 @@ class MainActivity : ComponentActivity() {
                     .verticalScroll(scrollState)
             )
         }
-
     }
 
     private fun testSim(): String? {
@@ -158,7 +155,8 @@ class MainActivity : ComponentActivity() {
             equipment = Equipment(Gladius()),
             bloodlust = 60.0,
             height = 160.0,
-            humanControlled = true
+            humanControlled = true,
+            id =1
         )
 
         val joseph = Gladiator(
@@ -173,38 +171,34 @@ class MainActivity : ComponentActivity() {
             equipment = Equipment(),
             bloodlust = 60.0,
             height = 160.0,
+            id = 2
         )
 
         combat = Combat.init(listOf(marcus, joseph))
-//        isStartGameUIEnabled = false
-//        isActionUIEnabled = false
         return combat?.simCombat()
     }
 
     private fun testReset() {
         combat = null
-//        isStartGameUIEnabled = true
-//        isActionUIEnabled = false
     }
 
 
     private fun startGame(): Combat {
         combat = Combat.init(listOf(titus, joseph))
         Log.d(TAG, "startGame: ${combat?.combatReport}")
-//        isStartGameUIEnabled = false
-//        isActionUIEnabled = true
         return combat!!
     }
 
     private fun submitCombatAction(choice: CombatActions): String? {
         if (combat!!.isComplete) {
             Log.d(TAG, "Combat over")
-//            isActionUIEnabled = false
+            isActionUIEnabled = false
         } else {
-            if (combat?.isComplete == true) {
+            combat?.playCombatRound(choice)
+            if (combat!!.isComplete) {
+                Log.d(TAG, "Combat over")
                 isActionUIEnabled = false
             }
-            combat?.playCombatRound(choice)
         }
         return combat?.combatReport
     }
@@ -225,7 +219,8 @@ class MainActivity : ComponentActivity() {
             equipment = Equipment(Gladius()),
             bloodlust = 60.0,
             height = 160.0,
-            humanControlled = true
+            humanControlled = true,
+            id = 1
         )
 
         var joseph = Gladiator(
@@ -240,6 +235,7 @@ class MainActivity : ComponentActivity() {
             equipment = Equipment(),
             bloodlust = 60.0,
             height = 160.0,
+            id = 2
         )
     }
 

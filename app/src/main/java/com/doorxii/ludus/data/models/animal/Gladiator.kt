@@ -18,8 +18,9 @@ class Gladiator(
     val bloodlust: Double,
     var equipment: Equipment,
     var humanControlled: Boolean = false,
+    id: Int,
 
-    ) : Human(name, age, height) {
+    ) : Human(name, age, height, id) {
 
     var attack = calculateAttack()
     var defence = calculateDefence()

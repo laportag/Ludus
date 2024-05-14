@@ -9,9 +9,8 @@ class TiredAttack: CombatAction {
 
     override val name: String = "Tired Attack"
     override val staminaCost: Double = -5.0
-
-    override fun act(aggressor: Gladiator, defender: Gladiator): List<Gladiator> {
-        val combatDifference = aggressor.attack - defender.defence
+    override fun act(gladiatorList: List<Gladiator>): CombatActionResult {
+        val combatDifference = gladiatorList[0].attack - gladiatorList[1].defence
         Log.d(TAG, "Combat difference: $combatDifference")
 
         var defenderDamageTaken: Double = when (combatDifference) {
@@ -29,14 +28,14 @@ class TiredAttack: CombatAction {
             }
         }
         defenderDamageTaken /= 2
-        Log.d(TAG, "${defender.name} damage taken: $defenderDamageTaken")
-        reduceStamina(aggressor)
-        defender.health -= defenderDamageTaken
-        Log.d(TAG, "${defender.name} health: ${defender.health}")
+        return CombatActionResult(
+            gladiatorList[0],
+            gladiatorList[1],
+            defenderDamageTaken,
+            staminaCost
+        )
 
-        return listOf(aggressor, defender)
     }
-
 
     companion object {
         private const val TAG = "BasicDefend"
