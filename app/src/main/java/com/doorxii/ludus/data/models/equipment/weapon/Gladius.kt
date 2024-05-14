@@ -6,9 +6,9 @@ class Gladius(
     name: String = "Gladius",
     type: EquipmentType = EquipmentType.WEAPON,
     attackBonus: Double = 20.0,
-    defenceBonus: Double = 5.0
+    defenceBonus: Double = 5.0, id: Int
 ) : Weapon(
-    name, type, attackBonus, defenceBonus
+    name, type, attackBonus, defenceBonus, id
 ) {
 
 }

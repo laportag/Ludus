@@ -6,7 +6,8 @@ class Armourless(
     name: String = "Armourless",
     type: EquipmentType = EquipmentType.ARMOUR,
     attackBonus: Double = 0.0,
-    defenceBonus: Double = 0.0
+    defenceBonus: Double = 0.0,
+    id: Int = -1
 ) :
-    Armour(name, type, attackBonus, defenceBonus) {
+    Armour(name, type, attackBonus, defenceBonus, id) {
 }

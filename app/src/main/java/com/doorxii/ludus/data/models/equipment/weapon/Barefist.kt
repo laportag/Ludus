@@ -6,7 +6,8 @@ class Barefist(
     name: String = "Barefists",
     type: EquipmentType = EquipmentType.WEAPON,
     attackBonus: Double = 0.0,
-    defenceBonus: Double = 0.0
-    ) :
-    Weapon(name, type, attackBonus, defenceBonus) {
+    defenceBonus: Double = 0.0,
+    id: Int = -1
+) :
+    Weapon(name, type, attackBonus, defenceBonus, id) {
 }

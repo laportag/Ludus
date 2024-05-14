@@ -1,5 +1,6 @@
 package com.doorxii.ludus.data.models.equipment
 
+import com.doorxii.ludus.data.models.Model
 import com.doorxii.ludus.data.models.equipment.armour.Armour
 import com.doorxii.ludus.data.models.equipment.armour.Armourless
 import com.doorxii.ludus.data.models.equipment.weapon.Barefist
