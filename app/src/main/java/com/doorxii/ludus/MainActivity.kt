@@ -194,8 +194,8 @@ class MainActivity : ComponentActivity() {
             Log.d(TAG, "Combat over")
             isActionUIEnabled = false
         } else {
-            combat?.playCombatRound(choice)
-            if (combat!!.isComplete) {
+            val report = combat?.playCombatRound(choice)
+            if (report!!.isComplete) {
                 Log.d(TAG, "Combat over")
                 isActionUIEnabled = false
             }

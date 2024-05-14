@@ -42,9 +42,11 @@ class Combat(
         combatReport += "$str\n"
     }
 
-    fun playCombatRound(choice: CombatActions): String {
-        if (gladiatorList.size > 2) {
-            return combatReport
+    fun playCombatRound(choice: CombatActions): CombatResult {
+        if (gladiatorList.size < 2) {
+            appendReport("Combat over, ${gladiatorList[0].name} won in $roundNumber rounds")
+            isComplete = true
+            return CombatResult(true, combatReport)
         } else {
 
             userChoice = enumToAction(choice)
@@ -52,14 +54,14 @@ class Combat(
 
 
             gladiatorList = runNewRound(gladiatorList, userChoice!!, enemyChoice!!)
-            if (gladiatorList.size == 1) {
+            if (gladiatorList.size < 2) {
                 appendReport("Combat over, ${gladiatorList[0].name} won in $roundNumber rounds")
                 isComplete = true
+                return CombatResult(true, combatReport)
             }
-//            round = CombatRound.init(gladiatorList[0], gladiatorList[1], roundNumber)
         }
 
-        return combatReport
+        return CombatResult(false, combatReport)
     }
 
     private fun runNewRound(
