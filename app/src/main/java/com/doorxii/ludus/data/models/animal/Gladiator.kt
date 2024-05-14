@@ -20,7 +20,7 @@ class Gladiator(
     var humanControlled: Boolean = false,
     id: Int,
 
-    ) : Human(name, age, height, id) {
+    ) : Human(name, age, height, id = id) {
 
     var attack = calculateAttack()
     var defence = calculateDefence()

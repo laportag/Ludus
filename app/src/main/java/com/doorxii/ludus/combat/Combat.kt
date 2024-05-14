@@ -43,7 +43,7 @@ class Combat(
     }
 
     fun playCombatRound(choice: CombatActions): String {
-        if (gladiatorList.size > 2){
+        if (gladiatorList.size > 2) {
             return combatReport
         } else {
 
@@ -51,7 +51,7 @@ class Combat(
             enemyChoice = CombatBehaviour.waitActionPicker()
 
 
-            runNewRound(gladiatorList, userChoice!!, enemyChoice!!)
+            gladiatorList = runNewRound(gladiatorList, userChoice!!, enemyChoice!!)
             if (gladiatorList.size == 1) {
                 appendReport("Combat over, ${gladiatorList[0].name} won in $roundNumber rounds")
                 isComplete = true
@@ -72,7 +72,9 @@ class Combat(
         gladiatorList[0].action = actionA
         gladiatorList[1].action = actionB
         appendReport("Round $roundNumber: ${gladiatorList[0].name}:${gladiatorList[0].action?.name} vs ${gladiatorList[1].name}: ${gladiatorList[1].action?.name}")
-
+        if (gladiatorList.size <= 1) {
+            return gladiatorList
+        }
         round = CombatRound.init(gladiatorList, roundNumber)
         gladiatorList = round!!.run(gladiatorList)
 

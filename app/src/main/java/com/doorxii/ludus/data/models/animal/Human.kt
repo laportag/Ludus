@@ -6,9 +6,10 @@ open class Human(
     val name: String,
     val age: Double,
     val height: Double,
+    var isAlive: Boolean = true,
     id: Int
 
-): Animal(id) {
+) : Animal(id) {
 
     var health: Double = 100.0
         set(value) {
@@ -17,17 +18,20 @@ open class Human(
             } else {
                 value
             }
+            if (field <= 0.0) {
+                isAlive = false
+            }
         }
 
 
-    fun isAlive(): Boolean {
-        if (health < 0) {
-            Log.d(TAG, "$name is dead")
-            return false
-        } else {
-            return true
-        }
-    }
+//    fun isAlive(): Boolean {
+//        if (health < 0) {
+//            Log.d(TAG, "$name is dead")
+//            return false
+//        } else {
+//            return true
+//        }
+//    }
 
     fun updateHealth(health: Double) {
         this.health = health

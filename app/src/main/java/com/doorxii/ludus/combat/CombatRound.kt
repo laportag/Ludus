@@ -45,43 +45,27 @@ class CombatRound(
         var gladiatorList = gladiatorList
         val beginner = determineBeginner()
 
+        if (gladiatorList.size < 2) { return gladiatorList }
+
         if (beginner == gladiatorList[0]) {
             // A Starts
             val resA = gladiatorList[0].action?.act(gladiatorList)!!
             gladiatorList = updateFromCombatActionResult(resA)
-            if (!gladiatorList[1].isAlive()) {
-                return listOf(gladiatorList[0])
-            } else if (!gladiatorList[0].isAlive()) {
-                return listOf(gladiatorList[1])
-            }
+            if (gladiatorList.size < 2) { return gladiatorList }
 
             val resB = gladiatorList[1].action?.act(gladiatorList)
             gladiatorList = updateFromCombatActionResult(resB!!)
-            if (!gladiatorList[0].isAlive()) {
-                return listOf(gladiatorList[1])
-            } else if (!gladiatorList[1].isAlive()) {
-                return listOf(gladiatorList[0])
-            }
+            if (gladiatorList.size < 2) { return gladiatorList }
 
-//            if dead return 1
         } else {
             // B Starts
             val resB = gladiatorList[1].action?.act(gladiatorList)
             gladiatorList = updateFromCombatActionResult(resB!!)
-            if (!gladiatorList[0].isAlive()) {
-                return listOf(gladiatorList[1])
-            } else if (!gladiatorList[1].isAlive()) {
-                return listOf(gladiatorList[0])
-            }
+            if (gladiatorList.size < 2) { return gladiatorList }
 
             val resA = gladiatorList[0].action?.act(gladiatorList)
             gladiatorList = updateFromCombatActionResult(resA!!)
-            if (!gladiatorList[1].isAlive()) {
-                return listOf(gladiatorList[0])
-            } else if (!gladiatorList[0].isAlive()) {
-                return listOf(gladiatorList[1])
-            }
-
+            if (gladiatorList.size < 2) { return gladiatorList }
         }
 
         appendReport(
@@ -91,9 +75,10 @@ class CombatRound(
     }
     
     fun updateFromCombatActionResult(result: CombatActionResult): List<Gladiator> {
-        val gladiatorList = gladiatorList
+        val gladiatorList:List<Gladiator> = gladiatorList
         Log.d(TAG, "updating from action result...")
         Log.d(TAG, "CombatActionResult: $result")
+        // reduce health and stamina
         for (gladiator in gladiatorList){
             if (gladiator.id == result.source.id){
                 Log.d(TAG, "gladiator: ${gladiator.name} losing ${result.deltaStamina} stamina")
@@ -104,7 +89,20 @@ class CombatRound(
                 gladiator.health -= result.deltaHealth
             }
         }
-        return gladiatorList
+        // remove dead gladiators
+        val aliveList = mutableListOf<Gladiator>()
+        val deadList = mutableListOf<Gladiator>()
+        for (gladiator in gladiatorList){
+            if (!gladiator.isAlive){
+                Log.d(TAG, "gladiator: ${gladiator.name} is dead")
+                appendReport("Gladiator ${gladiator.name} is dead")
+                deadList.add(gladiator)
+            }
+            else {
+                aliveList.add(gladiator)
+            }
+        }
+        return aliveList
     }
 
 
