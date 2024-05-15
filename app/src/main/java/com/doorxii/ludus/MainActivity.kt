@@ -36,8 +36,7 @@ import com.doorxii.ludus.combat.Combat
 import com.doorxii.ludus.data.models.animal.Gladiator
 import com.doorxii.ludus.data.models.equipment.Equipment
 import com.doorxii.ludus.data.models.equipment.weapon.Gladius
-import com.doorxii.ludus.ui.cards.ActionCard
-import com.doorxii.ludus.ui.cards.ActionCard.CardRow
+import com.doorxii.ludus.ui.cards.ActionCards.CardRow
 import com.doorxii.ludus.ui.theme.LudusTheme
 
 class MainActivity : ComponentActivity() {
@@ -145,6 +144,7 @@ class MainActivity : ComponentActivity() {
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(scrollState)
+
             )
         }
     }
