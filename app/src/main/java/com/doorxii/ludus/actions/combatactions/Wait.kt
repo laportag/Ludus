@@ -5,6 +5,7 @@ import com.doorxii.ludus.data.models.animal.Gladiator
 class Wait : CombatAction {
 
     override val name: String = "Wait"
+    override val description: String = "Do Nothing"
     override val staminaCost: Double = -20.0
     override fun act(gladiatorList: List<Gladiator>): CombatActionResult {
         return CombatActionResult(

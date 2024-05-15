@@ -8,6 +8,7 @@ import com.doorxii.ludus.utils.dice.DiceTypes
 class TiredAttack: CombatAction {
 
     override val name: String = "Tired Attack"
+    override val description: String = "Tired Attack"
     override val staminaCost: Double = -5.0
     override fun act(gladiatorList: List<Gladiator>): CombatActionResult {
         val combatDifference = gladiatorList[0].attack - gladiatorList[1].defence

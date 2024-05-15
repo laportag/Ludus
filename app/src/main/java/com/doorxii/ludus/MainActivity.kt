@@ -27,11 +27,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.doorxii.ludus.actions.combatactions.BasicAttack
+import com.doorxii.ludus.actions.combatactions.CombatAction
 import com.doorxii.ludus.actions.combatactions.CombatActions
+import com.doorxii.ludus.actions.combatactions.TiredAttack
+import com.doorxii.ludus.actions.combatactions.Wait
 import com.doorxii.ludus.combat.Combat
 import com.doorxii.ludus.data.models.animal.Gladiator
 import com.doorxii.ludus.data.models.equipment.Equipment
 import com.doorxii.ludus.data.models.equipment.weapon.Gladius
+import com.doorxii.ludus.ui.cards.ActionCard
+import com.doorxii.ludus.ui.cards.ActionCard.CardRow
 import com.doorxii.ludus.ui.theme.LudusTheme
 
 class MainActivity : ComponentActivity() {
@@ -130,6 +136,8 @@ class MainActivity : ComponentActivity() {
                     Text("Submit")
                 }
             }
+            val combatActions = listOf<CombatAction>(BasicAttack(), TiredAttack(), Wait())
+            CardRow(combatActions)
             TextField(
                 value = battleText,
                 onValueChange = {},

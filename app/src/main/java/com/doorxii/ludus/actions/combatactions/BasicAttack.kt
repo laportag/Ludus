@@ -8,6 +8,7 @@ import com.doorxii.ludus.utils.dice.DiceTypes
 class BasicAttack : CombatAction {
 
     override val name: String = "Basic Attack"
+    override val description: String = "Basic attack"
     override val staminaCost: Double = 15.0
     override fun act(gladiatorList: List<Gladiator>): CombatActionResult {
         Log.d(TAG, "Basic attack: ${gladiatorList[0].name} vs ${gladiatorList[1].name}")
