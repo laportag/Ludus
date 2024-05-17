@@ -15,8 +15,16 @@ object EnumToAction {
         }
     }
 
+    fun combatActionToEnum(action: CombatAction): CombatActions {
+        return when (action) {
+            is BasicAttack -> CombatActions.BASIC_ATTACK
+            is TiredAttack -> CombatActions.TIRED_ATTACK
+            is Wait -> CombatActions.WAIT
+            else -> {CombatActions.WAIT}
+        }
+    }
+
     fun combatEnumListToActionList(list: List<CombatActions>): List<CombatAction> {
         return list.map { combatEnumToAction(it) }
-
     }
 }

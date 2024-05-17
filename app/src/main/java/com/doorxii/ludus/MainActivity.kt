@@ -1,9 +1,10 @@
 package com.doorxii.ludus
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.util.JsonReader
 import android.util.Log
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
@@ -29,6 +30,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.app.ComponentActivity
+import androidx.core.net.toUri
 import com.doorxii.ludus.actions.combatactions.BasicAttack
 import com.doorxii.ludus.actions.combatactions.CombatAction
 import com.doorxii.ludus.actions.combatactions.CombatActions
@@ -42,8 +45,13 @@ import com.doorxii.ludus.data.models.equipment.Equipment
 import com.doorxii.ludus.data.models.equipment.weapon.Gladius
 import com.doorxii.ludus.ui.cards.ActionCards.CardRow
 import com.doorxii.ludus.ui.theme.LudusTheme
+import com.doorxii.ludus.ui.theme.Typography
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import java.io.File
+import java.io.InputStreamReader
 
-class MainActivity : ComponentActivity() {
+class MainActivity : androidx.activity.ComponentActivity() {
 
     private var combat: Combat? = null
     var gladiatorList = mutableListOf<Gladiator>()
@@ -51,21 +59,33 @@ class MainActivity : ComponentActivity() {
     private var isStartGameUIEnabled: Boolean = true
     private var isActionUIEnabled: Boolean = false
 
+    val combatFile = File(filesDir, "combat/combat.json")
+
+    var text = ""
+
     val combatResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
-                val combatResult = result.data?.getParcelableExtra<CombatResult>(
-                    "combatReport",
-                    CombatResult::class.java
-                )
+                Log.d(TAG, "Combat result: ${result.toString()}")
+                val resultUri: Uri = result.data?.data!!
+                val inputStream = contentResolver.openInputStream(resultUri)
+                text = inputStream.toString()
             }
         }
 
 
     fun startCombatActivity(gladiatorList: List<Gladiator>) {
+        val uri = combatFile.toUri()
         val intent = Intent(this, CombatActivity::class.java)
-        intent.putExtra("gladiatorList", gladiatorList.toString())
+        intent.putExtra("combatFileUri", uri)
         combatResultLauncher.launch(intent)
+        startActivity(intent)
+    }
+
+    fun saveCombatJson(combat: Combat) {
+        Log.d(TAG, "saving combat to file...")
+        val jsonString = Json.encodeToString(combat)
+        combatFile.writeText(jsonString)
     }
 
 
@@ -82,15 +102,34 @@ class MainActivity : ComponentActivity() {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    @Preview
+//    @Preview
     fun HomeScreen() {
+        var text by remember { mutableStateOf(text) }
+        val scrollState = rememberScrollState()
+
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             TopAppBar(title = { Text("Ludus") })
+            Button(
+                onClick = {
+                    startCombatActivity(listOf(titus, joseph))
+                },
+                enabled = isStartGameUIEnabled
+            ) {
+                Text("Start")
+            }
+            TextField(
+                value = text,
+                onValueChange = {},
+                minLines = 15,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(scrollState)
 
+            )
         }
     }
 

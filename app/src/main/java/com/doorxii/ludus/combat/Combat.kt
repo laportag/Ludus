@@ -5,16 +5,18 @@ import com.doorxii.ludus.actions.CombatBehaviour
 import com.doorxii.ludus.actions.combatactions.CombatAction
 import com.doorxii.ludus.actions.combatactions.CombatActions
 import com.doorxii.ludus.data.models.animal.Gladiator
+import com.doorxii.ludus.utils.EnumToAction.combatActionToEnum
 import com.doorxii.ludus.utils.EnumToAction.combatEnumToAction
+import kotlinx.serialization.Serializable
 
-
+@Serializable
 class Combat(
     var gladiatorList: List<Gladiator>
 ) {
     private var round: CombatRound? = null
     private var roundNumber: Int = 0
-    private var userChoice: CombatAction? = null
-    private var enemyChoice: CombatAction? = null
+    private var userChoice: CombatActions? = null
+    private var enemyChoice: CombatActions? = null
     var isComplete = false
     val combatName: String = calculateCombatName()
     var combatReport = "$combatName\n"
@@ -26,9 +28,9 @@ class Combat(
     fun simCombat(): String {
         appendReport("Sim Combat started")
         while (!isComplete) {
-            userChoice = CombatBehaviour.basicActionPicker(gladiatorList[0])
-            enemyChoice = CombatBehaviour.basicActionPicker(gladiatorList[1])
-            runNewRound(gladiatorList, userChoice!!, enemyChoice!!)
+            userChoice = combatActionToEnum(CombatBehaviour.basicActionPicker(gladiatorList[0]))
+            enemyChoice = combatActionToEnum(CombatBehaviour.basicActionPicker(gladiatorList[1]))
+            runNewRound(gladiatorList, combatEnumToAction(userChoice!!), combatEnumToAction(enemyChoice!!))
 
 
 
@@ -53,11 +55,11 @@ class Combat(
             return CombatResult(true, combatReport)
         } else {
 
-            userChoice = combatEnumToAction(choice)
-            enemyChoice = CombatBehaviour.waitActionPicker()
+            userChoice = choice
+            enemyChoice = combatActionToEnum(CombatBehaviour.basicActionPicker(gladiatorList[1]))
 
 
-            gladiatorList = runNewRound(gladiatorList, userChoice!!, enemyChoice!!)
+            runNewRound(gladiatorList, combatEnumToAction(userChoice!!), combatEnumToAction(enemyChoice!!))
             if (gladiatorList.size < 2) {
                 appendReport("Combat over, ${gladiatorList[0].name} won in $roundNumber rounds")
                 isComplete = true

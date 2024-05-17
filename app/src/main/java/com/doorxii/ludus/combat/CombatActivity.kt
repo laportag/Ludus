@@ -41,14 +41,20 @@ import com.doorxii.ludus.ui.cards.ActionCards
 import com.doorxii.ludus.ui.cards.GladiatorCards
 import com.doorxii.ludus.ui.theme.LudusTheme
 import com.doorxii.ludus.utils.EnumToAction.combatEnumListToActionList
+import kotlinx.serialization.json.Json
 
-class CombatActivity(combat: Combat) : ComponentActivity() {
+class CombatActivity() : ComponentActivity() {
+
+    lateinit var combat: Combat
 
 //    val gladiatorList = intent.getParcelableExtra("gladiatorList", List<Gladiator>::class.java)
 //    val combat = Combat.init(gladiatorList)
     var combatState: Combat by mutableStateOf(combat)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        readCombatFromJson()
+
         enableEdgeToEdge()
         setContent {
             LudusTheme {
@@ -57,12 +63,18 @@ class CombatActivity(combat: Combat) : ComponentActivity() {
         }
     }
 
+    fun readCombatFromJson(){
+        val combatFile = filesDir.resolve("combat.json")
+        val combatJson = combatFile.readText()
+        combat = Json.decodeFromString<Combat>(combatJson)
+    }
+
     override fun finishActivity(requestCode: Int) {
         super.finishActivity(requestCode)
     }
 
 
-    @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+
     @Composable
     fun CombatLayout(combat: Combat) {
         var battleText: String by remember { mutableStateOf("") }

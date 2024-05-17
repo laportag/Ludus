@@ -3,7 +3,9 @@ package com.doorxii.ludus.combat
 import android.util.Log
 import com.doorxii.ludus.actions.combatactions.CombatActionResult
 import com.doorxii.ludus.data.models.animal.Gladiator
+import kotlinx.serialization.Serializable
 
+@Serializable
 class CombatRound(
     // Each round has 2 actions, one for each gladiator
     private var gladiatorList: List<Gladiator>, private val round: Int
