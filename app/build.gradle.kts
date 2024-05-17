@@ -65,7 +65,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3.android)
     implementation(libs.androidx.appcompat)
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.20")
+    implementation(libs.kotlinx.serialization.json)
 
 
     testImplementation(libs.junit)
