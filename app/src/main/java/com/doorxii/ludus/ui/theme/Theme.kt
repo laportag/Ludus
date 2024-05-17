@@ -4,6 +4,9 @@ import android.app.Activity
 import android.os.Build
 import android.view.Window
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -13,6 +16,8 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
@@ -58,6 +63,14 @@ fun LudusTheme(
     }
 
     MaterialTheme(colorScheme = colorScheme, typography = Typography) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ){
+            TopAppBar(title = { Text("Ludus") })
+            content()
+        }
 
 
 //        val window: Window = (LocalContext.current as Activity).window
@@ -67,6 +80,6 @@ fun LudusTheme(
 //        window.navigationBarColor = Color.Transparent.toArgb()
 //
 //        TopAppBar(title = { Text("Ludus") })
-        content()
+//        content()
     }
 }

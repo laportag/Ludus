@@ -2,12 +2,11 @@ package com.doorxii.ludus.combat
 
 import android.util.Log
 import com.doorxii.ludus.actions.CombatBehaviour
-import com.doorxii.ludus.actions.combatactions.BasicAttack
-import com.doorxii.ludus.actions.combatactions.TiredAttack
 import com.doorxii.ludus.actions.combatactions.CombatAction
 import com.doorxii.ludus.actions.combatactions.CombatActions
-import com.doorxii.ludus.actions.combatactions.Wait
 import com.doorxii.ludus.data.models.animal.Gladiator
+import com.doorxii.ludus.utils.EnumToAction.combatEnumToAction
+
 
 class Combat(
     var gladiatorList: List<Gladiator>
@@ -17,7 +16,12 @@ class Combat(
     private var userChoice: CombatAction? = null
     private var enemyChoice: CombatAction? = null
     var isComplete = false
-    var combatReport = "Combat: ${gladiatorList[0].name} vs ${gladiatorList[1].name}\n"
+    val combatName: String = calculateCombatName()
+    var combatReport = "$combatName\n"
+
+    fun calculateCombatName(): String {
+        return "Combat: ${gladiatorList[0].name} vs ${gladiatorList[1].name}"
+    }
 
     fun simCombat(): String {
         appendReport("Sim Combat started")
@@ -49,7 +53,7 @@ class Combat(
             return CombatResult(true, combatReport)
         } else {
 
-            userChoice = enumToAction(choice)
+            userChoice = combatEnumToAction(choice)
             enemyChoice = CombatBehaviour.waitActionPicker()
 
 
@@ -91,13 +95,6 @@ class Combat(
         }
     }
 
-    private fun enumToAction(choice: CombatActions): CombatAction {
-        return when (choice) {
-            CombatActions.BASIC_ATTACK -> BasicAttack()
-            CombatActions.TIRED_ATTACK -> TiredAttack()
-            CombatActions.WAIT -> Wait()
-        }
-    }
 
     companion object {
         const val TAG = "Combat"

@@ -1,10 +1,12 @@
 package com.doorxii.ludus
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,6 +35,8 @@ import com.doorxii.ludus.actions.combatactions.CombatActions
 import com.doorxii.ludus.actions.combatactions.TiredAttack
 import com.doorxii.ludus.actions.combatactions.Wait
 import com.doorxii.ludus.combat.Combat
+import com.doorxii.ludus.combat.CombatActivity
+import com.doorxii.ludus.combat.CombatResult
 import com.doorxii.ludus.data.models.animal.Gladiator
 import com.doorxii.ludus.data.models.equipment.Equipment
 import com.doorxii.ludus.data.models.equipment.weapon.Gladius
@@ -42,9 +46,28 @@ import com.doorxii.ludus.ui.theme.LudusTheme
 class MainActivity : ComponentActivity() {
 
     private var combat: Combat? = null
+    var gladiatorList = mutableListOf<Gladiator>()
 
     private var isStartGameUIEnabled: Boolean = true
     private var isActionUIEnabled: Boolean = false
+
+    val combatResultLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                val combatResult = result.data?.getParcelableExtra<CombatResult>(
+                    "combatReport",
+                    CombatResult::class.java
+                )
+            }
+        }
+
+
+    fun startCombatActivity(gladiatorList: List<Gladiator>) {
+        val intent = Intent(this, CombatActivity::class.java)
+        intent.putExtra("gladiatorList", gladiatorList.toString())
+        combatResultLauncher.launch(intent)
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,158 +81,177 @@ class MainActivity : ComponentActivity() {
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
-    @Preview
     @Composable
+    @Preview
     fun HomeScreen() {
-        var battleText: String by remember { mutableStateOf("") }
-        var expanded by remember { mutableStateOf(false) }
-        val combatActions =
-            listOf(CombatActions.BASIC_ATTACK, CombatActions.TIRED_ATTACK, CombatActions.WAIT)
-        var choice: CombatActions? by remember {
-            mutableStateOf(null)
-        }
-        var buttonText: String by remember { mutableStateOf("Action Choice") }
-        val scrollState = rememberScrollState()
-        var isActionUIEnabledRemember: Boolean by remember { mutableStateOf(isActionUIEnabled) }
-        var isStartGameUIEnabledRemember: Boolean by remember { mutableStateOf(isStartGameUIEnabled) }
-
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
-
         ) {
             TopAppBar(title = { Text("Ludus") })
-            Text("Titus vs Joseph")
 
-            Row {
-                Button(
-                    onClick = {
-                        combat = startGame()
-                        isActionUIEnabledRemember = true
-                        isStartGameUIEnabledRemember = false
-                    },
-                    enabled = isStartGameUIEnabledRemember
-                ) {
-                    Text("Play")
-                }
-
-                Button(
-                    onClick = {
-                        isActionUIEnabledRemember = false
-                        isStartGameUIEnabledRemember = false
-                        battleText = testSim()!!
-                    },
-                    enabled = isStartGameUIEnabledRemember
-                ) { Text("Sim") }
-
-                Button(onClick = {
-                    battleText = ""
-                    isActionUIEnabledRemember = false
-                    isStartGameUIEnabledRemember = true
-                    testReset()
-                }) { Text("Reset") }
-            }
-            Row {
-                Button(onClick = { expanded = true }, enabled = isActionUIEnabledRemember) {
-                    Text(buttonText)
-                }
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    for (action in combatActions) {
-                        DropdownMenuItem(text = { Text(action.name) }, onClick = {
-                            choice = action
-                            buttonText = action.name
-                            expanded = false
-                        })
-                    }
-                }
-
-                Button(
-                    onClick = { battleText = submitCombatAction(choice!!)!! },
-                    enabled = isActionUIEnabledRemember
-                ) {
-                    Text("Submit")
-                }
-            }
-            val combatActions = listOf<CombatAction>(BasicAttack(), TiredAttack(), Wait())
-            CardRow(combatActions)
-            TextField(
-                value = battleText,
-                onValueChange = {},
-                minLines = 15,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(scrollState)
-
-            )
         }
     }
 
-    private fun testSim(): String? {
+//    @OptIn(ExperimentalMaterial3Api::class)
+//    @Preview
+//    @Composable
+//    fun HomeScreen() {
+//        var battleText: String by remember { mutableStateOf("") }
+//        var expanded by remember { mutableStateOf(false) }
+//        val combatActions =
+//            listOf(CombatActions.BASIC_ATTACK, CombatActions.TIRED_ATTACK, CombatActions.WAIT)
+//        var choice: CombatActions? by remember {
+//            mutableStateOf(null)
+//        }
+//        var buttonText: String by remember { mutableStateOf("Action Choice") }
+//        val scrollState = rememberScrollState()
+//        var isActionUIEnabledRemember: Boolean by remember { mutableStateOf(isActionUIEnabled) }
+//        var isStartGameUIEnabledRemember: Boolean by remember { mutableStateOf(isStartGameUIEnabled) }
+//
+//        Column(
+//            modifier = Modifier.fillMaxSize(),
+//            horizontalAlignment = Alignment.CenterHorizontally,
+//            verticalArrangement = Arrangement.Center
+//
+//        ) {
+//            TopAppBar(title = { Text("Ludus") })
+//            Text("Titus vs Joseph")
+//
+//            Row {
+//                Button(
+//                    onClick = {
+//                        combat = startGame()
+//                        isActionUIEnabledRemember = true
+//                        isStartGameUIEnabledRemember = false
+//                    },
+//                    enabled = isStartGameUIEnabledRemember
+//                ) {
+//                    Text("Play")
+//                }
+//
+//                Button(
+//                    onClick = {
+//                        isActionUIEnabledRemember = false
+//                        isStartGameUIEnabledRemember = false
+//                        battleText = testSim()!!
+//                    },
+//                    enabled = isStartGameUIEnabledRemember
+//                ) { Text("Sim") }
+//
+//                Button(onClick = {
+//                    battleText = ""
+//                    isActionUIEnabledRemember = false
+//                    isStartGameUIEnabledRemember = true
+//                    testReset()
+//                }) { Text("Reset") }
+//            }
+//            Row {
+//                Button(onClick = { expanded = true }, enabled = isActionUIEnabledRemember) {
+//                    Text(buttonText)
+//                }
+//                DropdownMenu(
+//                    expanded = expanded,
+//                    onDismissRequest = { expanded = false },
+//                    modifier = Modifier.fillMaxWidth()
+//                ) {
+//                    for (action in combatActions) {
+//                        DropdownMenuItem(text = { Text(action.name) }, onClick = {
+//                            choice = action
+//                            buttonText = action.name
+//                            expanded = false
+//                        })
+//                    }
+//                }
+//
+//                Button(
+//                    onClick = { battleText = submitCombatAction(choice!!)!! },
+//                    enabled = isActionUIEnabledRemember
+//                ) {
+//                    Text("Submit")
+//                }
+//            }
+//            val combatActions = listOf<CombatAction>(BasicAttack(), TiredAttack(), Wait())
+//            CardRow(combatActions)
+//            TextField(
+//                value = battleText,
+//                onValueChange = {},
+//                minLines = 15,
+//                modifier = Modifier
+//                    .fillMaxSize()
+//                    .verticalScroll(scrollState)
+//
+//            )
+//        }
+//    }
 
-        val marcus = Gladiator(
-            name = "Marcus",
-            age = 21.0,
-            strength = 75.0,
-            speed = 60.0,
-            technique = 90.0,
-            morale = 100.0,
-            health = 100.0,
-            stamina = 100.0,
-            equipment = Equipment(Gladius(id=1)),
-            bloodlust = 60.0,
-            height = 160.0,
-            humanControlled = true,
-            id =1
-        )
+//    private fun testSim(): String? {
+//
+//        val marcus = Gladiator(
+//            name = "Marcus",
+//            age = 21.0,
+//            strength = 75.0,
+//            speed = 60.0,
+//            technique = 90.0,
+//            morale = 100.0,
+//            health = 100.0,
+//            stamina = 100.0,
+//            equipment = Equipment(Gladius(id = 1)),
+//            bloodlust = 60.0,
+//            height = 160.0,
+//            humanControlled = true,
+//            id = 1
+//        )
+//
+//        val joseph = Gladiator(
+//            name = "Joshua",
+//            age = 34.0,
+//            strength = 75.0,
+//            speed = 60.0,
+//            technique = 40.0,
+//            morale = 800.0,
+//            health = 100.0,
+//            stamina = 100.0,
+//            equipment = Equipment(),
+//            bloodlust = 60.0,
+//            height = 160.0,
+//            id = 2
+//        )
+//
+//        combat = Combat.init(listOf(marcus, joseph))
+//        return combat?.simCombat()
+//    }
+//
+//    private fun testReset() {
+//        combat = null
+//    }
 
-        val joseph = Gladiator(
-            name = "Joshua",
-            age = 34.0,
-            strength = 75.0,
-            speed = 60.0,
-            technique = 40.0,
-            morale = 800.0,
-            health = 100.0,
-            stamina = 100.0,
-            equipment = Equipment(),
-            bloodlust = 60.0,
-            height = 160.0,
-            id = 2
-        )
 
-        combat = Combat.init(listOf(marcus, joseph))
-        return combat?.simCombat()
-    }
+//    private fun startGame(): Combat {
+//        gladiatorList = mutableListOf(titus, joseph)
+//        Log.d(TAG, "startGame: ${combat?.combatReport}")
+//        CombatActivity(combat!!).startActivities()
+//        return combat!!
+//    }
 
-    private fun testReset() {
-        combat = null
-    }
+//    private fun submitCombatAction(choice: CombatActions): String? {
+//        if (combat!!.isComplete) {
+//            Log.d(TAG, "Combat over")
+//            isActionUIEnabled = false
+//        } else {
+//            val report = combat?.playCombatRound(choice)
+//            if (report!!.isComplete) {
+//                Log.d(TAG, "Combat over")
+//                isActionUIEnabled = false
+//            }
+//        }
+//        return combat?.combatReport
+//    }
 
-
-    private fun startGame(): Combat {
-        combat = Combat.init(listOf(titus, joseph))
-        Log.d(TAG, "startGame: ${combat?.combatReport}")
-        return combat!!
-    }
-
-    private fun submitCombatAction(choice: CombatActions): String? {
-        if (combat!!.isComplete) {
-            Log.d(TAG, "Combat over")
-            isActionUIEnabled = false
-        } else {
-            val report = combat?.playCombatRound(choice)
-            if (report!!.isComplete) {
-                Log.d(TAG, "Combat over")
-                isActionUIEnabled = false
-            }
-        }
-        return combat?.combatReport
-    }
+//    fun startCombat() {
+//
+//    }
 
 
     companion object {
@@ -224,7 +266,7 @@ class MainActivity : ComponentActivity() {
             morale = 100.0,
             health = 100.0,
             stamina = 100.0,
-            equipment = Equipment(Gladius(id=1)),
+            equipment = Equipment(Gladius(id = 1)),
             bloodlust = 60.0,
             height = 160.0,
             humanControlled = true,

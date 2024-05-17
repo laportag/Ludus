@@ -29,29 +29,37 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.doorxii.ludus.actions.combatactions.BasicAttack
 import com.doorxii.ludus.actions.combatactions.CombatAction
 import com.doorxii.ludus.actions.combatactions.CombatActions
 import com.doorxii.ludus.actions.combatactions.TiredAttack
 import com.doorxii.ludus.actions.combatactions.Wait
+import com.doorxii.ludus.data.models.animal.Gladiator
 import com.doorxii.ludus.ui.cards.ActionCards
 import com.doorxii.ludus.ui.cards.GladiatorCards
 import com.doorxii.ludus.ui.theme.LudusTheme
 import com.doorxii.ludus.utils.EnumToAction.combatEnumListToActionList
 
 class CombatActivity(combat: Combat) : ComponentActivity() {
-    var combat: Combat by mutableStateOf(combat)
+
+//    val gladiatorList = intent.getParcelableExtra("gladiatorList", List<Gladiator>::class.java)
+//    val combat = Combat.init(gladiatorList)
+    var combatState: Combat by mutableStateOf(combat)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             LudusTheme {
-                CombatLayout(combat)
+                CombatLayout(combatState)
             }
         }
     }
 
+    override fun finishActivity(requestCode: Int) {
+        super.finishActivity(requestCode)
+    }
 
 
     @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -79,7 +87,7 @@ class CombatActivity(combat: Combat) : ComponentActivity() {
             verticalArrangement = Arrangement.Center
 
         ) {
-            TopAppBar(title = { Text(combat.combatName) })
+//            TopAppBar(title = { Text(combat.combatName) })
 
             val dropZone = Column{
                 // player card
