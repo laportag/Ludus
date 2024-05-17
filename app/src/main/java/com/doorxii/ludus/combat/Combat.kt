@@ -7,9 +7,8 @@ import com.doorxii.ludus.actions.combatactions.CombatActions
 import com.doorxii.ludus.data.models.animal.Gladiator
 import com.doorxii.ludus.utils.EnumToAction.combatActionToEnum
 import com.doorxii.ludus.utils.EnumToAction.combatEnumToAction
-import kotlinx.serialization.Serializable
 
-@Serializable
+
 class Combat(
     var gladiatorList: List<Gladiator>
 ) {
