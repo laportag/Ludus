@@ -3,24 +3,19 @@ package com.doorxii.ludus.data.models.animal
 import android.util.Log
 import com.doorxii.ludus.actions.combatactions.CombatAction
 import com.doorxii.ludus.data.models.equipment.Equipment
+import kotlinx.serialization.Serializable
 
+@Serializable
+class Gladiator() : Human() {
 
-class Gladiator(
-    name: String,
-    age: Double,
-    height: Double,
-    health: Double,
-    var morale: Double,
-    var stamina: Double,
-    val strength: Double,
-    val speed: Double,
-    val technique: Double,
-    val bloodlust: Double,
-    var equipment: Equipment,
-    var humanControlled: Boolean = false,
-    id: Int,
-
-    ) : Human(name, age, height, id = id) {
+    var morale: Double = 100.0
+    var stamina: Double = 100.0
+    var strength: Double = 60.0
+    var speed: Double = 60.0
+    var technique: Double = 60.0
+    var bloodlust: Double = 60.0
+    var equipment: Equipment = Equipment()
+    var humanControlled: Boolean = false
 
     var attack = calculateAttack()
     var defence = calculateDefence()
@@ -62,5 +57,7 @@ class Gladiator(
     companion object {
         private const val TAG = "Gladiator"
     }
+
+    override var id: Int = 11
 
 }

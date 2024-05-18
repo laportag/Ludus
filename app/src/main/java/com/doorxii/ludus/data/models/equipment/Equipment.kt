@@ -5,11 +5,15 @@ import com.doorxii.ludus.data.models.equipment.armour.Armour
 import com.doorxii.ludus.data.models.equipment.armour.Armourless
 import com.doorxii.ludus.data.models.equipment.weapon.Barefist
 import com.doorxii.ludus.data.models.equipment.weapon.Weapon
+import kotlinx.serialization.Serializable
 
+@Serializable
 class Equipment(
-    private var weapon: Weapon = Barefist(),
-    private var armour: Armour = Armourless()
+
 ) {
+
+    var weapon: Weapon = Barefist()
+    var armour: Armour = Armourless()
     fun getAttackBonus(): Double {
         return weapon.attackBonus + armour.attackBonus
     }

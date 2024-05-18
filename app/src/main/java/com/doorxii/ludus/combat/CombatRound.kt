@@ -5,11 +5,10 @@ import com.doorxii.ludus.actions.combatactions.CombatActionResult
 import com.doorxii.ludus.data.models.animal.Gladiator
 import kotlinx.serialization.Serializable
 
-class CombatRound(
-    // Each round has 2 actions, one for each gladiator
-    private var gladiatorList: List<Gladiator>, private val round: Int
-) {
-
+@Serializable
+class CombatRound() {
+    private lateinit var gladiatorList: List<Gladiator>
+    private var round: Int? = null
     private lateinit var beginner: Gladiator
     var roundReport: String = ""
 
@@ -112,7 +111,10 @@ class CombatRound(
         fun init(
             gladiatorList: List<Gladiator>, round: Int
         ): CombatRound {
-            return CombatRound(gladiatorList, round)
+            val combatRound = CombatRound()
+            combatRound.gladiatorList = gladiatorList
+            combatRound.round = round
+            return combatRound
         }
     }
 }

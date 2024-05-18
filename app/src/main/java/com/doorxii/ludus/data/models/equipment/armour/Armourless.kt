@@ -1,13 +1,12 @@
 package com.doorxii.ludus.data.models.equipment.armour
 
 import com.doorxii.ludus.data.models.equipment.EquipmentType
+import kotlinx.serialization.Serializable
 
-class Armourless(
-    name: String = "Armourless",
-    type: EquipmentType = EquipmentType.ARMOUR,
-    attackBonus: Double = 0.0,
-    defenceBonus: Double = 0.0,
-    id: Int = -1
-) :
-    Armour(name, type, attackBonus, defenceBonus, id) {
+@Serializable
+class Armourless() : Armour() {
+    override val name: String = "Armourless"
+    override var attackBonus: Double = 0.0
+    override var defenceBonus: Double = 0.0
+    override var id: Int = -1
 }

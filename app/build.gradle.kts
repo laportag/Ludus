@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)  //version "1.9.20" apply false
+    kotlin("plugin.serialization") version "1.9.20"
 }
 
 android {

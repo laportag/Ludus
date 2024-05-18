@@ -2,8 +2,11 @@ package com.doorxii.ludus.data.models.equipment.weapon
 
 import com.doorxii.ludus.data.models.equipment.EquipmentItem
 import com.doorxii.ludus.data.models.equipment.EquipmentType
+import kotlinx.serialization.Serializable
 
-open class Weapon(name: String, type: EquipmentType = EquipmentType.WEAPON, attackBonus: Double, defenceBonus: Double,
-                  id: Int
+@Serializable
+sealed class Weapon(
 ) :
-    EquipmentItem(name, type, attackBonus, defenceBonus, id) {}
+    EquipmentItem() {
+    override val equipmentType: EquipmentType = EquipmentType.WEAPON
+}

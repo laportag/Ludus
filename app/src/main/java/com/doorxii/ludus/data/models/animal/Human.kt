@@ -1,17 +1,15 @@
 package com.doorxii.ludus.data.models.animal
 
 import android.util.Log
+import kotlinx.serialization.Serializable
 
-open class Human(
-    val name: String,
-    val age: Double,
-    val height: Double,
-    var isAlive: Boolean = true,
-    id: Int
-
-) : Animal(id) {
-
-    var health: Double = 100.0
+@Serializable
+abstract class Human() : Animal() {
+    var name: String = ""
+    var age: Double = 0.0
+    var height: Double = 150.0
+    var isAlive: Boolean = true
+    override var health: Double = 100.0
         set(value) {
             field = if (value < 0.0) {
                 0.0
@@ -22,6 +20,7 @@ open class Human(
                 isAlive = false
             }
         }
+    abstract override var id: Int
 
 
 //    fun isAlive(): Boolean {

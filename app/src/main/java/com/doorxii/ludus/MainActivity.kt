@@ -30,6 +30,7 @@ import com.doorxii.ludus.combat.Combat
 import com.doorxii.ludus.combat.CombatActivity
 import com.doorxii.ludus.data.models.animal.Gladiator
 import com.doorxii.ludus.data.models.equipment.Equipment
+import com.doorxii.ludus.data.models.equipment.armour.LightArmour
 import com.doorxii.ludus.data.models.equipment.weapon.Gladius
 import com.doorxii.ludus.ui.theme.LudusTheme
 import kotlinx.serialization.encodeToString
@@ -48,6 +49,9 @@ class MainActivity : androidx.activity.ComponentActivity() {
 
     var text = ""
 
+    var titus = Gladiator()
+    var joseph = Gladiator()
+
     val combatResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
@@ -57,6 +61,41 @@ class MainActivity : androidx.activity.ComponentActivity() {
                 text = inputStream.toString()
             }
         }
+
+    fun setGladiators() {
+        titus.name = "Titus"
+        titus.age = 21.0
+        titus.strength = 75.0
+        titus.speed = 60.0
+        titus.technique = 90.0
+        titus.morale = 100.0
+        titus.health = 100.0
+        titus.stamina = 100.0
+        titus.equipment = Equipment()
+            .apply {
+                weapon = Gladius()
+                armour = LightArmour()
+            }
+        titus.bloodlust = 60.0
+        titus.height = 160.0
+        titus.humanControlled = true
+        titus.id = 1
+
+        joseph.name = "Joseph"
+        joseph.age = 34.0
+        joseph.strength = 75.0
+        joseph.speed = 60.0
+        joseph.technique = 40.0
+        joseph.morale = 100.0
+        joseph.health = 100.0
+        joseph.stamina = 100.0
+        joseph.equipment = Equipment()
+        joseph.bloodlust = 60.0
+        joseph.height = 160.0
+        joseph.id = 2
+
+        gladiatorList = listOf(titus, joseph).toMutableList()
+    }
 
     fun returnCombatFile(): File {
         val context = applicationContext
@@ -71,22 +110,30 @@ class MainActivity : androidx.activity.ComponentActivity() {
 
 
     fun startCombatActivity(gladiatorList: List<Gladiator>) {
-        val uri = combatFile.toUri()
-        val intent = Intent(this, CombatActivity::class.java)
-        intent.putExtra("combatFileUri", uri)
-        combatResultLauncher.launch(intent)
-        startActivity(intent)
+        combatFile = returnCombatFile()
+        combat = Combat.init(gladiatorList)
+        saveCombatJson(combat!!)
+        Log.d(TAG, "combatfile: "+ combatFile.readText())
+//        val uri = combatFile.toUri()
+//        val intent = Intent(this, CombatActivity::class.java)
+//        intent.putExtra("combatFileUri", uri)
+//        combatResultLauncher.launch(intent)
+//        startActivity(intent)
+
     }
 
     fun saveCombatJson(combat: Combat) {
         Log.d(TAG, "saving combat to file...")
-        val jsonString = Json.encodeToString(combat)
+        val json = Json { prettyPrint = true }
+        val jsonString = json.encodeToString(combat)
         combatFile.writeText(jsonString)
     }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        setGladiators()
 
         combatFile = returnCombatFile()
 
@@ -114,7 +161,7 @@ class MainActivity : androidx.activity.ComponentActivity() {
             TopAppBar(title = { Text("Ludus") })
             Button(
                 onClick = {
-                    startCombatActivity(listOf(titus, joseph))
+                    startCombatActivity(gladiatorList)
                 },
                 enabled = isStartGameUIEnabled
             ) {
@@ -127,204 +174,12 @@ class MainActivity : androidx.activity.ComponentActivity() {
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(scrollState)
-
             )
         }
     }
 
-//    @OptIn(ExperimentalMaterial3Api::class)
-//    @Preview
-//    @Composable
-//    fun HomeScreen() {
-//        var battleText: String by remember { mutableStateOf("") }
-//        var expanded by remember { mutableStateOf(false) }
-//        val combatActions =
-//            listOf(CombatActions.BASIC_ATTACK, CombatActions.TIRED_ATTACK, CombatActions.WAIT)
-//        var choice: CombatActions? by remember {
-//            mutableStateOf(null)
-//        }
-//        var buttonText: String by remember { mutableStateOf("Action Choice") }
-//        val scrollState = rememberScrollState()
-//        var isActionUIEnabledRemember: Boolean by remember { mutableStateOf(isActionUIEnabled) }
-//        var isStartGameUIEnabledRemember: Boolean by remember { mutableStateOf(isStartGameUIEnabled) }
-//
-//        Column(
-//            modifier = Modifier.fillMaxSize(),
-//            horizontalAlignment = Alignment.CenterHorizontally,
-//            verticalArrangement = Arrangement.Center
-//
-//        ) {
-//            TopAppBar(title = { Text("Ludus") })
-//            Text("Titus vs Joseph")
-//
-//            Row {
-//                Button(
-//                    onClick = {
-//                        combat = startGame()
-//                        isActionUIEnabledRemember = true
-//                        isStartGameUIEnabledRemember = false
-//                    },
-//                    enabled = isStartGameUIEnabledRemember
-//                ) {
-//                    Text("Play")
-//                }
-//
-//                Button(
-//                    onClick = {
-//                        isActionUIEnabledRemember = false
-//                        isStartGameUIEnabledRemember = false
-//                        battleText = testSim()!!
-//                    },
-//                    enabled = isStartGameUIEnabledRemember
-//                ) { Text("Sim") }
-//
-//                Button(onClick = {
-//                    battleText = ""
-//                    isActionUIEnabledRemember = false
-//                    isStartGameUIEnabledRemember = true
-//                    testReset()
-//                }) { Text("Reset") }
-//            }
-//            Row {
-//                Button(onClick = { expanded = true }, enabled = isActionUIEnabledRemember) {
-//                    Text(buttonText)
-//                }
-//                DropdownMenu(
-//                    expanded = expanded,
-//                    onDismissRequest = { expanded = false },
-//                    modifier = Modifier.fillMaxWidth()
-//                ) {
-//                    for (action in combatActions) {
-//                        DropdownMenuItem(text = { Text(action.name) }, onClick = {
-//                            choice = action
-//                            buttonText = action.name
-//                            expanded = false
-//                        })
-//                    }
-//                }
-//
-//                Button(
-//                    onClick = { battleText = submitCombatAction(choice!!)!! },
-//                    enabled = isActionUIEnabledRemember
-//                ) {
-//                    Text("Submit")
-//                }
-//            }
-//            val combatActions = listOf<CombatAction>(BasicAttack(), TiredAttack(), Wait())
-//            CardRow(combatActions)
-//            TextField(
-//                value = battleText,
-//                onValueChange = {},
-//                minLines = 15,
-//                modifier = Modifier
-//                    .fillMaxSize()
-//                    .verticalScroll(scrollState)
-//
-//            )
-//        }
-//    }
-
-//    private fun testSim(): String? {
-//
-//        val marcus = Gladiator(
-//            name = "Marcus",
-//            age = 21.0,
-//            strength = 75.0,
-//            speed = 60.0,
-//            technique = 90.0,
-//            morale = 100.0,
-//            health = 100.0,
-//            stamina = 100.0,
-//            equipment = Equipment(Gladius(id = 1)),
-//            bloodlust = 60.0,
-//            height = 160.0,
-//            humanControlled = true,
-//            id = 1
-//        )
-//
-//        val joseph = Gladiator(
-//            name = "Joshua",
-//            age = 34.0,
-//            strength = 75.0,
-//            speed = 60.0,
-//            technique = 40.0,
-//            morale = 800.0,
-//            health = 100.0,
-//            stamina = 100.0,
-//            equipment = Equipment(),
-//            bloodlust = 60.0,
-//            height = 160.0,
-//            id = 2
-//        )
-//
-//        combat = Combat.init(listOf(marcus, joseph))
-//        return combat?.simCombat()
-//    }
-//
-//    private fun testReset() {
-//        combat = null
-//    }
-
-
-//    private fun startGame(): Combat {
-//        gladiatorList = mutableListOf(titus, joseph)
-//        Log.d(TAG, "startGame: ${combat?.combatReport}")
-//        CombatActivity(combat!!).startActivities()
-//        return combat!!
-//    }
-
-//    private fun submitCombatAction(choice: CombatActions): String? {
-//        if (combat!!.isComplete) {
-//            Log.d(TAG, "Combat over")
-//            isActionUIEnabled = false
-//        } else {
-//            val report = combat?.playCombatRound(choice)
-//            if (report!!.isComplete) {
-//                Log.d(TAG, "Combat over")
-//                isActionUIEnabled = false
-//            }
-//        }
-//        return combat?.combatReport
-//    }
-
-//    fun startCombat() {
-//
-//    }
-
-
     companion object {
         private const val TAG = "MainActivity"
-
-        var titus = Gladiator(
-            name = "Titus",
-            age = 21.0,
-            strength = 75.0,
-            speed = 60.0,
-            technique = 90.0,
-            morale = 100.0,
-            health = 100.0,
-            stamina = 100.0,
-            equipment = Equipment(Gladius(id = 1)),
-            bloodlust = 60.0,
-            height = 160.0,
-            humanControlled = true,
-            id = 1
-        )
-
-        var joseph = Gladiator(
-            name = "Joseph",
-            age = 34.0,
-            strength = 75.0,
-            speed = 60.0,
-            technique = 40.0,
-            morale = 800.0,
-            health = 100.0,
-            stamina = 100.0,
-            equipment = Equipment(),
-            bloodlust = 60.0,
-            height = 160.0,
-            id = 2
-        )
     }
 
 }

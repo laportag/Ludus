@@ -1,13 +1,14 @@
 package com.doorxii.ludus.data.models.equipment
 
 import com.doorxii.ludus.data.models.Model
+import kotlinx.serialization.Serializable
 
-open class EquipmentItem(
-    val name: String,
-    val type: EquipmentType,
-    val attackBonus: Double,
-    val defenceBonus: Double,
-    id: Int
-): Model(id) {
+@Serializable
+abstract class EquipmentItem(
 
+): Model() {
+    abstract val name: String
+    abstract val equipmentType: EquipmentType
+    abstract val attackBonus: Double
+    abstract val defenceBonus: Double
 }

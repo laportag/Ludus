@@ -7,22 +7,20 @@ import com.doorxii.ludus.actions.combatactions.CombatActions
 import com.doorxii.ludus.data.models.animal.Gladiator
 import com.doorxii.ludus.utils.EnumToAction.combatActionToEnum
 import com.doorxii.ludus.utils.EnumToAction.combatEnumToAction
+import kotlinx.serialization.Serializable
 
-
+@Serializable
 class Combat(
-    var gladiatorList: List<Gladiator>
+
 ) {
+    lateinit var gladiatorList: List<Gladiator>
     private var round: CombatRound? = null
     private var roundNumber: Int = 0
     private var userChoice: CombatActions? = null
     private var enemyChoice: CombatActions? = null
     var isComplete = false
-    val combatName: String = calculateCombatName()
-    var combatReport = "$combatName\n"
-
-    fun calculateCombatName(): String {
-        return "Combat: ${gladiatorList[0].name} vs ${gladiatorList[1].name}"
-    }
+    lateinit var combatName: String
+    lateinit var combatReport: String
 
     fun simCombat(): String {
         appendReport("Sim Combat started")
@@ -100,7 +98,11 @@ class Combat(
     companion object {
         const val TAG = "Combat"
         fun init(gladiatorList: List<Gladiator>): Combat {
-            return Combat(gladiatorList)
+            val combat = Combat()
+            combat.gladiatorList = gladiatorList
+            combat.combatName = "Combat: ${gladiatorList[0].name} vs ${gladiatorList[1].name}"
+            combat.combatReport = "$combat.combatName\n"
+            return combat
         }
     }
 }
