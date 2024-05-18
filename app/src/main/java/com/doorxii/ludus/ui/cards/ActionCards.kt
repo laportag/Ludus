@@ -29,14 +29,13 @@ object ActionCards {
     @Composable
     fun CombatActionCard(combatAction: CombatAction, modifier: Modifier = Modifier){
         val configuration = LocalConfiguration.current
-        val screenHeight = configuration.screenHeightDp.dp
+//        val screenHeight = configuration.screenHeightDp.dp
 
 
         Card(
             modifier = modifier
                 .aspectRatio(9f / 16f)
                 .background(color = Color(0xFFD3D3D3), RoundedCornerShape(8.dp))
-                .height(screenHeight / 4)
                 .padding(4.dp),
             shape = RoundedCornerShape(8.dp)
         ){
@@ -56,7 +55,7 @@ object ActionCards {
         val screenHeight = configuration.screenHeightDp.dp
         LazyRow(
             modifier = Modifier
-            .heightIn(max = screenHeight / 4)
+            .heightIn(max = screenHeight * 0.30f)
         ) {
             items(cardList) { card ->
                 CombatActionCard(combatAction = card, modifier)

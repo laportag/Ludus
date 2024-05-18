@@ -26,7 +26,6 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import com.doorxii.ludus.actions.combatactions.CombatActions
 import com.doorxii.ludus.combat.Combat
-import com.doorxii.ludus.data.models.animal.Gladiator
 import com.doorxii.ludus.ui.cards.ActionCards
 import com.doorxii.ludus.ui.cards.GladiatorCards
 import com.doorxii.ludus.ui.theme.LudusTheme
@@ -34,6 +33,7 @@ import com.doorxii.ludus.utils.EnumToAction.combatEnumListToActionList
 import kotlinx.serialization.json.Json
 import java.io.File
 import android.util.Log
+import androidx.compose.ui.tooling.preview.Preview
 
 class CombatActivity() : ComponentActivity() {
 
@@ -47,12 +47,12 @@ class CombatActivity() : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         combat = readCombatFromJson()
-        Log.d(TAG, "combat null?: "+ combat!!.gladiatorList)
+        Log.d(TAG, "combat null?: " + combat!!.gladiatorList)
 
         enableEdgeToEdge()
         setContent {
             LudusTheme {
-                CombatLayout(combat!!)
+                CombatLayout()
             }
         }
     }
@@ -71,9 +71,9 @@ class CombatActivity() : ComponentActivity() {
     }
 
 
-
+    @Preview
     @Composable
-    fun CombatLayout(combat: Combat) {
+    fun CombatLayout() {
 
         var battleText: String by remember { mutableStateOf("") }
 
@@ -99,45 +99,38 @@ class CombatActivity() : ComponentActivity() {
         ) {
 //            TopAppBar(title = { Text(combat.combatName) })
 
-            val dropZone = Column{
+            val dropZone = Column (
+                modifier = Modifier.height(screenHeight * 0.65f)
+            ) {
                 // player card
-                GladiatorCards.CombatGladiatorCard(combat.gladiatorList[0])
+                GladiatorCards.CombatGladiatorCard(combat!!.gladiatorList[0])
                 // enemy card
-                GladiatorCards.CombatGladiatorCard(combat.gladiatorList[1])
+                GladiatorCards.CombatGladiatorCard(combat!!.gladiatorList[1])
 
 
                 TextField(
                     value = battleText,
                     onValueChange = {},
                     modifier = Modifier
-                        .fillMaxSize()
+//                        .fillMaxSize()
                         .verticalScroll(scrollState)
                         .aspectRatio(16f / 9f)
-                        .height(screenHeight/5)
+                        .height(screenHeight * 0.2f)
                 )
             }
             val state = rememberDraggableState {
 
             }
-            val dragModifier = Modifier.draggable(
-                state,
-                Orientation.Vertical
-            )
+            val actionCardModifier =
+                Modifier
+                    .draggable(state, Orientation.Vertical)
+                    .height(screenHeight * 0.3f)
 
-            ActionCards.CardRow(combatEnumListToActionList(combatActions), dragModifier)
-            TextField(
-                value = battleText,
-                onValueChange = {},
-                minLines = 15,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(scrollState)
-
-            )
+            ActionCards.CardRow(combatEnumListToActionList(combatActions), actionCardModifier)
         }
     }
 
-    companion object{
+    companion object {
         private const val TAG = "CombatActivity"
     }
 }

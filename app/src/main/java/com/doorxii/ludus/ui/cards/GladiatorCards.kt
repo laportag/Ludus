@@ -1,5 +1,6 @@
 package com.doorxii.ludus.ui.cards
 
+import android.icu.text.DecimalFormat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.DraggableState
 import androidx.compose.foundation.gestures.Orientation
@@ -22,6 +23,8 @@ import com.doorxii.ludus.data.models.animal.Gladiator
 
 object GladiatorCards {
 
+    val decimalFormat = DecimalFormat("0.##")
+
     @Composable
     fun CombatGladiatorCard(gladiator: Gladiator){
         val configuration = LocalConfiguration.current
@@ -29,9 +32,9 @@ object GladiatorCards {
 
         Card(
             modifier = Modifier
-                .aspectRatio(16f / 9f)
+                .aspectRatio(16f / 7f)
                 .background(color = Color(0xFFD3D3D3), RoundedCornerShape(8.dp))
-                .height(screenHeight / 5)
+                .height(screenHeight * 0.125f)
                 .padding(4.dp),
             shape = RoundedCornerShape(8.dp)
         ){
@@ -42,8 +45,8 @@ object GladiatorCards {
                         Text("H: ${gladiator.health}/100")
                         Text("S: ${gladiator.stamina}/100")
                         Text("M: ${gladiator.morale}/100")
-                        Text("A: ${gladiator.attack}")
-                        Text("D: ${gladiator.defence}")
+                        Text("A: ${decimalFormat.format(gladiator.attack)}")
+                        Text("D: ${decimalFormat.format(gladiator.defence)}")
                     }
                     Column {
                         Text("S: ${gladiator.strength}/100")
