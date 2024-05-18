@@ -1,26 +1,20 @@
-package com.doorxii.ludus.combat
+package com.doorxii.ludus
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.draganddrop.dragAndDropSource
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,44 +23,47 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.doorxii.ludus.actions.combatactions.BasicAttack
-import com.doorxii.ludus.actions.combatactions.CombatAction
 import com.doorxii.ludus.actions.combatactions.CombatActions
-import com.doorxii.ludus.actions.combatactions.TiredAttack
-import com.doorxii.ludus.actions.combatactions.Wait
+import com.doorxii.ludus.combat.Combat
 import com.doorxii.ludus.data.models.animal.Gladiator
 import com.doorxii.ludus.ui.cards.ActionCards
 import com.doorxii.ludus.ui.cards.GladiatorCards
 import com.doorxii.ludus.ui.theme.LudusTheme
 import com.doorxii.ludus.utils.EnumToAction.combatEnumListToActionList
 import kotlinx.serialization.json.Json
+import java.io.File
+import android.util.Log
 
 class CombatActivity() : ComponentActivity() {
 
-    lateinit var combat: Combat
+    var combat: Combat? = null
+//    var combatState: Combat by mutableStateOf(combat)
 
 //    val gladiatorList = intent.getParcelableExtra("gladiatorList", List<Gladiator>::class.java)
 //    val combat = Combat.init(gladiatorList)
-    var combatState: Combat by mutableStateOf(combat)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        readCombatFromJson()
+        combat = readCombatFromJson()
+        Log.d(TAG, "combat null?: "+ combat!!.gladiatorList)
 
         enableEdgeToEdge()
         setContent {
             LudusTheme {
-                CombatLayout(combatState)
+                CombatLayout(combat!!)
             }
         }
     }
 
-    fun readCombatFromJson(){
-        val combatFile = filesDir.resolve("combat.json")
+    fun readCombatFromJson(): Combat {
+//        val combatFile = filesDir.resolve("combat.json")
+        val uri = intent.data
+        val combatFile = File(uri!!.path!!)
         val combatJson = combatFile.readText()
-        combat = Json.decodeFromString<Combat>(combatJson)
+        val combat = Json.decodeFromString<Combat>(combatJson)
+        return combat
     }
 
     override fun finishActivity(requestCode: Int) {
@@ -77,6 +74,7 @@ class CombatActivity() : ComponentActivity() {
 
     @Composable
     fun CombatLayout(combat: Combat) {
+
         var battleText: String by remember { mutableStateOf("") }
 
         var expanded by remember { mutableStateOf(false) }
@@ -137,6 +135,10 @@ class CombatActivity() : ComponentActivity() {
 
             )
         }
+    }
+
+    companion object{
+        private const val TAG = "CombatActivity"
     }
 }
 

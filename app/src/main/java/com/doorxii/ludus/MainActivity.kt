@@ -1,6 +1,5 @@
 package com.doorxii.ludus
 
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -27,7 +26,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.core.net.toUri
 import com.doorxii.ludus.combat.Combat
-import com.doorxii.ludus.combat.CombatActivity
 import com.doorxii.ludus.data.models.animal.Gladiator
 import com.doorxii.ludus.data.models.equipment.Equipment
 import com.doorxii.ludus.data.models.equipment.armour.LightArmour
@@ -114,11 +112,13 @@ class MainActivity : androidx.activity.ComponentActivity() {
         combat = Combat.init(gladiatorList)
         saveCombatJson(combat!!)
         Log.d(TAG, "combatfile: "+ combatFile.readText())
-//        val uri = combatFile.toUri()
-//        val intent = Intent(this, CombatActivity::class.java)
+        val uri = combatFile.toUri()
+        val intent = Intent(this, CombatActivity::class.java)
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
 //        intent.putExtra("combatFileUri", uri)
-//        combatResultLauncher.launch(intent)
-//        startActivity(intent)
+        intent.setDataAndType(uri, contentResolver.getType(uri))
+        combatResultLauncher.launch(intent)
+        startActivity(intent)
 
     }
 

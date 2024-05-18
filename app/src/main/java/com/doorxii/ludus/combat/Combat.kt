@@ -13,7 +13,7 @@ import kotlinx.serialization.Serializable
 class Combat(
 
 ) {
-    lateinit var gladiatorList: List<Gladiator>
+    var gladiatorList: List<Gladiator> = listOf()
     private var round: CombatRound? = null
     private var roundNumber: Int = 0
     private var userChoice: CombatActions? = null
