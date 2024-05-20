@@ -35,10 +35,15 @@ import java.io.File
 import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.draganddrop.dragAndDropTarget
+import androidx.compose.material3.Text
 import androidx.compose.ui.draganddrop.DragAndDropEvent
 import androidx.compose.ui.draganddrop.DragAndDropTarget
 import androidx.compose.ui.draganddrop.toAndroidDragEvent
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import com.doorxii.ludus.ui.DragTarget
+import com.doorxii.ludus.ui.DropTarget
+import com.doorxii.ludus.ui.LongPressDraggable
 
 class CombatActivity() : ComponentActivity() {
 
@@ -53,7 +58,9 @@ class CombatActivity() : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             LudusTheme {
-                CombatLayout()
+                LongPressDraggable(modifier = Modifier.fillMaxSize()) {
+                    CombatLayout()
+                }
             }
         }
     }
@@ -101,49 +108,40 @@ class CombatActivity() : ComponentActivity() {
         ) {
 //            TopAppBar(title = { Text(combat.combatName) })
 
+            DropTarget<CombatActions>(modifier = Modifier.height(screenHeight * 0.65f)) { isInBound, combataction ->
+                val bgColor = if (isInBound) {
+                    Color.Red
+                } else {
+                    Color.White
+                }
 
-            val dropZone = Column(
-                modifier = Modifier
-                    .height(screenHeight * 0.65f)
-                    .dragAndDropTarget(
-                        shouldStartDragAndDrop = { true },
-                        target = object : DragAndDropTarget {
-                            override fun onDrop(event: DragAndDropEvent): Boolean {
-                                Log.d(TAG, "onDrop: ${event.toAndroidDragEvent().clipData.toString()}")
-                                when(event.toAndroidDragEvent().clipData.getItemAt(0).text){
-                                    CombatActions.BASIC_ATTACK.name -> choice = CombatActions.BASIC_ATTACK
-                                    CombatActions.TIRED_ATTACK.name -> choice = CombatActions.TIRED_ATTACK
-                                    CombatActions.WAIT.name -> choice = CombatActions.WAIT
-                                }
-                                Log.d(TAG, "choice: $choice")
-                                return true
-                            }
-                        }
-                    )
-            ) {
-                // player card
-                GladiatorCards.CombatGladiatorCard(combat!!.gladiatorList[0])
-                // enemy card
-                GladiatorCards.CombatGladiatorCard(combat!!.gladiatorList[1])
-
-
-                TextField(
-                    value = battleText,
-                    onValueChange = {},
+                choice = combataction
+                Log.d(TAG, "choice dropped: " + choice)
+                Column(
                     modifier = Modifier
-//                        .fillMaxSize()
-                        .verticalScroll(scrollState)
-                        .aspectRatio(16f / 9f)
-                        .height(screenHeight * 0.2f)
-                )
-            }
-            val state = rememberDraggableState {
+                        .height(screenHeight * 0.65f)
 
+                ) {
+                    // player card
+                    GladiatorCards.CombatGladiatorCard(combat!!.gladiatorList[0])
+                    // enemy card
+                    GladiatorCards.CombatGladiatorCard(combat!!.gladiatorList[1])
+
+
+                    TextField(
+                        value = battleText,
+                        onValueChange = {},
+                        modifier = Modifier
+//                        .fillMaxSize()
+                            .verticalScroll(scrollState)
+                            .aspectRatio(16f / 9f)
+                            .height(screenHeight * 0.2f)
+                    )
+                }
             }
             val actionCardModifier =
                 Modifier
                     .height(screenHeight * 0.3f)
-
             ActionCards.CardRow(combatEnumListToActionList(combatActions), actionCardModifier)
         }
     }

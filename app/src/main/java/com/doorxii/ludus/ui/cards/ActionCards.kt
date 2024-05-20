@@ -13,6 +13,7 @@ import androidx.compose.foundation.gestures.rememberDraggable2DState
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -32,6 +33,8 @@ import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import com.doorxii.ludus.actions.combatactions.CombatAction
+import com.doorxii.ludus.ui.DragTarget
+import com.doorxii.ludus.ui.LongPressDraggable
 
 object ActionCards {
 
@@ -40,7 +43,7 @@ object ActionCards {
     fun CombatActionCard(combatAction: CombatAction, modifier: Modifier = Modifier) {
 //        val configuration = LocalConfiguration.current
 //        val screenHeight = configuration.screenHeightDp.dp
-
+        DragTarget(modifier = Modifier.fillMaxSize(), dataToDrop = combatAction.actionEnum) {
         Card(
             modifier = modifier
                 .aspectRatio(9f / 16f)
@@ -51,9 +54,12 @@ object ActionCards {
             Column(
                 modifier = Modifier.padding(8.dp)
             ) {
-                Text(combatAction.name)
-                Text(combatAction.description)
-                Text(combatAction.staminaCost.toString())
+
+                    Text(combatAction.name, modifier = Modifier.padding(2.dp))
+                    Text(combatAction.description, modifier = Modifier.padding(2.dp))
+                    Text(combatAction.staminaCost.toString(), modifier = Modifier.padding(2.dp))
+                }
+
             }
         }
     }
@@ -65,6 +71,7 @@ object ActionCards {
         LazyRow(
             modifier = modifier
                 .heightIn(max = screenHeight * 0.30f)
+//                .fillMaxSize()
         ) {
             items(cardList) { card ->
                 CombatActionCard(combatAction = card, modifier)
