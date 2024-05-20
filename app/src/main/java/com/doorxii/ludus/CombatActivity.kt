@@ -33,15 +33,16 @@ import com.doorxii.ludus.utils.EnumToAction.combatEnumListToActionList
 import kotlinx.serialization.json.Json
 import java.io.File
 import android.util.Log
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.draganddrop.dragAndDropTarget
+import androidx.compose.ui.draganddrop.DragAndDropEvent
+import androidx.compose.ui.draganddrop.DragAndDropTarget
+import androidx.compose.ui.draganddrop.toAndroidDragEvent
 import androidx.compose.ui.tooling.preview.Preview
 
 class CombatActivity() : ComponentActivity() {
 
     var combat: Combat? = null
-//    var combatState: Combat by mutableStateOf(combat)
-
-//    val gladiatorList = intent.getParcelableExtra("gladiatorList", List<Gladiator>::class.java)
-//    val combat = Combat.init(gladiatorList)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,7 +59,6 @@ class CombatActivity() : ComponentActivity() {
     }
 
     fun readCombatFromJson(): Combat {
-//        val combatFile = filesDir.resolve("combat.json")
         val uri = intent.data
         val combatFile = File(uri!!.path!!)
         val combatJson = combatFile.readText()
@@ -67,10 +67,12 @@ class CombatActivity() : ComponentActivity() {
     }
 
     override fun finishActivity(requestCode: Int) {
+        Log.d(TAG, "finish combat")
         super.finishActivity(requestCode)
     }
 
 
+    @OptIn(ExperimentalFoundationApi::class)
     @Preview
     @Composable
     fun CombatLayout() {
@@ -99,8 +101,25 @@ class CombatActivity() : ComponentActivity() {
         ) {
 //            TopAppBar(title = { Text(combat.combatName) })
 
-            val dropZone = Column (
-                modifier = Modifier.height(screenHeight * 0.65f)
+
+            val dropZone = Column(
+                modifier = Modifier
+                    .height(screenHeight * 0.65f)
+                    .dragAndDropTarget(
+                        shouldStartDragAndDrop = { true },
+                        target = object : DragAndDropTarget {
+                            override fun onDrop(event: DragAndDropEvent): Boolean {
+                                Log.d(TAG, "onDrop: ${event.toAndroidDragEvent().clipData.toString()}")
+                                when(event.toAndroidDragEvent().clipData.getItemAt(0).text){
+                                    CombatActions.BASIC_ATTACK.name -> choice = CombatActions.BASIC_ATTACK
+                                    CombatActions.TIRED_ATTACK.name -> choice = CombatActions.TIRED_ATTACK
+                                    CombatActions.WAIT.name -> choice = CombatActions.WAIT
+                                }
+                                Log.d(TAG, "choice: $choice")
+                                return true
+                            }
+                        }
+                    )
             ) {
                 // player card
                 GladiatorCards.CombatGladiatorCard(combat!!.gladiatorList[0])
@@ -123,7 +142,6 @@ class CombatActivity() : ComponentActivity() {
             }
             val actionCardModifier =
                 Modifier
-                    .draggable(state, Orientation.Vertical)
                     .height(screenHeight * 0.3f)
 
             ActionCards.CardRow(combatEnumListToActionList(combatActions), actionCardModifier)

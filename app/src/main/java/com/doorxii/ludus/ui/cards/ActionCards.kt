@@ -1,8 +1,12 @@
 package com.doorxii.ludus.ui.cards
 
+import android.content.ClipData
 import android.util.Log
+import android.util.Size
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.draganddrop.dragAndDropSource
+import androidx.compose.foundation.draganddrop.dragAndDropTarget
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggable2DState
@@ -19,18 +23,23 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draganddrop.DragAndDropEvent
+import androidx.compose.ui.draganddrop.DragAndDropTarget
+import androidx.compose.ui.draganddrop.DragAndDropTransferData
+import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import com.doorxii.ludus.actions.combatactions.CombatAction
 
 object ActionCards {
 
+    @OptIn(ExperimentalFoundationApi::class)
     @Composable
-    fun CombatActionCard(combatAction: CombatAction, modifier: Modifier = Modifier){
-        val configuration = LocalConfiguration.current
+    fun CombatActionCard(combatAction: CombatAction, modifier: Modifier = Modifier) {
+//        val configuration = LocalConfiguration.current
 //        val screenHeight = configuration.screenHeightDp.dp
-
 
         Card(
             modifier = modifier
@@ -38,10 +47,10 @@ object ActionCards {
                 .background(color = Color(0xFFD3D3D3), RoundedCornerShape(8.dp))
                 .padding(4.dp),
             shape = RoundedCornerShape(8.dp)
-        ){
+        ) {
             Column(
                 modifier = Modifier.padding(8.dp)
-            ){
+            ) {
                 Text(combatAction.name)
                 Text(combatAction.description)
                 Text(combatAction.staminaCost.toString())
@@ -54,8 +63,8 @@ object ActionCards {
         val configuration = LocalConfiguration.current
         val screenHeight = configuration.screenHeightDp.dp
         LazyRow(
-            modifier = Modifier
-            .heightIn(max = screenHeight * 0.30f)
+            modifier = modifier
+                .heightIn(max = screenHeight * 0.30f)
         ) {
             items(cardList) { card ->
                 CombatActionCard(combatAction = card, modifier)

@@ -7,6 +7,8 @@ class Wait : CombatAction {
     override val name: String = "Wait"
     override val description: String = "Do Nothing"
     override val staminaCost: Double = -20.0
+    override val actionEnum: CombatActions = CombatActions.WAIT
+
     override fun act(gladiatorList: List<Gladiator>): CombatActionResult {
         return CombatActionResult(
             gladiatorList[0],

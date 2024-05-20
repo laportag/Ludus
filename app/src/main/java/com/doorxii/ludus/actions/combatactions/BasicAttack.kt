@@ -10,6 +10,8 @@ class BasicAttack : CombatAction {
     override val name: String = "Basic Attack"
     override val description: String = "Basic attack"
     override val staminaCost: Double = 15.0
+    override val actionEnum: CombatActions = CombatActions.BASIC_ATTACK
+
     override fun act(gladiatorList: List<Gladiator>): CombatActionResult {
         Log.d(TAG, "Basic attack: ${gladiatorList[0].name} vs ${gladiatorList[1].name}")
 
