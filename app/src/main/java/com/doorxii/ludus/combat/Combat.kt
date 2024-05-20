@@ -101,7 +101,7 @@ class Combat(
             val combat = Combat()
             combat.gladiatorList = gladiatorList
             combat.combatName = "Combat: ${gladiatorList[0].name} vs ${gladiatorList[1].name}"
-            combat.combatReport = "$combat.combatName\n"
+            combat.combatReport = "${combat.combatName}\n"
             return combat
         }
     }

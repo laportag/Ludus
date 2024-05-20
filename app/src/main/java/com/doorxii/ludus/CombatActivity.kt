@@ -39,8 +39,8 @@ import com.doorxii.ludus.ui.LongPressDraggable
 class CombatActivity() : ComponentActivity() {
 
     var combat: Combat? = null
-    var choice: CombatActions? = CombatActions.WAIT
-    var battleText = ""
+    var choice: CombatActions? = null
+    var text = mutableStateOf("")
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -78,7 +78,7 @@ class CombatActivity() : ComponentActivity() {
     @Composable
     fun CombatLayout() {
 
-        var battleText: String by remember { mutableStateOf(battleText) }
+        var battleText: String by remember { text }
 
         var expanded by remember { mutableStateOf(false) }
 
@@ -152,10 +152,16 @@ class CombatActivity() : ComponentActivity() {
             Log.d(TAG, "choice: " + choice)
             if (combatAction != null) {
                 val roundResult = combat!!.playCombatRound(combatAction)
-                battleText += roundResult.combatReport
+                Log.d(TAG, "roundResult: " + roundResult.combatReport)
+                text.value = roundResult.combatReport
+                Log.d(TAG, "text: " + text)
             }
         }
         choice = null
+    }
+
+    fun updateBattleText(text: String){
+
     }
 
     companion object {
