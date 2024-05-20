@@ -1,5 +1,6 @@
 package com.doorxii.ludus.ui
 
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -68,6 +69,7 @@ fun <T> DragTarget(
         }
         .pointerInput(Unit) {
             detectDragGesturesAfterLongPress(onDragStart = {
+//            detectDragGestures(onDragStart = {
                 currentState.dataToDrop = dataToDrop
                 currentState.isDragging = true
                 currentState.dragPosition = currentPosition + it

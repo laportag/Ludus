@@ -4,9 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.draggable
-import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
@@ -34,20 +31,17 @@ import kotlinx.serialization.json.Json
 import java.io.File
 import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.draganddrop.dragAndDropTarget
-import androidx.compose.material3.Text
-import androidx.compose.ui.draganddrop.DragAndDropEvent
-import androidx.compose.ui.draganddrop.DragAndDropTarget
-import androidx.compose.ui.draganddrop.toAndroidDragEvent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import com.doorxii.ludus.ui.DragTarget
 import com.doorxii.ludus.ui.DropTarget
 import com.doorxii.ludus.ui.LongPressDraggable
 
 class CombatActivity() : ComponentActivity() {
 
     var combat: Combat? = null
+    var choice: CombatActions? = CombatActions.WAIT
+    var battleText = ""
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,17 +78,17 @@ class CombatActivity() : ComponentActivity() {
     @Composable
     fun CombatLayout() {
 
-        var battleText: String by remember { mutableStateOf("") }
+        var battleText: String by remember { mutableStateOf(battleText) }
 
         var expanded by remember { mutableStateOf(false) }
 
         val combatActions =
             listOf(CombatActions.BASIC_ATTACK, CombatActions.TIRED_ATTACK, CombatActions.WAIT)
-        var choice: CombatActions? by remember {
-            mutableStateOf(null)
+
+        var droppedChoice: CombatActions? by remember {
+            mutableStateOf(choice)
         }
 
-        var buttonText: String by remember { mutableStateOf("Action Choice") }
         val scrollState = rememberScrollState()
 
         val configuration = LocalConfiguration.current
@@ -108,15 +102,21 @@ class CombatActivity() : ComponentActivity() {
         ) {
 //            TopAppBar(title = { Text(combat.combatName) })
 
-            DropTarget<CombatActions>(modifier = Modifier.height(screenHeight * 0.65f)) { isInBound, combataction ->
+            DropTarget<CombatActions>(modifier = Modifier.height(screenHeight * 0.65f)) { isInBound, combatAction ->
+                // when card dropped
                 val bgColor = if (isInBound) {
                     Color.Red
                 } else {
                     Color.White
                 }
+                if (combatAction != null) {
+                    choice = combatAction
+                    Log.d(TAG, "choice dropped: " + droppedChoice)
+                }
+                playCardonDrop(combatAction)
+//                var roundResult = combat!!.playCombatRound(choice)
+//                battleText += roundResult.combatReport
 
-                choice = combataction
-                Log.d(TAG, "choice dropped: " + choice)
                 Column(
                     modifier = Modifier
                         .height(screenHeight * 0.65f)
@@ -144,6 +144,18 @@ class CombatActivity() : ComponentActivity() {
                     .height(screenHeight * 0.3f)
             ActionCards.CardRow(combatEnumListToActionList(combatActions), actionCardModifier)
         }
+    }
+
+    fun playCardonDrop(combatAction: CombatActions?) {
+
+        if (choice != null) {
+            Log.d(TAG, "choice: " + choice)
+            if (combatAction != null) {
+                val roundResult = combat!!.playCombatRound(combatAction)
+                battleText += roundResult.combatReport
+            }
+        }
+        choice = null
     }
 
     companion object {
