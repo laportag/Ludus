@@ -45,25 +45,34 @@ class CombatRound() {
         var gladiatorList = gladiatorList
         val beginner = determineBeginner()
 
+        ////////////
+
+        var actionGladiatorAList = mutableListOf<Gladiator>(gladiatorList[0], gladiatorList[1])
+        var actionGladiatorBList = mutableListOf<Gladiator>(gladiatorList[1], gladiatorList[0])
+
+
+
+        ////////////
+
         if (gladiatorList.size < 2) { return gladiatorList }
 
         if (beginner == gladiatorList[0]) {
             // A Starts
-            val resA = gladiatorList[0].action?.act(gladiatorList)!!
+            val resA = gladiatorList[0].action?.act(mutableListOf(gladiatorList[0], gladiatorList[1]))!!
             gladiatorList = updateFromCombatActionResult(resA)
             if (gladiatorList.size < 2) { return gladiatorList }
 
-            val resB = gladiatorList[1].action?.act(gladiatorList)
+            val resB = gladiatorList[1].action?.act(mutableListOf(gladiatorList[1], gladiatorList[0]))
             gladiatorList = updateFromCombatActionResult(resB!!)
             if (gladiatorList.size < 2) { return gladiatorList }
 
         } else {
             // B Starts
-            val resB = gladiatorList[1].action?.act(gladiatorList)
+            val resB = gladiatorList[1].action?.act(mutableListOf(gladiatorList[1], gladiatorList[0]))
             gladiatorList = updateFromCombatActionResult(resB!!)
             if (gladiatorList.size < 2) { return gladiatorList }
 
-            val resA = gladiatorList[0].action?.act(gladiatorList)
+            val resA = gladiatorList[0].action?.act(mutableListOf(gladiatorList[0], gladiatorList[1]))
             gladiatorList = updateFromCombatActionResult(resA!!)
             if (gladiatorList.size < 2) { return gladiatorList }
         }
