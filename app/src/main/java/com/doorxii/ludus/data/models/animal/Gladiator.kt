@@ -40,13 +40,13 @@ class Gladiator() : Human() {
 
     private fun getEquipmentAttackBonus(): Double {
         val total = equipment.getAttackBonus()
-        Log.d(TAG, "getEquipmentAttackBonus: $total")
+//        Log.d(TAG, "getEquipmentAttackBonus: $total")
         return total
     }
 
     private fun getEquipmentDefenceBonus(): Double {
         val total = equipment.getDefenceBonus()
-        Log.d(TAG, "getEquipmentDefenceBonus: $total")
+//        Log.d(TAG, "getEquipmentDefenceBonus: $total")
         return total
     }
 

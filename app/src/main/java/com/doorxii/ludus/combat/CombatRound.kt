@@ -45,15 +45,6 @@ class CombatRound() {
         var gladiatorList = gladiatorList
         val beginner = determineBeginner()
 
-        ////////////
-
-        var actionGladiatorAList = mutableListOf<Gladiator>(gladiatorList[0], gladiatorList[1])
-        var actionGladiatorBList = mutableListOf<Gladiator>(gladiatorList[1], gladiatorList[0])
-
-
-
-        ////////////
-
         if (gladiatorList.size < 2) { return gladiatorList }
 
         if (beginner == gladiatorList[0]) {

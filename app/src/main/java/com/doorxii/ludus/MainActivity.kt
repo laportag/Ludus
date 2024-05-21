@@ -33,6 +33,8 @@ import com.doorxii.ludus.data.models.equipment.weapon.Gladius
 import com.doorxii.ludus.ui.theme.LudusTheme
 import com.doorxii.ludus.utils.CombatSerialization.returnCombatFile
 import com.doorxii.ludus.utils.CombatSerialization.saveCombatJson
+import com.doorxii.ludus.utils.GladiatorGenerator.newGladiator
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File
 
@@ -97,6 +99,8 @@ class MainActivity : androidx.activity.ComponentActivity() {
         joseph.height = 160.0
         joseph.id = 2
 
+        val newGlad = newGladiator()
+        val newGlad2 = newGladiator()
         gladiatorList = listOf(titus, joseph).toMutableList()
     }
 
