@@ -1,5 +1,7 @@
 package com.doorxii.ludus
 
+import android.content.Intent
+import android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -31,16 +33,22 @@ import kotlinx.serialization.json.Json
 import java.io.File
 import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.net.toUri
 import com.doorxii.ludus.ui.DropTarget
 import com.doorxii.ludus.ui.LongPressDraggable
+import com.doorxii.ludus.utils.CombatSerialization.returnCombatFile
+import com.doorxii.ludus.utils.CombatSerialization.saveCombatJson
 
 class CombatActivity() : ComponentActivity() {
 
     var combat: Combat? = null
     var choice: CombatActions? = null
     var text = mutableStateOf("")
+    lateinit var combatFile: File
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,7 +69,7 @@ class CombatActivity() : ComponentActivity() {
 
     fun readCombatFromJson(): Combat {
         val uri = intent.data
-        val combatFile = File(uri!!.path!!)
+        combatFile = File(uri!!.path!!)
         val combatJson = combatFile.readText()
         val combat = Json.decodeFromString<Combat>(combatJson)
         return combat
@@ -122,10 +130,16 @@ class CombatActivity() : ComponentActivity() {
                         .height(screenHeight * 0.65f)
 
                 ) {
-                    // player card
-                    GladiatorCards.CombatGladiatorCard(combat!!.gladiatorList[0])
-                    // enemy card
-                    GladiatorCards.CombatGladiatorCard(combat!!.gladiatorList[1])
+                    for (gladiator in combat!!.gladiatorList){
+                        GladiatorCards.CombatGladiatorCard(gladiator)
+                    }
+                    if (combat!!.gladiatorList.size < 2){
+                        Text("Combat over")
+                        Button(onClick = { combatCompleted() }) {
+                            Text("Finish Combat")
+                        }
+                    }
+
 
 
                     TextField(
@@ -153,15 +167,26 @@ class CombatActivity() : ComponentActivity() {
             if (combatAction != null) {
                 val roundResult = combat!!.playCombatRound(combatAction)
                 Log.d(TAG, "roundResult: " + roundResult.combatReport)
+                Log.d(TAG, "combat: " + combat.toString())
                 text.value = roundResult.combatReport
-                Log.d(TAG, "text: " + text)
+                if (combat!!.isComplete) {
+                    combatCompleted()
+                }
             }
         }
         choice = null
     }
 
-    fun updateBattleText(text: String){
-
+    fun combatCompleted(){
+        Log.d(TAG, "combat completed")
+        val report = combat?.combatReport
+        saveCombatJson(combat!!, combatFile)
+        val data = Intent().apply {
+            addFlags(FLAG_GRANT_READ_URI_PERMISSION)
+            setDataAndType(combatFile.toUri(), contentResolver.getType(combatFile.toUri()))
+        }
+        setResult(RESULT_OK, data)
+        finish()
     }
 
     companion object {

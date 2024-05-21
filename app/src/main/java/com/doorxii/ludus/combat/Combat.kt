@@ -50,13 +50,13 @@ class Combat(
             appendReport("Combat over, ${gladiatorList[0].name} won in $roundNumber rounds")
             isComplete = true
             return CombatResult(true, combatReport)
-        } else {
 
+        } else {
             userChoice = choice
             enemyChoice = combatActionToEnum(CombatBehaviour.basicActionPicker(gladiatorList[1]))
 
+            gladiatorList = runNewRound(gladiatorList, combatEnumToAction(userChoice!!), combatEnumToAction(enemyChoice!!))
 
-            runNewRound(gladiatorList, combatEnumToAction(userChoice!!), combatEnumToAction(enemyChoice!!))
             if (gladiatorList.size < 2) {
                 appendReport("Combat over, ${gladiatorList[0].name} won in $roundNumber rounds")
                 isComplete = true

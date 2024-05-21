@@ -7,9 +7,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 class CombatRound() {
-    private lateinit var gladiatorList: List<Gladiator>
+    private var gladiatorList: List<Gladiator> = mutableListOf()
     private var round: Int? = null
-    private lateinit var beginner: Gladiator
+    private var beginner: Gladiator? = null
     var roundReport: String = ""
 
     private fun determineBeginner(): Gladiator {
@@ -93,7 +93,7 @@ class CombatRound() {
         val aliveList = mutableListOf<Gladiator>()
         val deadList = mutableListOf<Gladiator>()
         for (gladiator in gladiatorList){
-            if (!gladiator.isAlive){
+            if (!gladiator.isAlive()){
                 Log.d(TAG, "gladiator: ${gladiator.name} is dead")
                 appendReport("Gladiator ${gladiator.name} is dead")
                 deadList.add(gladiator)

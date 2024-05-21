@@ -31,7 +31,8 @@ import com.doorxii.ludus.data.models.equipment.Equipment
 import com.doorxii.ludus.data.models.equipment.armour.LightArmour
 import com.doorxii.ludus.data.models.equipment.weapon.Gladius
 import com.doorxii.ludus.ui.theme.LudusTheme
-import kotlinx.serialization.encodeToString
+import com.doorxii.ludus.utils.CombatSerialization.returnCombatFile
+import com.doorxii.ludus.utils.CombatSerialization.saveCombatJson
 import kotlinx.serialization.json.Json
 import java.io.File
 
@@ -45,8 +46,7 @@ class MainActivity : androidx.activity.ComponentActivity() {
 
     lateinit var combatFile: File
 
-    var text = ""
-
+    var text = mutableStateOf("TEST TEXT")
     var titus = Gladiator()
     var joseph = Gladiator()
 
@@ -55,10 +55,15 @@ class MainActivity : androidx.activity.ComponentActivity() {
             if (result.resultCode == RESULT_OK) {
                 Log.d(TAG, "Combat result: ${result.toString()}")
                 val resultUri: Uri = result.data?.data!!
-                val inputStream = contentResolver.openInputStream(resultUri)
-                text = inputStream.toString()
+                val resFile = File(resultUri.path!!)
+                val resCombat = Json.decodeFromString<Combat>(resFile.readText())
+                Log.d(TAG, "Combat complete?: ${resCombat.isComplete.toString()}")
+                val winner = resCombat.gladiatorList[0]
+                Log.d(TAG, "Winner: ${winner.name}")
+                text.value = "Winner: ${winner.name}"
             }
         }
+
 
     fun setGladiators() {
         titus.name = "Titus"
@@ -95,22 +100,10 @@ class MainActivity : androidx.activity.ComponentActivity() {
         gladiatorList = listOf(titus, joseph).toMutableList()
     }
 
-    fun returnCombatFile(): File {
-        val context = applicationContext
-        val path = File(context.filesDir, "combat/combat.json")
-        val exists = path.exists()
-        if (!exists) {
-            path.mkdirs()
-            path.createNewFile()
-        }
-        return path
-    }
-
-
     fun startCombatActivity(gladiatorList: List<Gladiator>) {
-        combatFile = returnCombatFile()
+        combatFile = returnCombatFile(applicationContext)
         combat = Combat.init(gladiatorList)
-        saveCombatJson(combat!!)
+        saveCombatJson(combat!!, combatFile)
         Log.d(TAG, "combatfile: "+ combatFile.readText())
         val uri = combatFile.toUri()
         val intent = Intent(this, CombatActivity::class.java)
@@ -122,20 +115,13 @@ class MainActivity : androidx.activity.ComponentActivity() {
 
     }
 
-    fun saveCombatJson(combat: Combat) {
-        Log.d(TAG, "saving combat to file...")
-        val json = Json { prettyPrint = true }
-        val jsonString = json.encodeToString(combat)
-        combatFile.writeText(jsonString)
-    }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setGladiators()
 
-        combatFile = returnCombatFile()
+        combatFile = returnCombatFile(context = applicationContext)
 
         enableEdgeToEdge()
         setContent {
@@ -168,7 +154,7 @@ class MainActivity : androidx.activity.ComponentActivity() {
                 Text("Start")
             }
             TextField(
-                value = text,
+                value = text.value,
                 onValueChange = {},
                 minLines = 15,
                 modifier = Modifier
