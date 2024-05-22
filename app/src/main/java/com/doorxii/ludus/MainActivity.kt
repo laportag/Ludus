@@ -159,6 +159,13 @@ class MainActivity : androidx.activity.ComponentActivity() {
 
     }
 
+    fun simCombat(gladiatorList: List<Gladiator>) {
+        combat = Combat.init(gladiatorList)
+        val res = combat!!.simCombat()
+        text.value = "Sim: " + res.combatReport
+        Log.d(TAG, "res: " + res.combatReport)
+    }
+
 
 
 
@@ -194,15 +201,27 @@ class MainActivity : androidx.activity.ComponentActivity() {
         ) {
 //            TopAppBar(title = { Text("Ludus") })
             Text("Combat: ${choiceA.value.name} v ${choiceB.value.name}")
-            Button(
-                onClick = {
-                    gladiatorList = mutableListOf(choiceA.value, choiceB.value)
-                    startCombatActivity(gladiatorList)
-                },
-                enabled = isStartGameUIEnabled
-            ) {
-                Text("Start")
+            Row{
+                Button(
+                    onClick = {
+                        gladiatorList = mutableListOf(choiceA.value, choiceB.value)
+                        startCombatActivity(gladiatorList)
+                    },
+                    enabled = isStartGameUIEnabled
+                ) {
+                    Text("Start")
+                }
+                Button(
+                    onClick = {
+                        gladiatorList = mutableListOf(choiceA.value, choiceB.value)
+                        simCombat(gladiatorList)
+                    },
+                    enabled = isStartGameUIEnabled
+                ) {
+                    Text("Sim")
+                }
             }
+
             Row(
                 Modifier.fillMaxWidth()
             ){
