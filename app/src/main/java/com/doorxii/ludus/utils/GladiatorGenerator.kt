@@ -50,6 +50,14 @@ object GladiatorGenerator {
         return glad
     }
 
+    fun newGladiatorList(size: Int): MutableList<Gladiator> {
+        val gladList = mutableListOf<Gladiator>()
+        for (i in 1..size){
+            gladList.add(newGladiator())
+        }
+        return gladList
+    }
+
     fun doubleToOneSigFig(number: Double): Double {
         val exponent = floor(log10(abs(number))).toDouble()
 

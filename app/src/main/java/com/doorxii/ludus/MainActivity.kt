@@ -7,13 +7,21 @@ import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
@@ -24,16 +32,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.doorxii.ludus.combat.Combat
 import com.doorxii.ludus.data.models.animal.Gladiator
 import com.doorxii.ludus.data.models.equipment.Equipment
 import com.doorxii.ludus.data.models.equipment.armour.LightArmour
 import com.doorxii.ludus.data.models.equipment.weapon.Gladius
+import com.doorxii.ludus.data.models.ludus.Ludus
 import com.doorxii.ludus.ui.theme.LudusTheme
 import com.doorxii.ludus.utils.CombatSerialization.returnCombatFile
 import com.doorxii.ludus.utils.CombatSerialization.saveCombatJson
 import com.doorxii.ludus.utils.GladiatorGenerator.newGladiator
+import com.doorxii.ludus.utils.GladiatorGenerator.newGladiatorList
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File
@@ -65,6 +78,27 @@ class MainActivity : androidx.activity.ComponentActivity() {
                 text.value = "Winner: ${winner.name}"
             }
         }
+
+    var listA: MutableList<Gladiator> = mutableListOf()
+    var listB: MutableList<Gladiator> = mutableListOf()
+    var choiceA = mutableStateOf<Gladiator>(Gladiator())
+    var choiceB = mutableStateOf<Gladiator>(Gladiator())
+
+    fun testLudus() {
+        val romeLudus: Ludus = Ludus.init(
+            "Rome Ludus",
+            newGladiatorList(5)
+        )
+        listA = romeLudus.barracks.gladiators
+        val capuaLudus: Ludus = Ludus.init(
+            "Capua Ludus",
+            newGladiatorList(5)
+        )
+        listB = capuaLudus.barracks.gladiators
+
+        Log.d(TAG, "rome: " + Json.encodeToString(romeLudus))
+        Log.d(TAG, "capua: " + Json.encodeToString(capuaLudus))
+    }
 
 
     fun setGladiators() {
@@ -108,7 +142,7 @@ class MainActivity : androidx.activity.ComponentActivity() {
         combatFile = returnCombatFile(applicationContext)
         combat = Combat.init(gladiatorList)
         saveCombatJson(combat!!, combatFile)
-        Log.d(TAG, "combatfile: "+ combatFile.readText())
+        Log.d(TAG, "combatfile: " + combatFile.readText())
         val uri = combatFile.toUri()
         val intent = Intent(this, CombatActivity::class.java)
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -120,9 +154,11 @@ class MainActivity : androidx.activity.ComponentActivity() {
     }
 
 
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        testLudus()
         setGladiators()
 
         combatFile = returnCombatFile(context = applicationContext)
@@ -137,6 +173,7 @@ class MainActivity : androidx.activity.ComponentActivity() {
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
+    @Preview
     @Composable
 //    @Preview
     fun HomeScreen() {
@@ -148,7 +185,7 @@ class MainActivity : androidx.activity.ComponentActivity() {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            TopAppBar(title = { Text("Ludus") })
+//            TopAppBar(title = { Text("Ludus") })
             Button(
                 onClick = {
                     startCombatActivity(gladiatorList)
@@ -157,16 +194,72 @@ class MainActivity : androidx.activity.ComponentActivity() {
             ) {
                 Text("Start")
             }
+            Row(
+                Modifier.fillMaxWidth()
+            ){
+                Column(
+                    Modifier.weight(1f)
+                ) {
+                    BarracksList(list = listA) {
+                        choiceA.value = it
+                    }
+                }
+                Column(
+                    Modifier.weight(1f)
+                ) {
+                    BarracksList(list = listB) {
+                        choiceB.value = it
+                    }
+                }
+            }
             TextField(
                 value = text.value,
                 onValueChange = {},
                 minLines = 15,
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
                     .verticalScroll(scrollState)
             )
         }
     }
+
+    @Composable
+    fun BarracksList(
+        list: List<Gladiator>,
+        onItemSelected: (Gladiator) -> Unit
+    ) {
+        LazyColumn {
+            items(list) { gladiator ->
+                SelectableItem(
+                    gladiator,
+                    onItemSelected
+                )
+
+            }
+        }
+    }
+
+    @Composable
+    fun SelectableItem(
+        item: Gladiator,
+        onSelected: (Gladiator) -> Unit
+    ) {
+        val isSelected = item == choiceA.value || item == choiceB.value
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onSelected(item) },
+            shape = MaterialTheme.shapes.small,
+            tonalElevation = 4.dp,
+            color = if (isSelected) Color.LightGray else Color.Transparent
+        ) {
+            Text(
+                text = item.name,
+                modifier = Modifier.padding(16.dp)
+            )
+        }
+    }
+
 
     companion object {
         private const val TAG = "MainActivity"
