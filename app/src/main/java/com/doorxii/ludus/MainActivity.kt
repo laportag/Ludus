@@ -73,6 +73,11 @@ class MainActivity : androidx.activity.ComponentActivity() {
                 val resFile = File(resultUri.path!!)
                 val resCombat = Json.decodeFromString<Combat>(resFile.readText())
                 Log.d(TAG, "Combat complete?: ${resCombat.isComplete.toString()}")
+                if (resCombat.gladiatorList.size == 0){
+                    text.value = "No winner"
+                    Log.d(TAG, "No winner")
+                    return@registerForActivityResult
+                }
                 val winner = resCombat.gladiatorList[0]
                 Log.d(TAG, "Winner: ${winner.name}")
                 text.value = "Winner: ${winner.name}"
@@ -95,7 +100,8 @@ class MainActivity : androidx.activity.ComponentActivity() {
             newGladiatorList(5)
         )
         listB = capuaLudus.barracks.gladiators
-
+        choiceA.value = listA[0]
+        choiceB.value = listB[0]
         Log.d(TAG, "rome: " + Json.encodeToString(romeLudus))
         Log.d(TAG, "capua: " + Json.encodeToString(capuaLudus))
     }
@@ -158,6 +164,7 @@ class MainActivity : androidx.activity.ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         testLudus()
         setGladiators()
 
@@ -186,8 +193,10 @@ class MainActivity : androidx.activity.ComponentActivity() {
             verticalArrangement = Arrangement.Center
         ) {
 //            TopAppBar(title = { Text("Ludus") })
+            Text("Combat: ${choiceA.value.name} v ${choiceB.value.name}")
             Button(
                 onClick = {
+                    gladiatorList = mutableListOf(choiceA.value, choiceB.value)
                     startCombatActivity(gladiatorList)
                 },
                 enabled = isStartGameUIEnabled
