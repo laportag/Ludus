@@ -36,7 +36,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import androidx.room.Room
 import com.doorxii.ludus.combat.Combat
+import com.doorxii.ludus.data.db.AppDatabase
 import com.doorxii.ludus.data.models.animal.Gladiator
 import com.doorxii.ludus.data.models.equipment.Equipment
 import com.doorxii.ludus.data.models.equipment.armour.LightArmour
@@ -159,12 +161,22 @@ class MainActivity : androidx.activity.ComponentActivity() {
 
     }
 
+    lateinit var db: AppDatabase
+    fun initDb(){
+        db = Room.databaseBuilder(
+            applicationContext,
+            AppDatabase::class.java,
+            "database-name"
+        )
+            .build()
+    }
+
 
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        initDb()
         testLudus()
         setGladiators()
 

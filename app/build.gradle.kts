@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)  //version "1.9.20" apply false
     kotlin("plugin.serialization") version "1.9.20"
+    id("kotlin-kapt")
 }
 
 android {
@@ -67,6 +68,8 @@ dependencies {
     implementation(libs.androidx.material3.android)
     implementation(libs.androidx.appcompat)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.androidx.room.runtime)
+    kapt(libs.androidx.room.compiler)
 
 
     testImplementation(libs.junit)
