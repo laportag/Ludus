@@ -146,28 +146,50 @@ class MainActivity : androidx.activity.ComponentActivity() {
             val ludusDao = db.ludusDao()
             val gladiatorDao = db.gladiatorDao()
 
-
-//            val listA = newGladiatorList(5)
-//            val listB = newGladiatorList(5)
             val romeLudus: Ludus = Ludus("Rome")
             val capuaLudus: Ludus = Ludus("Capua")
+
+            val listA = newGladiatorList(5)
+            val listB = newGladiatorList(5)
+
+
 
 //            ludusDao.insertLudus(romeLudus)
 //            ludusDao.insertLudus(capuaLudus)
 
             val rome = ludusDao.getLudusByName("Rome")
             val capua = ludusDao.getLudusByName("Capua")
+            Log.d(TAG, "id rome: ${rome.ludusId}, id capua: ${capua.ludusId}")
+
+            listA.forEach { gladiator ->
+                try {
+                    gladiator.ludusId = rome.ludusId
+                    gladiatorDao.insertGladiator(gladiator)
+                } catch (e: Exception) {
+                    Log.d(TAG, "error: ${e.message}")
+                }
+
+            }
+            listB.forEach { gladiator ->
+                try {
+                    gladiator.ludusId = capua.ludusId
+                    gladiatorDao.insertGladiator(gladiator)
+                } catch (e: Exception) {
+                    Log.d(TAG, "error: ${e.message}")
+                }
+            }
 
             val all = ludusDao.getAllLudus()
+//            Log.d(TAG, "rome: $rome, capua: $capua")
 
-            Log.d(TAG, "rome: $rome, capua: $capua")
-
-            val ostiaLu = Ludus("Ostia")
+//            val ostiaLu = Ludus("Ostia")
 //            ludusDao.insertLudus(ostiaLu)
 
 
             Log.d(TAG, "all: ${Json.encodeToString(all)}")
-
+            Log.d(TAG, "get all glads: ${(gladiatorDao.getAll())}")
+            Log.d(TAG, "get rome glads: ${(gladiatorDao.getByLudusId(rome.ludusId))}")
+            Log.d(TAG, "get capua glads: ${(gladiatorDao.getByLudusId(capua.ludusId))}")
         }
 
 

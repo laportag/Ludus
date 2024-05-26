@@ -25,7 +25,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 class Gladiator() : Human() {
     @PrimaryKey(autoGenerate = true)
-    var gladiatorId: Int = -1
+    var gladiatorId: Int = 0
     var ludusId: Int = -1
     var morale: Double = 100.0
     var stamina: Double = 100.0

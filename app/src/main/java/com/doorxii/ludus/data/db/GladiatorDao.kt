@@ -15,22 +15,22 @@ abstract class GladiatorDao {
     abstract fun getAll(): List<Gladiator>
 
     @Query("SELECT * FROM Gladiator WHERE id = :id")
-    abstract fun getById(id: Long): Gladiator?
+    abstract fun getById(id: Int): Gladiator?
 
     @Query("SELECT * FROM Gladiator WHERE name = :name")
     abstract fun getByName(name: String): Gladiator?
 
     @Query("SELECT * FROM Gladiator WHERE ludusId = :id")
-    abstract fun getByLudusId(id: Long): List<Gladiator>
+    abstract fun getByLudusId(id: Int): List<Gladiator>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     abstract suspend fun insertGladiator(gladiator: Gladiator)
 
     @Update
     abstract fun update(gladiator: Gladiator)
 
     @Query("DELETE FROM Gladiator WHERE id = :id")
-    abstract fun deleteById(id: Long)
+    abstract fun deleteById(id: Int)
 
 
 
