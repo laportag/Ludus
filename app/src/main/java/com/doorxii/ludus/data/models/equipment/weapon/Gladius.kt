@@ -9,5 +9,5 @@ class Gladius() : Weapon(
     override var name: String = "Gladius"
     override var attackBonus: Double = 20.0
     override var defenceBonus: Double = 5.0
-    override var id: Int = 1
+    var id: Int = 1
 }

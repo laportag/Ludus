@@ -8,5 +8,5 @@ class Armourless() : Armour() {
     override val name: String = "Armourless"
     override var attackBonus: Double = 0.0
     override var defenceBonus: Double = 0.0
-    override var id: Int = -1
+    var id: Int = -1
 }

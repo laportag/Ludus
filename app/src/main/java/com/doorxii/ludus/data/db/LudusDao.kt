@@ -5,25 +5,32 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import com.doorxii.ludus.data.models.animal.Gladiator
 import com.doorxii.ludus.data.models.ludus.Ludus
 
 @Dao
-abstract class LudusDao{
+interface LudusDao{
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun insertLudus(ludus: Ludus)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun insertLudus(ludus: Ludus)
 
     @Query(value = "SELECT * FROM ludus")
-    abstract suspend fun getAllLudus(): List<Ludus>
+    fun getAllLudus(): List<Ludus>
 
-    @Query(value = "SELECT * FROM ludus WHERE id = :id")
-    abstract suspend fun getLudus(id: Int): Ludus
+    @Query(value = "SELECT * FROM ludus WHERE ludusId = :ludusId")
+    fun getLudus(ludusId: Int): Ludus
+
+    @Query(value = "SELECT * FROM ludus WHERE name = :name")
+    fun getLudusByName(name: String): Ludus
+
+    @Query(value = "SELECT * FROM ludus WHERE ludusId = :ludusId")
+    fun getLudusById(ludusId: Int): Ludus
 
     @Update
-    abstract suspend fun updateLudusById(id: Int, ludus: Ludus)
+    fun updateLudusById(ludus: Ludus)
 
-    @Query(value = "DELETE FROM ludus WHERE id = :id")
-    abstract suspend fun deleteLudusById(id: Int)
+    @Query(value = "DELETE FROM ludus WHERE ludusId = :ludusId")
+    fun deleteLudusById(ludusId: Int)
 
 
 }

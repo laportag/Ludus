@@ -8,5 +8,5 @@ class Barefist() : Weapon() {
     override val name: String = "Barefists"
     override var attackBonus: Double = 0.0
     override var defenceBonus: Double = 0.0
-    override var id: Int = 2
+    var id: Int = 2
 }

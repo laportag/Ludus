@@ -5,8 +5,8 @@ import com.doorxii.ludus.actions.CombatBehaviour
 import com.doorxii.ludus.actions.combatactions.CombatAction
 import com.doorxii.ludus.actions.combatactions.CombatActions
 import com.doorxii.ludus.data.models.animal.Gladiator
-import com.doorxii.ludus.utils.EnumToAction.combatActionToEnum
-import com.doorxii.ludus.utils.EnumToAction.combatEnumToAction
+import com.doorxii.ludus.utils.enums.EnumToAction.combatActionToEnum
+import com.doorxii.ludus.utils.enums.EnumToAction.combatEnumToAction
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -78,9 +78,9 @@ class Combat(
     ): List<Gladiator> {
         var gladiatorList = gladiatorList
         roundNumber++
-        gladiatorList[0].action = actionA
-        gladiatorList[1].action = actionB
-        appendReport("Round $roundNumber: ${gladiatorList[0].name}:${gladiatorList[0].action?.name} vs ${gladiatorList[1].name}: ${gladiatorList[1].action?.name}")
+        gladiatorList[0].action = combatActionToEnum(actionA)
+        gladiatorList[1].action = combatActionToEnum(actionB)
+        appendReport("Round $roundNumber: ${gladiatorList[0].name}:${gladiatorList[0].action.toString()} vs ${gladiatorList[1].name}: ${gladiatorList[1].action?.name}")
         if (gladiatorList.size <= 1) {
             return gladiatorList
         }

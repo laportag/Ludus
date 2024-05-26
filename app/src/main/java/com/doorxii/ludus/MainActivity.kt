@@ -41,14 +41,21 @@ import com.doorxii.ludus.combat.Combat
 import com.doorxii.ludus.data.db.AppDatabase
 import com.doorxii.ludus.data.models.animal.Gladiator
 import com.doorxii.ludus.data.models.equipment.Equipment
+import com.doorxii.ludus.data.models.equipment.armour.Armours
 import com.doorxii.ludus.data.models.equipment.armour.LightArmour
 import com.doorxii.ludus.data.models.equipment.weapon.Gladius
+import com.doorxii.ludus.data.models.equipment.weapon.Weapons
 import com.doorxii.ludus.data.models.ludus.Ludus
 import com.doorxii.ludus.ui.theme.LudusTheme
 import com.doorxii.ludus.utils.CombatSerialization.returnCombatFile
 import com.doorxii.ludus.utils.CombatSerialization.saveCombatJson
 import com.doorxii.ludus.utils.GladiatorGenerator.newGladiator
 import com.doorxii.ludus.utils.GladiatorGenerator.newGladiatorList
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File
@@ -64,8 +71,8 @@ class MainActivity : androidx.activity.ComponentActivity() {
     lateinit var combatFile: File
 
     var text = mutableStateOf("TEST TEXT")
-    var titus = Gladiator()
-    var joseph = Gladiator()
+//    var titus = Gladiator()
+//    var joseph = Gladiator()
 
     val combatResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -91,60 +98,23 @@ class MainActivity : androidx.activity.ComponentActivity() {
     var choiceA = mutableStateOf<Gladiator>(Gladiator())
     var choiceB = mutableStateOf<Gladiator>(Gladiator())
 
-    fun testLudus() {
-        val romeLudus: Ludus = Ludus.init(
-            "Rome Ludus",
-            newGladiatorList(5)
-        )
-        listA = romeLudus.barracks.gladiators
-        val capuaLudus: Ludus = Ludus.init(
-            "Capua Ludus",
-            newGladiatorList(5)
-        )
-        listB = capuaLudus.barracks.gladiators
-        choiceA.value = listA[0]
-        choiceB.value = listB[0]
-        Log.d(TAG, "rome: " + Json.encodeToString(romeLudus))
-        Log.d(TAG, "capua: " + Json.encodeToString(capuaLudus))
-    }
+//    fun testLudus() {
+//        val romeLudus: Ludus = Ludus.init(
+//            "Rome Ludus",
+//            newGladiatorList(5)
+//        )
+//        listA = romeLudus.barracks  //.gladiators
+//        val capuaLudus: Ludus = Ludus.init(
+//            "Capua Ludus",
+//            newGladiatorList(5)
+//        )
+//        listB = capuaLudus.barracks  //.gladiators
+//        choiceA.value = listA[0]
+//        choiceB.value = listB[0]
+//        Log.d(TAG, "rome: " + Json.encodeToString(romeLudus))
+//        Log.d(TAG, "capua: " + Json.encodeToString(capuaLudus))
+//    }
 
-
-    fun setGladiators() {
-        titus.name = "Titus"
-        titus.age = 21.0
-        titus.strength = 75.0
-        titus.speed = 60.0
-        titus.technique = 90.0
-        titus.morale = 100.0
-        titus.health = 100.0
-        titus.stamina = 100.0
-        titus.equipment = Equipment()
-            .apply {
-                weapon = Gladius()
-                armour = LightArmour()
-            }
-        titus.bloodlust = 60.0
-        titus.height = 160.0
-        titus.humanControlled = true
-        titus.id = 1
-
-        joseph.name = "Joseph"
-        joseph.age = 34.0
-        joseph.strength = 75.0
-        joseph.speed = 60.0
-        joseph.technique = 40.0
-        joseph.morale = 100.0
-        joseph.health = 100.0
-        joseph.stamina = 100.0
-        joseph.equipment = Equipment()
-        joseph.bloodlust = 60.0
-        joseph.height = 160.0
-        joseph.id = 2
-
-        val newGlad = newGladiator()
-        val newGlad2 = newGladiator()
-        gladiatorList = listOf(titus, joseph).toMutableList()
-    }
 
     fun startCombatActivity(gladiatorList: List<Gladiator>) {
         combatFile = returnCombatFile(applicationContext)
@@ -162,13 +132,46 @@ class MainActivity : androidx.activity.ComponentActivity() {
     }
 
     lateinit var db: AppDatabase
+    @OptIn(DelicateCoroutinesApi::class)
     fun initDb(){
-        db = Room.databaseBuilder(
-            applicationContext,
-            AppDatabase::class.java,
-            "database-name"
-        )
-            .build()
+
+        GlobalScope.launch(Dispatchers.IO) {
+            db = Room.databaseBuilder(
+                applicationContext,
+                AppDatabase::class.java,
+                "database-name"
+            )
+                .build()
+
+            val ludusDao = db.ludusDao()
+            val gladiatorDao = db.gladiatorDao()
+
+
+//            val listA = newGladiatorList(5)
+//            val listB = newGladiatorList(5)
+            val romeLudus: Ludus = Ludus("Rome")
+            val capuaLudus: Ludus = Ludus("Capua")
+
+//            ludusDao.insertLudus(romeLudus)
+//            ludusDao.insertLudus(capuaLudus)
+
+            val rome = ludusDao.getLudusByName("Rome")
+            val capua = ludusDao.getLudusByName("Capua")
+
+            val all = ludusDao.getAllLudus()
+
+            Log.d(TAG, "rome: $rome, capua: $capua")
+
+            val ostiaLu = Ludus("Ostia")
+//            ludusDao.insertLudus(ostiaLu)
+
+
+            Log.d(TAG, "all: ${Json.encodeToString(all)}")
+
+        }
+
+
+
     }
 
 
@@ -177,8 +180,8 @@ class MainActivity : androidx.activity.ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initDb()
-        testLudus()
-        setGladiators()
+//        testLudus()
+//        setGladiators()
 
         combatFile = returnCombatFile(context = applicationContext)
 

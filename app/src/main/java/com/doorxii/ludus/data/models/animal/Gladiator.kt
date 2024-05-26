@@ -1,26 +1,46 @@
 package com.doorxii.ludus.data.models.animal
 
-import android.util.Log
+import androidx.room.Embedded
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
+import androidx.room.PrimaryKey
 import com.doorxii.ludus.actions.combatactions.CombatAction
+import com.doorxii.ludus.actions.combatactions.CombatActions
 import com.doorxii.ludus.data.models.equipment.Equipment
+import com.doorxii.ludus.data.models.ludus.Ludus
 import kotlinx.serialization.Serializable
 
+@Entity(
+    foreignKeys = [ForeignKey(
+        entity = Ludus::class,
+        parentColumns = ["ludusId"],
+        childColumns = ["ludusId"]
+    )
+    ],
+    indices = [
+        Index(value = ["ludusId"])
+    ]
+)
 @Serializable
 class Gladiator() : Human() {
-
+    @PrimaryKey(autoGenerate = true)
+    var gladiatorId: Int = -1
+    var ludusId: Int = -1
     var morale: Double = 100.0
     var stamina: Double = 100.0
     var strength: Double = 60.0
     var speed: Double = 60.0
     var technique: Double = 60.0
     var bloodlust: Double = 60.0
+    @Embedded
     var equipment: Equipment = Equipment()
     var humanControlled: Boolean = false
 
     var attack = calculateAttack()
     var defence = calculateDefence()
 
-    var action: CombatAction? = null
+    var action: CombatActions? = null
 
     private fun calculateAttack(): Double {
         val fatigue = 100 - ((morale + stamina) / 200)

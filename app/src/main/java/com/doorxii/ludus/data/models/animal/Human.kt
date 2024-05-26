@@ -18,7 +18,7 @@ abstract class Human() : Animal() {
             if (field <= 0.0) {
             }
         }
-    abstract override var id: Int
+    abstract var id: Int
 
 
     fun isAlive(): Boolean {

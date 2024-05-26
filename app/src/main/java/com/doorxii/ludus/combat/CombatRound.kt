@@ -3,6 +3,7 @@ package com.doorxii.ludus.combat
 import android.util.Log
 import com.doorxii.ludus.actions.combatactions.CombatActionResult
 import com.doorxii.ludus.data.models.animal.Gladiator
+import com.doorxii.ludus.utils.enums.EnumToAction.combatEnumToAction
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -49,22 +50,22 @@ class CombatRound() {
 
         if (beginner == gladiatorList[0]) {
             // A Starts
-            val resA = gladiatorList[0].action?.act(mutableListOf(gladiatorList[0], gladiatorList[1]))!!
+            val resA = combatEnumToAction(gladiatorList[0].action!!).act(mutableListOf(gladiatorList[0], gladiatorList[1]))!!
             gladiatorList = updateFromCombatActionResult(resA)
             if (gladiatorList.size < 2) { return gladiatorList }
 
-            val resB = gladiatorList[1].action?.act(mutableListOf(gladiatorList[1], gladiatorList[0]))
-            gladiatorList = updateFromCombatActionResult(resB!!)
+            val resB = combatEnumToAction(gladiatorList[1].action!!).act(mutableListOf(gladiatorList[1], gladiatorList[0]))
+            gladiatorList = updateFromCombatActionResult(resB)
             if (gladiatorList.size < 2) { return gladiatorList }
 
         } else {
             // B Starts
-            val resB = gladiatorList[1].action?.act(mutableListOf(gladiatorList[1], gladiatorList[0]))
-            gladiatorList = updateFromCombatActionResult(resB!!)
+            val resB = combatEnumToAction(gladiatorList[1].action!!).act(mutableListOf(gladiatorList[1], gladiatorList[0]))
+            gladiatorList = updateFromCombatActionResult(resB)
             if (gladiatorList.size < 2) { return gladiatorList }
 
-            val resA = gladiatorList[0].action?.act(mutableListOf(gladiatorList[0], gladiatorList[1]))
-            gladiatorList = updateFromCombatActionResult(resA!!)
+            val resA = combatEnumToAction(gladiatorList[0].action!!).act(mutableListOf(gladiatorList[0], gladiatorList[1]))
+            gladiatorList = updateFromCombatActionResult(resA)
             if (gladiatorList.size < 2) { return gladiatorList }
         }
 

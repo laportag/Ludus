@@ -5,9 +5,11 @@ import com.doorxii.ludus.MainActivity
 import com.doorxii.ludus.data.models.animal.Gladiator
 import com.doorxii.ludus.data.models.equipment.Equipment
 import com.doorxii.ludus.data.models.equipment.armour.Armourless
+import com.doorxii.ludus.data.models.equipment.armour.Armours
 import com.doorxii.ludus.data.models.equipment.armour.LightArmour
 import com.doorxii.ludus.data.models.equipment.weapon.Barefist
 import com.doorxii.ludus.data.models.equipment.weapon.Gladius
+import com.doorxii.ludus.data.models.equipment.weapon.Weapons
 import com.doorxii.ludus.utils.NameStrings.getRandomName
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -33,15 +35,15 @@ object GladiatorGenerator {
         glad.bloodlust = getRandomStat()
         glad.equipment = Equipment()
         if (Random.nextBoolean()){
-            glad.equipment.weapon = Gladius()
+            glad.equipment.weapon = Weapons.GLADIUS
         }
         else {
-            glad.equipment.weapon = Barefist()
+            glad.equipment.weapon = Weapons.BAREFIST
         }
         if (Random.nextBoolean()){
-            glad.equipment.armour = LightArmour()
+            glad.equipment.armour = Armours.LIGHT_ARMOUR
         } else {
-            glad.equipment.armour = Armourless()
+            glad.equipment.armour = Armours.ARMOURLESS
         }
 
         val json = Json { prettyPrint = true }
@@ -56,16 +58,6 @@ object GladiatorGenerator {
             gladList.add(newGladiator())
         }
         return gladList
-    }
-
-    fun doubleToOneSigFig(number: Double): Double {
-        val exponent = floor(log10(abs(number))).toDouble()
-
-        // Calculate the first significant digit
-        val firstDigit = floor(number / 10.0.pow(exponent)).toInt()
-
-        // Return the number rounded to 1 significant figure
-        return firstDigit * 10.0.pow(exponent)
     }
 
     fun getRandomAge():Double{
@@ -99,14 +91,6 @@ object GladiatorGenerator {
         }
         return biasedRandomNumber.toDouble()
     }
-
-
-//    var strength: Double = 60.0
-//    var speed: Double = 60.0
-//    var technique: Double = 60.0
-//    var bloodlust: Double = 60.0
-//    var equipment: Equipment = Equipment()
-//    var humanControlled: Boolean = false
 
     const val TAG = "GladiatorGenerator"
 }

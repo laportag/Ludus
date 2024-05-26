@@ -28,7 +28,7 @@ import com.doorxii.ludus.combat.Combat
 import com.doorxii.ludus.ui.cards.ActionCards
 import com.doorxii.ludus.ui.cards.GladiatorCards
 import com.doorxii.ludus.ui.theme.LudusTheme
-import com.doorxii.ludus.utils.EnumToAction.combatEnumListToActionList
+import com.doorxii.ludus.utils.enums.EnumToAction.combatEnumListToActionList
 import kotlinx.serialization.json.Json
 import java.io.File
 import android.util.Log
@@ -40,7 +40,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.net.toUri
 import com.doorxii.ludus.ui.DropTarget
 import com.doorxii.ludus.ui.LongPressDraggable
-import com.doorxii.ludus.utils.CombatSerialization.returnCombatFile
 import com.doorxii.ludus.utils.CombatSerialization.saveCombatJson
 
 class CombatActivity() : ComponentActivity() {
