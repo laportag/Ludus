@@ -7,30 +7,31 @@ import androidx.room.Query
 import androidx.room.Update
 import com.doorxii.ludus.data.models.animal.Gladiator
 import com.doorxii.ludus.data.models.ludus.Ludus
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface LudusDao{
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insertLudus(ludus: Ludus)
+    suspend fun insertLudus(ludus: Ludus)
 
     @Query(value = "SELECT * FROM ludus")
-    fun getAllLudus(): List<Ludus>
+    fun getAllLudus(): Flow<List<Ludus>>
 
     @Query(value = "SELECT * FROM ludus WHERE ludusId = :ludusId")
-    fun getLudus(ludusId: Int): Ludus
+    fun getLudus(ludusId: Int): Flow<Ludus>
 
     @Query(value = "SELECT * FROM ludus WHERE name = :name")
-    fun getLudusByName(name: String): Ludus
+    fun getLudusByName(name: String): Flow<Ludus>
 
     @Query(value = "SELECT * FROM ludus WHERE ludusId = :ludusId")
-    fun getLudusById(ludusId: Int): Ludus
+    fun getLudusById(ludusId: Int): Flow<Ludus>
 
     @Update
-    fun updateLudusById(ludus: Ludus)
+    suspend fun updateLudusById(ludus: Ludus)
 
     @Query(value = "DELETE FROM ludus WHERE ludusId = :ludusId")
-    fun deleteLudusById(ludusId: Int)
+    suspend fun deleteLudusById(ludusId: Int)
 
 
 }

@@ -6,31 +6,31 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.doorxii.ludus.data.models.animal.Gladiator
-import com.doorxii.ludus.data.models.ludus.Ludus
+import kotlinx.coroutines.flow.Flow
 
 @Dao
-abstract class GladiatorDao {
+interface GladiatorDao {
 
     @Query("SELECT * FROM Gladiator")
-    abstract fun getAll(): List<Gladiator>
+    fun getAll(): Flow<List<Gladiator>>
 
     @Query("SELECT * FROM Gladiator WHERE id = :id")
-    abstract fun getById(id: Int): Gladiator?
+    fun getById(id: Int): Flow<Gladiator>
 
     @Query("SELECT * FROM Gladiator WHERE name = :name")
-    abstract fun getByName(name: String): Gladiator?
+    fun getByName(name: String): Flow<Gladiator>
 
     @Query("SELECT * FROM Gladiator WHERE ludusId = :id")
-    abstract fun getByLudusId(id: Int): List<Gladiator>
+    fun getByLudusId(id: Int): Flow<List<Gladiator>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    abstract suspend fun insertGladiator(gladiator: Gladiator)
+    suspend fun insertGladiator(gladiator: Gladiator)
 
     @Update
-    abstract fun update(gladiator: Gladiator)
+    suspend fun updateGladiator(gladiator: Gladiator)
 
     @Query("DELETE FROM Gladiator WHERE id = :id")
-    abstract fun deleteById(id: Int)
+    suspend fun deleteById(id: Int)
 
 
 

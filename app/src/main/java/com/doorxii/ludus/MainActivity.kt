@@ -24,7 +24,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,22 +41,15 @@ import com.doorxii.ludus.data.db.AppDatabase
 import com.doorxii.ludus.data.db.GladiatorDao
 import com.doorxii.ludus.data.db.LudusDao
 import com.doorxii.ludus.data.models.animal.Gladiator
-import com.doorxii.ludus.data.models.equipment.Equipment
-import com.doorxii.ludus.data.models.equipment.armour.Armours
-import com.doorxii.ludus.data.models.equipment.armour.LightArmour
-import com.doorxii.ludus.data.models.equipment.weapon.Gladius
-import com.doorxii.ludus.data.models.equipment.weapon.Weapons
 import com.doorxii.ludus.data.models.ludus.Ludus
 import com.doorxii.ludus.ui.theme.LudusTheme
 import com.doorxii.ludus.utils.CombatSerialization.returnCombatFile
 import com.doorxii.ludus.utils.CombatSerialization.saveCombatJson
-import com.doorxii.ludus.utils.GladiatorGenerator.newGladiator
 import com.doorxii.ludus.utils.GladiatorGenerator.newGladiatorList
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File
@@ -102,16 +94,14 @@ class MainActivity : androidx.activity.ComponentActivity() {
                 if (gladiator !in resCombat.gladiatorList) {
                     // dead gladiators
                     gladiator.health = 0.0
-                    gladiatorDao.update(gladiator)
+                    gladiatorDao.updateGladiator(gladiator)
                 }
             }
             for (gladiator in resCombat.gladiatorList) {
-                gladiatorDao.update(gladiator)
+                gladiatorDao.updateGladiator(gladiator)
             }
             updateLudusList()
         }
-
-
     }
 
     var listA: MutableList<Gladiator> = mutableListOf()
@@ -132,7 +122,6 @@ class MainActivity : androidx.activity.ComponentActivity() {
         intent.setDataAndType(uri, contentResolver.getType(uri))
         combatResultLauncher.launch(intent)
         startActivity(intent)
-
     }
 
     fun simCombat(gladiatorList: List<Gladiator>) {
