@@ -19,7 +19,7 @@
             android:label="@string/title_activity_combat"
             android:theme="@style/Theme.Ludus" />
         <activity
-            android:name=".MainActivity"
+            android:name=".StartActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.Ludus" >

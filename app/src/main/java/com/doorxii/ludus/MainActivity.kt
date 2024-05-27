@@ -143,32 +143,32 @@ class MainActivity : androidx.activity.ComponentActivity() {
 
     @OptIn(DelicateCoroutinesApi::class)
     fun initDb() {
-
-        GlobalScope.launch(Dispatchers.IO) {
-            db = Room.databaseBuilder(
-                applicationContext,
-                AppDatabase::class.java,
-                "database-name"
-            )
-                .build()
-
-            ludusDao = db.ludusDao()
-            gladiatorDao = db.gladiatorDao()
-
-            val romeLudus: Ludus = Ludus("Rome")
-            val capuaLudus: Ludus = Ludus("Capua")
-
-            val listA = newGladiatorList(5)
-            val listB = newGladiatorList(5)
-
-
-//            ludusDao.insertLudus(romeLudus)
-//            ludusDao.insertLudus(capuaLudus)
-
-            rome = ludusDao.getLudusByName("Rome")
-            capua = ludusDao.getLudusByName("Capua")
-            Log.d(TAG, "id rome: ${rome.ludusId}, id capua: ${capua.ludusId}")
-            updateLudusList()
+//
+//        GlobalScope.launch(Dispatchers.IO) {
+//            db = Room.databaseBuilder(
+//                applicationContext,
+//                AppDatabase::class.java,
+//                "ludus.db"
+//            )
+//                .build()
+//
+//            ludusDao = db.ludusDao()
+//            gladiatorDao = db.gladiatorDao()
+//
+//            val romeLudus: Ludus = Ludus("Rome")
+//            val capuaLudus: Ludus = Ludus("Capua")
+//
+//            val listA = newGladiatorList(5)
+//            val listB = newGladiatorList(5)
+//
+//
+////            ludusDao.insertLudus(romeLudus)
+////            ludusDao.insertLudus(capuaLudus)
+//
+//            rome = ludusDao.getLudusByName("Rome")
+//            capua = ludusDao.getLudusByName("Capua")
+//            Log.d(TAG, "id rome: ${rome.ludusId}, id capua: ${capua.ludusId}")
+//            updateLudusList()
 //            romeList = gladiatorDao.getByLudusId(rome.ludusId).toMutableList()
 //            capuaList = gladiatorDao.getByLudusId(capua.ludusId).toMutableList()
 
@@ -190,48 +190,48 @@ class MainActivity : androidx.activity.ComponentActivity() {
 //                }
 //            }
 
-            val all = ludusDao.getAllLudus()
-//            Log.d(TAG, "rome: $rome, capua: $capua")
-
-//            val ostiaLu = Ludus("Ostia")
-//            ludusDao.insertLudus(ostiaLu)
-
-            var romelist = gladiatorDao.getByLudusId(rome.ludusId)
-            var romestr = ""
-            romelist.forEach {
-                romestr += Json.encodeToString(it)
-            }
-            Log.d(TAG, "rome: ${romestr}")
-
-            var capualist = gladiatorDao.getByLudusId(capua.ludusId)
-            var capuastr = ""
-            capualist.forEach {
-                capuastr += Json.encodeToString(it)
-            }
-            Log.d(TAG, "capua: ${capuastr}")
-
-            Log.d(TAG, "all: ${Json.encodeToString(all)}")
-            Log.d(TAG, "get all glads: ${(gladiatorDao.getAll())}")
-            Log.d(TAG, "get rome glads: ${(gladiatorDao.getByLudusId(rome.ludusId))}")
-            Log.d(TAG, "get capua glads: ${(gladiatorDao.getByLudusId(capua.ludusId))}")
-        }
+//            val all = ludusDao.getAllLudus()
+////            Log.d(TAG, "rome: $rome, capua: $capua")
+//
+////            val ostiaLu = Ludus("Ostia")
+////            ludusDao.insertLudus(ostiaLu)
+//
+//            var romelist = gladiatorDao.getByLudusId(rome.ludusId)
+//            var romestr = ""
+//            romelist.forEach {
+//                romestr += Json.encodeToString(it)
+//            }
+//            Log.d(TAG, "rome: ${romestr}")
+//
+//            var capualist = gladiatorDao.getByLudusId(capua.ludusId)
+//            var capuastr = ""
+//            capualist.forEach {
+//                capuastr += Json.encodeToString(it)
+//            }
+//            Log.d(TAG, "capua: ${capuastr}")
+//
+//            Log.d(TAG, "all: ${Json.encodeToString(all)}")
+//            Log.d(TAG, "get all glads: ${(gladiatorDao.getAll())}")
+//            Log.d(TAG, "get rome glads: ${(gladiatorDao.getByLudusId(rome.ludusId))}")
+//            Log.d(TAG, "get capua glads: ${(gladiatorDao.getByLudusId(capua.ludusId))}")
+//        }
     }
 
     fun updateLudusList() {
-        GlobalScope.launch(Dispatchers.IO) {
-            romeList = mutableListOf()
-            for (gladiator in gladiatorDao.getByLudusId(rome.ludusId).toMutableList()) {
-                if (gladiator.isAlive()) {
-                    romeList.add(gladiator)
-                }
-            }
-            capuaList = mutableListOf()
-            for (gladiator in gladiatorDao.getByLudusId(capua.ludusId).toMutableList()) {
-                if (gladiator.isAlive()) {
-                    capuaList.add(gladiator)
-                }
-            }
-        }
+//        GlobalScope.launch(Dispatchers.IO) {
+//            romeList = mutableListOf()
+//            for (gladiator in gladiatorDao.getByLudusId(rome.ludusId).toMutableList()) {
+//                if (gladiator.isAlive()) {
+//                    romeList.add(gladiator)
+//                }
+//            }
+//            capuaList = mutableListOf()
+//            for (gladiator in gladiatorDao.getByLudusId(capua.ludusId).toMutableList()) {
+//                if (gladiator.isAlive()) {
+//                    capuaList.add(gladiator)
+//                }
+//            }
+//        }
     }
 
 
