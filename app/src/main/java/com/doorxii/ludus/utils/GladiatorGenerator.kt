@@ -62,6 +62,14 @@ object GladiatorGenerator {
         return gladList
     }
 
+    fun newGladiatorListWithLudusId(size:Int, ludusId: Int): MutableList<Gladiator> {
+        var list = newGladiatorList(size)
+        for (gladiator in list){
+            gladiator.ludusId = ludusId
+        }
+        return list
+    }
+
     fun getRandomAge():Double{
         val rangeStart = 15
         val rangeEnd = 40

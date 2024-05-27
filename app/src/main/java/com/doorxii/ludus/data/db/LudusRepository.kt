@@ -22,6 +22,7 @@ class LudusRepository(db: AppDatabase) {
 
     suspend fun insertGladiator(gladiator: Gladiator) = gladiatorDao.insertGladiator(gladiator)
 
+
     fun getAllGladiators(): Flow<List<Gladiator>> = gladiatorDao.getAll()
 
     fun getGladiator(gladiatorId: Int): Flow<Gladiator> = gladiatorDao.getById(gladiatorId)

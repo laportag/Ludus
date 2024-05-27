@@ -3,6 +3,7 @@ package com.doorxii.ludus
 import android.app.AlertDialog
 import android.app.Application
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -38,6 +39,13 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.doorxii.ludus.data.db.AppDatabase
 import com.doorxii.ludus.data.models.ludus.Ludus
 import com.doorxii.ludus.ui.theme.LudusTheme
+import com.doorxii.ludus.utils.DatabaseManagement
+import com.doorxii.ludus.utils.DatabaseManagement.createDb
+import com.doorxii.ludus.utils.DatabaseManagement.deleteDb
+import com.doorxii.ludus.utils.DatabaseManagement.getAllDatabases
+import com.doorxii.ludus.utils.DatabaseManagement.returnDb
+import com.doorxii.ludus.utils.GladiatorGenerator.newGladiatorList
+import com.doorxii.ludus.utils.GladiatorGenerator.newGladiatorListWithLudusId
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -62,96 +70,113 @@ class StartActivity : ComponentActivity() {
             }
         }
 
-        Log.d(TAG, "dbs: ${getAllDatabases()}")
+        Log.d(TAG, "dbs: ${getAllDatabases(applicationContext)}")
     }
 
-    fun getAllDatabases(): List<String> {
+//    fun getAllDatabases(): List<String> {
+//
+//        val databases = mutableListOf<String>()
+//        applicationContext.databaseList().forEach { databaseName ->
+//            if (!databaseName.endsWith("-journal") && !databaseName.endsWith("-wal") && !databaseName.endsWith(
+//                    "-shm"
+//                )
+//            ) {
+//                databases.add(databaseName)
+//            }
+//        }
+//        Log.d(TAG, "getAllDatabases: $databases")
+//        return databases
+//    }
 
-        val databases = mutableListOf<String>()
-        applicationContext.databaseList().forEach { databaseName ->
-            if (!databaseName.endsWith("-journal") && !databaseName.endsWith("-wal") && !databaseName.endsWith(
-                    "-shm"
-                )
-            ) {
-                databases.add(databaseName)
-            }
-        }
-        Log.d(TAG, "getAllDatabases: $databases")
-        return databases
+//    fun createDb(ludusName: String) {
+//        GlobalScope.launch(Dispatchers.IO) {
+//            Log.d(TAG, "createDb: $ludusName")
+//
+//            // Validate the ludusName parameter
+//            if (ludusName.isEmpty() || ludusName.contains(Regex("[\\s\\W]"))) {
+//                Log.e(TAG, "Invalid database name: $ludusName")
+//                return@launch
+//            }
+//
+//            // Check if the database file already exists
+//            val dbFile = applicationContext.getDatabasePath(ludusName)
+//            if (dbFile.exists()) {
+//                Log.d(TAG, "Database file already exists: $ludusName")
+//                return@launch
+//            }
+//
+//            // Create the database file
+//            val db = Room.databaseBuilder(
+//                applicationContext,
+//                AppDatabase::class.java,
+//                ludusName
+//            )
+//                .enableMultiInstanceInvalidation()
+//                .setJournalMode(RoomDatabase.JournalMode.TRUNCATE)
+//                .setQueryExecutor(Executors.newSingleThreadExecutor())
+//                .setTransactionExecutor(Executors.newSingleThreadExecutor())
+//                .build()
+//
+//
+////            db.ludusDao().insertLudus(Ludus(ludusName))
+//
+//            Log.d(TAG, "Database file created: $ludusName")
+//
+//            populateDb(db)
+//
+//            launchLudusManagement(db)
+//
+//        }
+
+
+//    }
+
+//    fun loadDb(dbName: String) {
+//        val db = Room.databaseBuilder(
+//            applicationContext,
+//            AppDatabase::class.java, dbName
+//        ).build()
+//        launchLudusManagement(db)
+//    }
+
+//    suspend fun populateDb(db: AppDatabase) {
+//        var ludi = listOf("Ludus Magnus", "Capua", "Pergamum", "Alexandria", "Praeneste")
+//        for (ludusName in ludi) {
+//            val newLudus = Ludus(ludusName)
+//            db.ludusDao().insertLudus(newLudus)
+//            val id = db.ludusDao().getLudusByName(ludusName).first().ludusId
+//
+//            val newGladiators = newGladiatorListWithLudusId(7, id)
+//            for (gladiator in newGladiators) {
+//                db.gladiatorDao().insertGladiator(gladiator)
+//            }
+//        }
+//
+//    }
+
+    fun launchLudusManagement(db: AppDatabase) {
+        val name = ""
+        val intent = Intent(this, LudusManagementActivity::class.java)
+        intent.putExtra("db_name", name)
+        startActivity(intent)
     }
 
-    fun createDb(ludusName: String) {
-        GlobalScope.launch(Dispatchers.IO) {
-            Log.d(TAG, "createDb: $ludusName")
-
-            // Validate the ludusName parameter
-            if (ludusName.isEmpty() || ludusName.contains(Regex("[\\s\\W]"))) {
-                Log.e(TAG, "Invalid database name: $ludusName")
-                return@launch
-            }
-
-            // Check if the database file already exists
-            val dbFile = applicationContext.getDatabasePath(ludusName)
-            if (dbFile.exists()) {
-                Log.d(TAG, "Database file already exists: $ludusName")
-                return@launch
-            }
-
-            // Create the database file
-            val db = Room.databaseBuilder(
-                applicationContext,
-                AppDatabase::class.java,
-                ludusName
-            )
-                .enableMultiInstanceInvalidation()
-                .setJournalMode(RoomDatabase.JournalMode.TRUNCATE)
-                .setQueryExecutor(Executors.newSingleThreadExecutor())
-                .setTransactionExecutor(Executors.newSingleThreadExecutor())
-                .build()
-
-
-//            db.ludusDao().insertLudus(Ludus(ludusName))
-
-            Log.d(TAG, "Database file created: $ludusName")
-
-            Log.d(TAG, db.ludusDao().getAllLudus().first().toString())
-        }
-
-
-    }
-
-    fun loadDb(dbName: String): AppDatabase {
-        val db = Room.databaseBuilder(
-            applicationContext,
-            AppDatabase::class.java, dbName
-        ).build()
-        return db
-    }
-
-    fun populateDb(db: AppDatabase) {
-
-    }
-
-    fun launchLudusManagement(){
-
-    }
-
-    @OptIn(DelicateCoroutinesApi::class)
-    fun deleteDb(dbName: String) {
-        GlobalScope.launch(Dispatchers.IO) {
-            val db = Room.databaseBuilder(
-                applicationContext,
-                AppDatabase::class.java, dbName
-            ).build()
-            db.clearAllTables()
-            db.close()
-            val file = applicationContext.getDatabasePath(dbName)
-            val jFile = File(file.parentFile, "${file.name}-journal")
-            file.delete()
-            jFile.delete()
-        }
-
-    }
+//    @OptIn(DelicateCoroutinesApi::class)
+//    fun deleteDb(dbName: String) {
+//        GlobalScope.launch(Dispatchers.IO) {
+//            val db = Room.databaseBuilder(
+//                applicationContext,
+//                AppDatabase::class.java, dbName
+//            ).build()
+//            db.clearAllTables()
+//            db.close()
+//            val file = applicationContext.getDatabasePath(dbName)
+//            val jFile = File(file.parentFile, "${file.name}-journal")
+//            file.delete()
+//            jFile.delete()
+//        }
+//
+//    }
 
     @Preview
     @Composable
@@ -186,11 +211,12 @@ class StartActivity : ComponentActivity() {
         }
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     @Preview
     @Composable
     fun NewLudusDialogue(visibleCallback: (Boolean) -> Unit = { newDialogueVisible = it }) {
         var ludusName by remember { mutableStateOf("") }
-        var databases = getAllDatabases()
+        var databases = getAllDatabases(applicationContext)
 
         AlertDialog(
             onDismissRequest = {
@@ -200,7 +226,10 @@ class StartActivity : ComponentActivity() {
                 Button(
                     onClick = {
                         Log.d(TAG, "New Ludus: $ludusName")
-                        createDb(ludusName)
+                        GlobalScope.launch(Dispatchers.IO) {
+                            val db = createDb(ludusName, applicationContext)
+                            launchLudusManagement(db)
+                        }
                         visibleCallback(false)
                     },
                     enabled = ludusName.isNotEmpty() && ludusName !in databases.map { it.toString() }
@@ -239,7 +268,7 @@ class StartActivity : ComponentActivity() {
         visibleCallback: (Boolean) -> Unit = { loadDialogueVisible = it }
     ) {
 
-        var databases = remember { mutableStateOf(getAllDatabases()) }
+        var databases = remember { mutableStateOf(getAllDatabases(applicationContext)) }
         val selectedDb = remember { mutableStateOf("") }
         AlertDialog(
             modifier = Modifier.fillMaxWidth(),
@@ -279,12 +308,13 @@ class StartActivity : ComponentActivity() {
                                 Column {
                                     Row {
                                         Button(onClick = {
-                                            loadDb(database.toString())
+                                            val db = returnDb(database, applicationContext)
+                                            launchLudusManagement(db)
                                             visibleCallback(false)
                                         }) { Text("Load") }
                                         Button(onClick = {
-                                            deleteDb(database.toString())
-                                            databases.value = getAllDatabases()
+                                            deleteDb(database, applicationContext)
+                                            databases.value = getAllDatabases(applicationContext)
                                         }) { Text("Delete") }
                                     }
                                 }

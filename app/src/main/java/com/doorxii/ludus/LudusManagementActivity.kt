@@ -14,10 +14,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.doorxii.ludus.data.db.AppDatabase
 import com.doorxii.ludus.ui.theme.LudusTheme
 
-class LudusManagementActivity(db: AppDatabase): ComponentActivity() {
+class LudusManagementActivity(): ComponentActivity() {
+
+    lateinit var db: AppDatabase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val dbName = intent.getStringExtra("dbName")
+
 
         enableEdgeToEdge()
         setContent {
