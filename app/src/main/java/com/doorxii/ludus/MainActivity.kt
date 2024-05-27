@@ -73,8 +73,6 @@ class MainActivity : androidx.activity.ComponentActivity() {
     lateinit var combatFile: File
 
     var text = mutableStateOf("TEST TEXT")
-//    var titus = Gladiator()
-//    var joseph = Gladiator()
 
     val combatResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -83,29 +81,38 @@ class MainActivity : androidx.activity.ComponentActivity() {
                 val resultUri: Uri = result.data?.data!!
                 val resFile = File(resultUri.path!!)
                 val resCombat = Json.decodeFromString<Combat>(resFile.readText())
-                Log.d(TAG, "Combat complete?: ${resCombat.isComplete.toString()}")
-                if (resCombat.gladiatorList.size == 0){
-                    text.value = "No winner"
-                    Log.d(TAG, "No winner")
-                    return@registerForActivityResult
-                }
-                val winner = resCombat.gladiatorList[0]
-                Log.d(TAG, "Winner: ${winner.name}")
-                text.value = "Winner: ${winner.name}"
-
-                for (gladiator in resCombat.originalGladiatorList){
-                    if (gladiator !in resCombat.gladiatorList){
-                        // dead gladiators
-                        gladiator.health = 0.0
-                        gladiatorDao.update(gladiator)
-                    }
-                }
-                for (gladiator in resCombat.gladiatorList){
-                    gladiatorDao.update(gladiator)
-                }
-                updateLudusList()
+                combatFinished(resCombat)
             }
         }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    fun combatFinished(resCombat: Combat) {
+        Log.d(TAG, "Combat complete?: ${resCombat.isComplete.toString()}")
+        if (resCombat.gladiatorList.size == 0) {
+            text.value = "No winner"
+            Log.d(TAG, "No winner")
+            return
+        }
+        val winner = resCombat.gladiatorList[0]
+        Log.d(TAG, "Winner: ${winner.name}")
+        text.value = "Winner: ${winner.name}"
+
+        GlobalScope.launch(Dispatchers.IO) {
+            for (gladiator in resCombat.originalGladiatorList) {
+                if (gladiator !in resCombat.gladiatorList) {
+                    // dead gladiators
+                    gladiator.health = 0.0
+                    gladiatorDao.update(gladiator)
+                }
+            }
+            for (gladiator in resCombat.gladiatorList) {
+                gladiatorDao.update(gladiator)
+            }
+            updateLudusList()
+        }
+
+
+    }
 
     var listA: MutableList<Gladiator> = mutableListOf()
     var listB: MutableList<Gladiator> = mutableListOf()
@@ -133,6 +140,7 @@ class MainActivity : androidx.activity.ComponentActivity() {
         val res = combat!!.simCombat()
         text.value = "Sim: " + res.combatReport
         Log.d(TAG, "res: " + res.combatReport)
+        combatFinished(combat!!)
     }
 
     lateinit var db: AppDatabase
@@ -145,7 +153,7 @@ class MainActivity : androidx.activity.ComponentActivity() {
     var capuaList = mutableListOf<Gladiator>()
 
     @OptIn(DelicateCoroutinesApi::class)
-    fun initDb(){
+    fun initDb() {
 
         GlobalScope.launch(Dispatchers.IO) {
             db = Room.databaseBuilder(
@@ -163,7 +171,6 @@ class MainActivity : androidx.activity.ComponentActivity() {
 
             val listA = newGladiatorList(5)
             val listB = newGladiatorList(5)
-
 
 
 //            ludusDao.insertLudus(romeLudus)
@@ -200,6 +207,19 @@ class MainActivity : androidx.activity.ComponentActivity() {
 //            val ostiaLu = Ludus("Ostia")
 //            ludusDao.insertLudus(ostiaLu)
 
+            var romelist = gladiatorDao.getByLudusId(rome.ludusId)
+            var romestr = ""
+            romelist.forEach {
+                romestr += Json.encodeToString(it)
+            }
+            Log.d(TAG, "rome: ${romestr}")
+
+            var capualist = gladiatorDao.getByLudusId(capua.ludusId)
+            var capuastr = ""
+            capualist.forEach {
+                capuastr += Json.encodeToString(it)
+            }
+            Log.d(TAG, "capua: ${capuastr}")
 
             Log.d(TAG, "all: ${Json.encodeToString(all)}")
             Log.d(TAG, "get all glads: ${(gladiatorDao.getAll())}")
@@ -208,11 +228,11 @@ class MainActivity : androidx.activity.ComponentActivity() {
         }
     }
 
-    fun updateLudusList(){
+    fun updateLudusList() {
         GlobalScope.launch(Dispatchers.IO) {
             romeList = mutableListOf()
-            for (gladiator in gladiatorDao.getByLudusId(rome.ludusId).toMutableList()){
-                if(gladiator.isAlive()){
+            for (gladiator in gladiatorDao.getByLudusId(rome.ludusId).toMutableList()) {
+                if (gladiator.isAlive()) {
                     romeList.add(gladiator)
                 }
             }
@@ -258,7 +278,7 @@ class MainActivity : androidx.activity.ComponentActivity() {
         ) {
 //            TopAppBar(title = { Text("Ludus") })
             Text("Combat: ${choiceA.value.name} v ${choiceB.value.name}")
-            Row{
+            Row {
                 Button(
                     onClick = {
                         gladiatorList = mutableListOf(choiceA.value, choiceB.value)
@@ -281,7 +301,7 @@ class MainActivity : androidx.activity.ComponentActivity() {
 
             Row(
                 Modifier.fillMaxWidth()
-            ){
+            ) {
                 Column(
                     Modifier.weight(1f)
                 ) {

@@ -82,11 +82,11 @@ class CombatRound() {
         Log.d(TAG, "CombatActionResult: $result")
         // reduce health and stamina
         for (gladiator in gladiatorList){
-            if (gladiator.id == result.source.id){
+            if (gladiator.gladiatorId == result.source.gladiatorId){
                 Log.d(TAG, "gladiator: ${gladiator.name} losing ${result.deltaStamina} stamina")
                 gladiator.stamina -= result.deltaStamina
             }
-            if (gladiator.id == result.target.id){
+            if (gladiator.gladiatorId == result.target.gladiatorId){
                 Log.d(TAG, "gladiator: ${gladiator.name} losing ${result.deltaHealth} health")
                 gladiator.health -= result.deltaHealth
             }
