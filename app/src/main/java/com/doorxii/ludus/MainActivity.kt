@@ -39,6 +39,8 @@ import androidx.core.net.toUri
 import androidx.room.Room
 import com.doorxii.ludus.combat.Combat
 import com.doorxii.ludus.data.db.AppDatabase
+import com.doorxii.ludus.data.db.GladiatorDao
+import com.doorxii.ludus.data.db.LudusDao
 import com.doorxii.ludus.data.models.animal.Gladiator
 import com.doorxii.ludus.data.models.equipment.Equipment
 import com.doorxii.ludus.data.models.equipment.armour.Armours
@@ -90,6 +92,18 @@ class MainActivity : androidx.activity.ComponentActivity() {
                 val winner = resCombat.gladiatorList[0]
                 Log.d(TAG, "Winner: ${winner.name}")
                 text.value = "Winner: ${winner.name}"
+
+                for (gladiator in resCombat.originalGladiatorList){
+                    if (gladiator !in resCombat.gladiatorList){
+                        // dead gladiators
+                        gladiator.health = 0.0
+                        gladiatorDao.update(gladiator)
+                    }
+                }
+                for (gladiator in resCombat.gladiatorList){
+                    gladiatorDao.update(gladiator)
+                }
+                updateLudusList()
             }
         }
 
@@ -97,23 +111,6 @@ class MainActivity : androidx.activity.ComponentActivity() {
     var listB: MutableList<Gladiator> = mutableListOf()
     var choiceA = mutableStateOf<Gladiator>(Gladiator())
     var choiceB = mutableStateOf<Gladiator>(Gladiator())
-
-//    fun testLudus() {
-//        val romeLudus: Ludus = Ludus.init(
-//            "Rome Ludus",
-//            newGladiatorList(5)
-//        )
-//        listA = romeLudus.barracks  //.gladiators
-//        val capuaLudus: Ludus = Ludus.init(
-//            "Capua Ludus",
-//            newGladiatorList(5)
-//        )
-//        listB = capuaLudus.barracks  //.gladiators
-//        choiceA.value = listA[0]
-//        choiceB.value = listB[0]
-//        Log.d(TAG, "rome: " + Json.encodeToString(romeLudus))
-//        Log.d(TAG, "capua: " + Json.encodeToString(capuaLudus))
-//    }
 
 
     fun startCombatActivity(gladiatorList: List<Gladiator>) {
@@ -132,6 +129,14 @@ class MainActivity : androidx.activity.ComponentActivity() {
     }
 
     lateinit var db: AppDatabase
+    lateinit var ludusDao: LudusDao
+    lateinit var gladiatorDao: GladiatorDao
+    lateinit var rome: Ludus
+    lateinit var capua: Ludus
+
+    var romeList = mutableListOf<Gladiator>()
+    var capuaList = mutableListOf<Gladiator>()
+
     @OptIn(DelicateCoroutinesApi::class)
     fun initDb(){
 
@@ -143,8 +148,8 @@ class MainActivity : androidx.activity.ComponentActivity() {
             )
                 .build()
 
-            val ludusDao = db.ludusDao()
-            val gladiatorDao = db.gladiatorDao()
+            ludusDao = db.ludusDao()
+            gladiatorDao = db.gladiatorDao()
 
             val romeLudus: Ludus = Ludus("Rome")
             val capuaLudus: Ludus = Ludus("Capua")
@@ -157,27 +162,30 @@ class MainActivity : androidx.activity.ComponentActivity() {
 //            ludusDao.insertLudus(romeLudus)
 //            ludusDao.insertLudus(capuaLudus)
 
-            val rome = ludusDao.getLudusByName("Rome")
-            val capua = ludusDao.getLudusByName("Capua")
+            rome = ludusDao.getLudusByName("Rome")
+            capua = ludusDao.getLudusByName("Capua")
             Log.d(TAG, "id rome: ${rome.ludusId}, id capua: ${capua.ludusId}")
+            updateLudusList()
+//            romeList = gladiatorDao.getByLudusId(rome.ludusId).toMutableList()
+//            capuaList = gladiatorDao.getByLudusId(capua.ludusId).toMutableList()
 
-            listA.forEach { gladiator ->
-                try {
-                    gladiator.ludusId = rome.ludusId
-                    gladiatorDao.insertGladiator(gladiator)
-                } catch (e: Exception) {
-                    Log.d(TAG, "error: ${e.message}")
-                }
-
-            }
-            listB.forEach { gladiator ->
-                try {
-                    gladiator.ludusId = capua.ludusId
-                    gladiatorDao.insertGladiator(gladiator)
-                } catch (e: Exception) {
-                    Log.d(TAG, "error: ${e.message}")
-                }
-            }
+//            listA.forEach { gladiator ->
+//                try {
+//                    gladiator.ludusId = rome.ludusId
+//                    gladiatorDao.insertGladiator(gladiator)
+//                } catch (e: Exception) {
+//                    Log.d(TAG, "error: ${e.message}")
+//                }
+//
+//            }
+//            listB.forEach { gladiator ->
+//                try {
+//                    gladiator.ludusId = capua.ludusId
+//                    gladiatorDao.insertGladiator(gladiator)
+//                } catch (e: Exception) {
+//                    Log.d(TAG, "error: ${e.message}")
+//                }
+//            }
 
             val all = ludusDao.getAllLudus()
 //            Log.d(TAG, "rome: $rome, capua: $capua")
@@ -191,12 +199,24 @@ class MainActivity : androidx.activity.ComponentActivity() {
             Log.d(TAG, "get rome glads: ${(gladiatorDao.getByLudusId(rome.ludusId))}")
             Log.d(TAG, "get capua glads: ${(gladiatorDao.getByLudusId(capua.ludusId))}")
         }
-
-
-
     }
 
-
+    fun updateLudusList(){
+        GlobalScope.launch(Dispatchers.IO) {
+            romeList = mutableListOf()
+            for (gladiator in gladiatorDao.getByLudusId(rome.ludusId).toMutableList()){
+                if(gladiator.isAlive()){
+                    romeList.add(gladiator)
+                }
+            }
+            capuaList = mutableListOf()
+            for (gladiator in gladiatorDao.getByLudusId(capua.ludusId).toMutableList()) {
+                if (gladiator.isAlive()) {
+                    capuaList.add(gladiator)
+                }
+            }
+        }
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -246,14 +266,14 @@ class MainActivity : androidx.activity.ComponentActivity() {
                 Column(
                     Modifier.weight(1f)
                 ) {
-                    BarracksList(list = listA) {
+                    BarracksList(list = romeList) {
                         choiceA.value = it
                     }
                 }
                 Column(
                     Modifier.weight(1f)
                 ) {
-                    BarracksList(list = listB) {
+                    BarracksList(list = capuaList) {
                         choiceB.value = it
                     }
                 }

@@ -14,6 +14,7 @@ class Combat(
 
 ) {
     var gladiatorList: List<Gladiator> = listOf()
+    var originalGladiatorList: List<Gladiator> = listOf()
     private var round: CombatRound? = null
     private var roundNumber: Int = 0
     private var userChoice: CombatActions? = null
@@ -104,6 +105,7 @@ class Combat(
         fun init(gladiatorList: List<Gladiator>): Combat {
             val combat = Combat()
             combat.gladiatorList = gladiatorList
+            combat.originalGladiatorList = gladiatorList
             combat.combatName = "Combat: ${gladiatorList[0].name} vs ${gladiatorList[1].name}"
             combat.combatReport = "${combat.combatName}\n"
             return combat
