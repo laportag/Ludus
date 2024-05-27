@@ -41,6 +41,6 @@ class TiredAttack: CombatAction {
     }
 
     companion object {
-        private const val TAG = "BasicDefend"
+        private const val TAG = "TiredAttack"
     }
 }

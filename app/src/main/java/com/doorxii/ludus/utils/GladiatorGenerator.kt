@@ -23,9 +23,10 @@ object GladiatorGenerator {
 
     fun newGladiator(): Gladiator {
         val glad = Gladiator()
+        glad.id = Random.nextInt(200, 701)
         glad.name = getRandomName()
         glad.age = getRandomAge()
-        glad.height = Random.nextInt(150, 200).toDouble()
+        glad.height = Random.nextInt(145, 211).toDouble()
         glad.health = 100.0
         glad.stamina = 100.0
         glad.morale = 100.0
@@ -53,6 +54,7 @@ object GladiatorGenerator {
     }
 
     fun newGladiatorList(size: Int): MutableList<Gladiator> {
+        var count = 1
         val gladList = mutableListOf<Gladiator>()
         for (i in 1..size){
             gladList.add(newGladiator())

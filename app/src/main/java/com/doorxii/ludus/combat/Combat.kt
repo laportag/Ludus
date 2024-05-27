@@ -23,22 +23,28 @@ class Combat(
     lateinit var combatName: String
     lateinit var combatReport: String
 
-    fun simCombat(): String {
+    fun simCombat(): CombatResult {
         appendReport("Sim Combat started")
         while (!isComplete) {
             userChoice = combatActionToEnum(CombatBehaviour.basicActionPicker(gladiatorList[0]))
             enemyChoice = combatActionToEnum(CombatBehaviour.basicActionPicker(gladiatorList[1]))
-            runNewRound(gladiatorList, combatEnumToAction(userChoice!!), combatEnumToAction(enemyChoice!!))
+            gladiatorList = runNewRound(
+                gladiatorList,
+                combatEnumToAction(userChoice!!),
+                combatEnumToAction(enemyChoice!!)
+            )
 
-
-
-            if (gladiatorList.size == 1) {
-                appendReport("Combat over, ${gladiatorList[0].name} won in $roundNumber rounds")
+            if (gladiatorList.size < 2) {
+                if (gladiatorList.isEmpty()) {
+                    appendReport("Combat over, both dead in $roundNumber rounds")
+                } else {
+                    appendReport("Combat over, ${gladiatorList[0].name} won in $roundNumber rounds")
+                }
                 isComplete = true
 
             }
         }
-        return combatReport
+        return CombatResult(true, combatReport)
     }
 
     private fun appendReport(str: String) {
@@ -56,14 +62,17 @@ class Combat(
             userChoice = choice
             enemyChoice = combatActionToEnum(CombatBehaviour.basicActionPicker(gladiatorList[1]))
 
-            gladiatorList = runNewRound(gladiatorList, combatEnumToAction(userChoice!!), combatEnumToAction(enemyChoice!!))
-            if (gladiatorList.size == 0) {
-                appendReport("Combat over, both dead in $roundNumber rounds")
-                isComplete = true
-                return CombatResult(true, combatReport)
-            }
-            else if (gladiatorList.size < 2) {
-                appendReport("Combat over, ${gladiatorList[0].name} won in $roundNumber rounds")
+            gladiatorList = runNewRound(
+                gladiatorList,
+                combatEnumToAction(userChoice!!),
+                combatEnumToAction(enemyChoice!!)
+            )
+            if (gladiatorList.size < 2) {
+                if (gladiatorList.isEmpty()) {
+                    appendReport("Combat over, both dead in $roundNumber rounds")
+                } else {
+                    appendReport("Combat over, ${gladiatorList[0].name} won in $roundNumber rounds")
+                }
                 isComplete = true
                 return CombatResult(true, combatReport)
             }

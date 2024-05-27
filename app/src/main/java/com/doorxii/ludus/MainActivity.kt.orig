@@ -128,6 +128,13 @@ class MainActivity : androidx.activity.ComponentActivity() {
 
     }
 
+<<<<<<< HEAD
+    lateinit var db: AppDatabase
+    lateinit var ludusDao: LudusDao
+    lateinit var gladiatorDao: GladiatorDao
+    lateinit var rome: Ludus
+    lateinit var capua: Ludus
+=======
     fun simCombat(gladiatorList: List<Gladiator>) {
         combat = Combat.init(gladiatorList)
         val res = combat!!.simCombat()
@@ -135,11 +142,7 @@ class MainActivity : androidx.activity.ComponentActivity() {
         Log.d(TAG, "res: " + res.combatReport)
     }
 
-    lateinit var db: AppDatabase
-    lateinit var ludusDao: LudusDao
-    lateinit var gladiatorDao: GladiatorDao
-    lateinit var rome: Ludus
-    lateinit var capua: Ludus
+>>>>>>> master
 
     var romeList = mutableListOf<Gladiator>()
     var capuaList = mutableListOf<Gladiator>()

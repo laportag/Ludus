@@ -34,6 +34,7 @@ class CombatRound() {
                 }
             }
         }
+        Log.d(TAG, "beginner: ${beginner.name}")
         return beginner
     }
 
