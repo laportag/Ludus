@@ -27,6 +27,9 @@ interface LudusDao{
     @Query(value = "SELECT * FROM ludus WHERE ludusId = :ludusId")
     fun getLudusById(ludusId: Int): Flow<Ludus>
 
+    @Query("SELECT * FROM ludus WHERE playerLudus = 1 LIMIT 1")
+    fun getPlayerLudus(): Flow<Ludus>
+
     @Update
     suspend fun updateLudusById(ludus: Ludus)
 

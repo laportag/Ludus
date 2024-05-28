@@ -1,4 +1,4 @@
-package com.doorxii.ludus
+package com.doorxii.ludus.activities
 
 import android.content.Intent
 import android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION

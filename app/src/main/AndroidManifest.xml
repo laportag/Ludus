@@ -14,17 +14,17 @@
         android:theme="@style/Theme.Ludus"
         tools:targetApi="31" >
         <activity
-            android:name=".CombatActivity"
+            android:name=".activities.CombatActivity"
             android:exported="true"
             android:label="@string/title_activity_combat"
             android:theme="@style/Theme.Ludus" />
         <activity
-            android:name=".LudusManagementActivity"
+            android:name=".activities.LudusManagementActivity"
             android:exported="true"
             android:label="StartActivity"
             android:theme="@style/Theme.Ludus" />
         <activity
-            android:name=".StartActivity"
+            android:name=".activities.StartActivity"
             android:exported="true"
             android:label="LudusManagementActivity"
             android:theme="@style/Theme.Ludus" >

@@ -1,12 +1,9 @@
 package com.doorxii.ludus.utils
 
 import android.content.Context
-import android.content.Intent
 import android.util.Log
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.doorxii.ludus.LudusManagementActivity
-import com.doorxii.ludus.StartActivity
 import com.doorxii.ludus.data.db.AppDatabase
 import com.doorxii.ludus.data.models.ludus.Ludus
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -66,6 +63,7 @@ object DatabaseManagement {
 
         Log.d(TAG, "Database file created: $ludusName")
         val ludus = Ludus(ludusName)
+        ludus.playerLudus = true
         db.ludusDao().insertLudus(ludus)
         populateDb(db)
 

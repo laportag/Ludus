@@ -2,7 +2,6 @@ package com.doorxii.ludus.utils
 
 import android.content.Context
 import android.util.Log
-import com.doorxii.ludus.MainActivity
 import com.doorxii.ludus.combat.Combat
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json

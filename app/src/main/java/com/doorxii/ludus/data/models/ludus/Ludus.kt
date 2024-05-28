@@ -14,7 +14,7 @@ class Ludus(
 ) {
     @PrimaryKey(autoGenerate = true)
     var ludusId: Int = 0
-
+    var playerLudus = false
 
     // Add an empty constructor
     constructor() : this("")

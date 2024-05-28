@@ -12,6 +12,8 @@ class LudusRepository(db: AppDatabase) {
 
     suspend fun addLudus(ludus: Ludus) = ludusDao.insertLudus(ludus)
 
+    fun getPlayerLudus(): Flow<Ludus> = ludusDao.getPlayerLudus()
+
     fun getAllLudi(): Flow<List<Ludus>> = ludusDao.getAllLudus()
 
     fun getLudusByName(name: String): Flow<Ludus> = ludusDao.getLudusByName(name)

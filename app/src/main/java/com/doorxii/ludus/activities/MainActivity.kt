@@ -1,4 +1,4 @@
-package com.doorxii.ludus
+package com.doorxii.ludus.activities
 
 import android.content.Intent
 import android.net.Uri
@@ -35,7 +35,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
-import androidx.room.Room
 import com.doorxii.ludus.combat.Combat
 import com.doorxii.ludus.data.db.AppDatabase
 import com.doorxii.ludus.data.db.GladiatorDao
@@ -45,12 +44,10 @@ import com.doorxii.ludus.data.models.ludus.Ludus
 import com.doorxii.ludus.ui.theme.LudusTheme
 import com.doorxii.ludus.utils.CombatSerialization.returnCombatFile
 import com.doorxii.ludus.utils.CombatSerialization.saveCombatJson
-import com.doorxii.ludus.utils.GladiatorGenerator.newGladiatorList
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File
 

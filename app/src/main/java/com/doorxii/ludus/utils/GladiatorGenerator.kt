@@ -1,22 +1,13 @@
 package com.doorxii.ludus.utils
 
 import android.util.Log
-import com.doorxii.ludus.MainActivity
 import com.doorxii.ludus.data.models.animal.Gladiator
 import com.doorxii.ludus.data.models.equipment.Equipment
-import com.doorxii.ludus.data.models.equipment.armour.Armourless
 import com.doorxii.ludus.data.models.equipment.armour.Armours
-import com.doorxii.ludus.data.models.equipment.armour.LightArmour
-import com.doorxii.ludus.data.models.equipment.weapon.Barefist
-import com.doorxii.ludus.data.models.equipment.weapon.Gladius
 import com.doorxii.ludus.data.models.equipment.weapon.Weapons
 import com.doorxii.ludus.utils.NameStrings.getRandomName
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlin.math.abs
-import kotlin.math.floor
-import kotlin.math.log10
-import kotlin.math.pow
 import kotlin.random.Random
 
 object GladiatorGenerator {

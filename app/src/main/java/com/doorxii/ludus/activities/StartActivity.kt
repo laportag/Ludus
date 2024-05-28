@@ -1,8 +1,5 @@
-package com.doorxii.ludus
+package com.doorxii.ludus.activities
 
-import android.app.AlertDialog
-import android.app.Application
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -33,26 +30,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.room.Room
-import androidx.room.RoomDatabase
-import androidx.sqlite.db.SupportSQLiteDatabase
 import com.doorxii.ludus.data.db.AppDatabase
-import com.doorxii.ludus.data.models.ludus.Ludus
 import com.doorxii.ludus.ui.theme.LudusTheme
-import com.doorxii.ludus.utils.DatabaseManagement
 import com.doorxii.ludus.utils.DatabaseManagement.createDb
 import com.doorxii.ludus.utils.DatabaseManagement.deleteDb
 import com.doorxii.ludus.utils.DatabaseManagement.getAllDatabases
 import com.doorxii.ludus.utils.DatabaseManagement.returnDb
-import com.doorxii.ludus.utils.GladiatorGenerator.newGladiatorList
-import com.doorxii.ludus.utils.GladiatorGenerator.newGladiatorListWithLudusId
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.io.File
-import java.util.concurrent.Executors
 
 class StartActivity : ComponentActivity() {
 
@@ -73,110 +60,11 @@ class StartActivity : ComponentActivity() {
         Log.d(TAG, "dbs: ${getAllDatabases(applicationContext)}")
     }
 
-//    fun getAllDatabases(): List<String> {
-//
-//        val databases = mutableListOf<String>()
-//        applicationContext.databaseList().forEach { databaseName ->
-//            if (!databaseName.endsWith("-journal") && !databaseName.endsWith("-wal") && !databaseName.endsWith(
-//                    "-shm"
-//                )
-//            ) {
-//                databases.add(databaseName)
-//            }
-//        }
-//        Log.d(TAG, "getAllDatabases: $databases")
-//        return databases
-//    }
-
-//    fun createDb(ludusName: String) {
-//        GlobalScope.launch(Dispatchers.IO) {
-//            Log.d(TAG, "createDb: $ludusName")
-//
-//            // Validate the ludusName parameter
-//            if (ludusName.isEmpty() || ludusName.contains(Regex("[\\s\\W]"))) {
-//                Log.e(TAG, "Invalid database name: $ludusName")
-//                return@launch
-//            }
-//
-//            // Check if the database file already exists
-//            val dbFile = applicationContext.getDatabasePath(ludusName)
-//            if (dbFile.exists()) {
-//                Log.d(TAG, "Database file already exists: $ludusName")
-//                return@launch
-//            }
-//
-//            // Create the database file
-//            val db = Room.databaseBuilder(
-//                applicationContext,
-//                AppDatabase::class.java,
-//                ludusName
-//            )
-//                .enableMultiInstanceInvalidation()
-//                .setJournalMode(RoomDatabase.JournalMode.TRUNCATE)
-//                .setQueryExecutor(Executors.newSingleThreadExecutor())
-//                .setTransactionExecutor(Executors.newSingleThreadExecutor())
-//                .build()
-//
-//
-////            db.ludusDao().insertLudus(Ludus(ludusName))
-//
-//            Log.d(TAG, "Database file created: $ludusName")
-//
-//            populateDb(db)
-//
-//            launchLudusManagement(db)
-//
-//        }
-
-
-//    }
-
-//    fun loadDb(dbName: String) {
-//        val db = Room.databaseBuilder(
-//            applicationContext,
-//            AppDatabase::class.java, dbName
-//        ).build()
-//        launchLudusManagement(db)
-//    }
-
-//    suspend fun populateDb(db: AppDatabase) {
-//        var ludi = listOf("Ludus Magnus", "Capua", "Pergamum", "Alexandria", "Praeneste")
-//        for (ludusName in ludi) {
-//            val newLudus = Ludus(ludusName)
-//            db.ludusDao().insertLudus(newLudus)
-//            val id = db.ludusDao().getLudusByName(ludusName).first().ludusId
-//
-//            val newGladiators = newGladiatorListWithLudusId(7, id)
-//            for (gladiator in newGladiators) {
-//                db.gladiatorDao().insertGladiator(gladiator)
-//            }
-//        }
-//
-//    }
-
-    fun launchLudusManagement(db: AppDatabase) {
-        val name = ""
+    fun launchLudusManagement(name: String, db: AppDatabase) {
         val intent = Intent(this, LudusManagementActivity::class.java)
         intent.putExtra("db_name", name)
         startActivity(intent)
     }
-
-//    @OptIn(DelicateCoroutinesApi::class)
-//    fun deleteDb(dbName: String) {
-//        GlobalScope.launch(Dispatchers.IO) {
-//            val db = Room.databaseBuilder(
-//                applicationContext,
-//                AppDatabase::class.java, dbName
-//            ).build()
-//            db.clearAllTables()
-//            db.close()
-//            val file = applicationContext.getDatabasePath(dbName)
-//            val jFile = File(file.parentFile, "${file.name}-journal")
-//            file.delete()
-//            jFile.delete()
-//        }
-//
-//    }
 
     @Preview
     @Composable
@@ -228,7 +116,7 @@ class StartActivity : ComponentActivity() {
                         Log.d(TAG, "New Ludus: $ludusName")
                         GlobalScope.launch(Dispatchers.IO) {
                             val db = createDb(ludusName, applicationContext)
-                            launchLudusManagement(db)
+                            launchLudusManagement(ludusName, db)
                         }
                         visibleCallback(false)
                     },
@@ -309,7 +197,7 @@ class StartActivity : ComponentActivity() {
                                     Row {
                                         Button(onClick = {
                                             val db = returnDb(database, applicationContext)
-                                            launchLudusManagement(db)
+                                            launchLudusManagement(database, db)
                                             visibleCallback(false)
                                         }) { Text("Load") }
                                         Button(onClick = {
