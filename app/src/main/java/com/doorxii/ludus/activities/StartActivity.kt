@@ -94,7 +94,6 @@ class StartActivity : ComponentActivity() {
         if (loadDialogueState.value) {
             LoadLudusDialogue() {
                 loadDialogueState.value = it
-                loadDialogueState.value = it
             }
         }
     }

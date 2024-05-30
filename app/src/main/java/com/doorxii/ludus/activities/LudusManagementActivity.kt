@@ -8,20 +8,25 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.doorxii.ludus.data.db.AppDatabase
 import com.doorxii.ludus.data.db.LudusRepository
 import com.doorxii.ludus.data.models.ludus.Ludus
 import com.doorxii.ludus.ui.theme.LudusTheme
 import com.doorxii.ludus.utils.DatabaseManagement.returnDb
-import kotlinx.coroutines.flow.collect
-import androidx.lifecycle.flowWithLifecycle
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.first
@@ -31,29 +36,30 @@ class LudusManagementActivity() : ComponentActivity() {
 
     lateinit var db: AppDatabase
     lateinit var repository: LudusRepository
-    var ludus: Ludus? = null
-    val viewModel: LudusManagementActivityViewModel by viewModels()
+    var ludus = mutableStateOf<Ludus?>(null)
+    lateinit var viewModel: LudusManagementActivityViewModel
 
-
-    var ludusName = mutableStateOf("")
-
+    @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val dbName = intent.getStringExtra("db_name")
         Log.d(TAG, "onCreate db name: $dbName")
-    // null pointer exception, change intent extras
+
         db = returnDb(dbName!!, applicationContext)
         repository = LudusRepository(db)
 
-        viewModel.setRespository(repository)
-        GlobalScope.launch (Dispatchers.IO) {
-            val player = repository.ludusDao.getPlayerLudus().first()
-            Log.d(TAG, "onCreate: ${player.name}")
-            ludus = player
+        viewModel = ViewModelProvider(this)[LudusManagementActivityViewModel::class.java]
+        viewModel.start(repository)
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.playerLudus.collect { playerLudus ->
+                    Log.d(TAG, "onCreate playerLudus: $playerLudus")
+                    ludus.value = playerLudus
+                }
+            }
         }
-
-
 
         enableEdgeToEdge()
         setContent {
@@ -64,17 +70,47 @@ class LudusManagementActivity() : ComponentActivity() {
 
     }
 
+    fun launchBarracksManagement() {
 
+    }
+
+    fun launchGladiatorMarket() {
+
+    }
+
+    fun chooseEnemyLudus() {
+
+    }
+
+    @Composable
+    fun BarracksManagement(){
+
+    }
+
+
+
+    @Preview
     @Composable
     fun LudusManagementLayout() {
 
-        if (ludus != null) {
+        if (ludus.value != null) {
             Column(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                Text("Ludus: ${ludus?.name}")
+                Text("Ludus: ${ludus.value?.name}")
+                Button(onClick = { launchBarracksManagement() }) {
+                    Text("Manage Barracks")
+                }
+                Button(onClick = { launchGladiatorMarket() }) {
+                    Text("Purchase Gladiators")
+                }
+                Row {
+                    Button(onClick = { chooseEnemyLudus() }) {
+                        Text("Choose Enemy Ludus")
+                    }
+                }
             }
         }
 

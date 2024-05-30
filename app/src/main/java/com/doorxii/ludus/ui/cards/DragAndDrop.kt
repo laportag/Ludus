@@ -1,6 +1,5 @@
-package com.doorxii.ludus.ui
+package com.doorxii.ludus.ui.cards
 
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope

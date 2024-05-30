@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.doorxii.ludus.data.db.LudusRepository
 import com.doorxii.ludus.data.models.ludus.Ludus
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,12 +18,21 @@ open class  LudusManagementActivityViewModel(): ViewModel() {
     private val _playerLudus = MutableStateFlow<Ludus?>(null)
     val playerLudus: StateFlow<Ludus?> = _playerLudus.asStateFlow()
 
-    fun setRespository(repo: LudusRepository){
-        ludusRepository  = repo
-    }
 
     init {
         Log.d(TAG, "init vm")
+
+    }
+
+    fun start(repo: LudusRepository){
+        ludusRepository  = repo
+        viewModelScope.launch {
+            // Fetch initial data from the database
+            ludusRepository.getPlayerLudus().collect { ludus ->
+                _playerLudus.value = ludus
+                Log.d(TAG, "playerLudus: $ludus")
+            }
+        }
     }
 
     fun setPlayerLudus(){
@@ -32,6 +40,14 @@ open class  LudusManagementActivityViewModel(): ViewModel() {
             _playerLudus.value = ludusRepository.getPlayerLudus().first()
         }
     }
+
+    fun updatePlayerLudus(newLudus: Ludus) {
+        viewModelScope.launch {
+            ludusRepository.updateLudus (newLudus)
+            _playerLudus.value = newLudus // Update the local state
+        }
+    }
+
 
     companion object {
         private const val TAG = "LudusManagementActivityViewModel"

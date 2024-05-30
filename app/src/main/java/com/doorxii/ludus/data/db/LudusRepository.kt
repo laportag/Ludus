@@ -1,6 +1,5 @@
 package com.doorxii.ludus.data.db
 
-import androidx.room.withTransaction
 import com.doorxii.ludus.data.models.animal.Gladiator
 import com.doorxii.ludus.data.models.ludus.Ludus
 import kotlinx.coroutines.flow.Flow
@@ -18,7 +17,7 @@ class LudusRepository(db: AppDatabase) {
 
     fun getLudusByName(name: String): Flow<Ludus> = ludusDao.getLudusByName(name)
 
-    suspend fun updateLudusById(ludus: Ludus) = ludusDao.updateLudusById(ludus)
+    suspend fun updateLudus(ludus: Ludus) = ludusDao.updateLudusById(ludus)
 
     suspend fun deleteLudusById(ludusId: Int) = ludusDao.deleteLudusById(ludusId)
 

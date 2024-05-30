@@ -75,8 +75,13 @@ object DatabaseManagement {
     fun returnDb(dbName: String, context: Context): AppDatabase {
         val db = Room.databaseBuilder(
             context,
-            AppDatabase::class.java, dbName
-        ).build()
+            AppDatabase::class.java,
+            dbName
+        )   .enableMultiInstanceInvalidation()
+            .setJournalMode(RoomDatabase.JournalMode.TRUNCATE)
+            .setQueryExecutor(Executors.newSingleThreadExecutor())
+            .setTransactionExecutor(Executors.newSingleThreadExecutor())
+            .build()
         return db
     }
 
