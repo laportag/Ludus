@@ -1,10 +1,9 @@
 package com.doorxii.ludus.data.models.animal
 
 import android.util.Log
-import kotlinx.serialization.Serializable
 
-@Serializable
-abstract class Human() : Animal() {
+
+abstract class Human : Animal() {
     var name: String = ""
     var age: Double = 0.0
     var height: Double = 150.0
@@ -16,6 +15,7 @@ abstract class Human() : Animal() {
                 value
             }
             if (field <= 0.0) {
+                Log.d(TAG, "$name is dead")
             }
         }
     abstract var id: Int
@@ -28,10 +28,6 @@ abstract class Human() : Animal() {
         } else {
             return true
         }
-    }
-
-    fun updateHealth(health: Double) {
-        this.health = health
     }
 
 

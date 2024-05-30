@@ -3,6 +3,7 @@ package com.doorxii.ludus.activities
 import android.content.Intent
 import android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -13,6 +14,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -21,33 +24,29 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import com.doorxii.ludus.actions.combatactions.CombatActions
 import com.doorxii.ludus.combat.Combat
 import com.doorxii.ludus.ui.cards.ActionCards
+import com.doorxii.ludus.ui.cards.DropTarget
 import com.doorxii.ludus.ui.cards.GladiatorCards
+import com.doorxii.ludus.ui.cards.LongPressDraggable
 import com.doorxii.ludus.ui.theme.LudusTheme
+import com.doorxii.ludus.utils.CombatSerialization.saveCombatJson
 import com.doorxii.ludus.utils.enums.EnumToAction.combatEnumListToActionList
 import kotlinx.serialization.json.Json
 import java.io.File
-import android.util.Log
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.core.net.toUri
-import com.doorxii.ludus.ui.cards.DropTarget
-import com.doorxii.ludus.ui.cards.LongPressDraggable
-import com.doorxii.ludus.utils.CombatSerialization.saveCombatJson
 
-class CombatActivity() : ComponentActivity() {
+class CombatActivity: ComponentActivity() {
 
-    var combat: Combat? = null
-    var choice: CombatActions? = null
-    var text = mutableStateOf("")
-    lateinit var combatFile: File
+    private var combat: Combat? = null
+    private var choice: CombatActions? = null
+    private var text = mutableStateOf("")
+    private lateinit var combatFile: File
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,7 +65,7 @@ class CombatActivity() : ComponentActivity() {
         }
     }
 
-    fun readCombatFromJson(): Combat {
+    private fun readCombatFromJson(): Combat {
         val uri = intent.data
         combatFile = File(uri!!.path!!)
         val combatJson = combatFile.readText()
@@ -80,19 +79,18 @@ class CombatActivity() : ComponentActivity() {
     }
 
 
-    @OptIn(ExperimentalFoundationApi::class)
     @Preview
     @Composable
     fun CombatLayout() {
 
-        var battleText: String by remember { text }
+        val battleText: String by remember { text }
 
         var expanded by remember { mutableStateOf(false) }
 
         val combatActions =
             listOf(CombatActions.BASIC_ATTACK, CombatActions.TIRED_ATTACK, CombatActions.WAIT)
 
-        var droppedChoice: CombatActions? by remember {
+        val droppedChoice: CombatActions? by remember {
             mutableStateOf(choice)
         }
 
@@ -118,7 +116,7 @@ class CombatActivity() : ComponentActivity() {
                 }
                 if (combatAction != null) {
                     choice = combatAction
-                    Log.d(TAG, "choice dropped: " + droppedChoice)
+                    Log.d(TAG, "choice dropped: $droppedChoice")
                 }
                 playCardonDrop(combatAction)
 //                var roundResult = combat!!.playCombatRound(choice)
@@ -159,10 +157,10 @@ class CombatActivity() : ComponentActivity() {
         }
     }
 
-    fun playCardonDrop(combatAction: CombatActions?) {
+    private fun playCardonDrop(combatAction: CombatActions?) {
 
         if (choice != null) {
-            Log.d(TAG, "choice: " + choice)
+            Log.d(TAG, "choice: $choice")
             if (combatAction != null) {
                 val roundResult = combat!!.playCombatRound(combatAction)
                 Log.d(TAG, "roundResult: " + roundResult.combatReport)
@@ -176,7 +174,7 @@ class CombatActivity() : ComponentActivity() {
         choice = null
     }
 
-    fun combatCompleted(){
+    private fun combatCompleted(){
         Log.d(TAG, "combat completed")
         val report = combat?.combatReport
         saveCombatJson(combat!!, combatFile)

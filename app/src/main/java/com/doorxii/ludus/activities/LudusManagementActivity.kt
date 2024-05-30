@@ -5,13 +5,11 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -29,21 +27,16 @@ import com.doorxii.ludus.data.db.LudusRepository
 import com.doorxii.ludus.data.models.ludus.Ludus
 import com.doorxii.ludus.ui.theme.LudusTheme
 import com.doorxii.ludus.utils.DatabaseManagement.returnDb
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-class LudusManagementActivity() : ComponentActivity() {
+class LudusManagementActivity : ComponentActivity() {
 
     lateinit var db: AppDatabase
-    lateinit var repository: LudusRepository
-    lateinit var viewModel: LudusManagementActivityViewModel
+    private lateinit var repository: LudusRepository
+    private lateinit var viewModel: LudusManagementActivityViewModel
     val ludus = mutableStateOf<Ludus?>(null)
-    val ludusManagementView = mutableStateOf<LudusManagementViews>(LudusManagementViews.HOME)
+    private val ludusManagementView = mutableStateOf(LudusManagementViews.HOME)
 
-    @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -167,9 +160,9 @@ class LudusManagementActivity() : ComponentActivity() {
         Text("Combat Select")
     }
 
-    override fun finishActivity(requestCode: Int) {
-        super.finishActivity(requestCode)
-    }
+//    override fun finishActivity(requestCode: Int) {
+//        super.finishActivity(requestCode)
+//    }
 
     companion object {
         const val TAG = "LudusManagementActivity"

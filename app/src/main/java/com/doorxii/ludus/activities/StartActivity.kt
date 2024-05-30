@@ -43,8 +43,8 @@ import kotlinx.coroutines.launch
 
 class StartActivity : ComponentActivity() {
 
-    var newDialogueVisible = false
-    var loadDialogueVisible = false
+    private var newDialogueVisible = false
+    private var loadDialogueVisible = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,7 +60,7 @@ class StartActivity : ComponentActivity() {
         Log.d(TAG, "dbs: ${getAllDatabases(applicationContext)}")
     }
 
-    fun launchLudusManagement(name: String, db: AppDatabase) {
+    private fun launchLudusManagement(name: String, db: AppDatabase) {
         val intent = Intent(this, LudusManagementActivity::class.java)
         intent.putExtra("db_name", name)
         startActivity(intent)
@@ -87,12 +87,12 @@ class StartActivity : ComponentActivity() {
 
         }
         if (newDialogueState.value) {
-            NewLudusDialogue() {
+            NewLudusDialogue {
                 newDialogueState.value = it
             }
         }
         if (loadDialogueState.value) {
-            LoadLudusDialogue() {
+            LoadLudusDialogue {
                 loadDialogueState.value = it
             }
         }
@@ -103,7 +103,7 @@ class StartActivity : ComponentActivity() {
     @Composable
     fun NewLudusDialogue(visibleCallback: (Boolean) -> Unit = { newDialogueVisible = it }) {
         var ludusName by remember { mutableStateOf("") }
-        var databases = getAllDatabases(applicationContext)
+        val databases = getAllDatabases(applicationContext)
 
         AlertDialog(
             onDismissRequest = {
@@ -119,7 +119,7 @@ class StartActivity : ComponentActivity() {
                         }
                         visibleCallback(false)
                     },
-                    enabled = ludusName.isNotEmpty() && ludusName !in databases.map { it.toString() }
+                    enabled = ludusName.isNotEmpty() && ludusName !in databases.map { it }
                 ) {
                     Text("Create")
                 }
@@ -155,7 +155,7 @@ class StartActivity : ComponentActivity() {
         visibleCallback: (Boolean) -> Unit = { loadDialogueVisible = it }
     ) {
 
-        var databases = remember { mutableStateOf(getAllDatabases(applicationContext)) }
+        val databases = remember { mutableStateOf(getAllDatabases(applicationContext)) }
         val selectedDb = remember { mutableStateOf("") }
         AlertDialog(
             modifier = Modifier.fillMaxWidth(),
@@ -173,7 +173,7 @@ class StartActivity : ComponentActivity() {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable { selectedDb.value = database.toString() },
+                                .clickable { selectedDb.value = database },
                             verticalArrangement = Arrangement.Center
                         ) {
                             Row(
@@ -184,13 +184,13 @@ class StartActivity : ComponentActivity() {
                                 Surface(
                                     shape = MaterialTheme.shapes.small,
                                     tonalElevation = 4.dp,
-                                    color = if (selectedDb.value == database.toString()) {
+                                    color = if (selectedDb.value == database) {
                                         Color.LightGray
                                     } else {
                                         Color.Transparent
                                     }
                                 ) {
-                                    Text(database.toString())
+                                    Text(database)
                                 }
                                 Column {
                                     Row {

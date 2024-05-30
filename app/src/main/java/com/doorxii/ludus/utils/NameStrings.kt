@@ -2,7 +2,7 @@ package com.doorxii.ludus.utils
 
 object NameStrings {
 
-    val romanFirstNames = listOf(
+    private val romanFirstNames = listOf(
         "Aemilius",
         "Agrippa",
         "Antonius",
@@ -44,7 +44,7 @@ object NameStrings {
         "Vitellius"
     )
 
-    val ancientGreekFirstNames = listOf(
+    private val ancientGreekFirstNames = listOf(
         "Achilles",
         "Agamemnon",
         "Ajax",
@@ -105,7 +105,7 @@ object NameStrings {
         "Xenophon"
     )
 
-    val ancientGallicFirstNames = listOf(
+    private val ancientGallicFirstNames = listOf(
         "Ambiorix",
         "Arverni",
         "Boudica",
@@ -125,7 +125,7 @@ object NameStrings {
         "Viridomarus"
     )
 
-    val ancientGermanicFirstNames = listOf(
+    private val ancientGermanicFirstNames = listOf(
         "Adalberht",
         "Adalgisa",
         "Aethelflaed",
@@ -190,7 +190,7 @@ object NameStrings {
         "Svanhild",
         "Theoderic")
 
-    val ancientEgyptianFirstNames = listOf(
+    private val ancientEgyptianFirstNames = listOf(
         "Ahmose",
         "Akhenaten",
         "Amenhotep",
@@ -224,7 +224,7 @@ object NameStrings {
         "Yaa"
     )
 
-    val ancientDacianFirstNames = listOf(
+    private val ancientDacianFirstNames = listOf(
         "Burebista",
         "Cotiso",
         "Decebalus",
@@ -239,7 +239,7 @@ object NameStrings {
         "Zalmodegikos"
     )
 
-    val ancientThracianFirstNames = listOf(
+    private val ancientThracianFirstNames = listOf(
         "Berisades",
         "Cotys",
         "Diegylis",
@@ -254,7 +254,7 @@ object NameStrings {
         "Zalmoxis"
     )
 
-    val ancientPunicFirstNames = listOf(
+    private val ancientPunicFirstNames = listOf(
         "Abdemon",
         "Adherbal",
         "Amilcar",
@@ -274,7 +274,7 @@ object NameStrings {
         "Utica"
     )
 
-    val ancientSemiticFirstNames = listOf(
+    private val ancientSemiticFirstNames = listOf(
         "Abraham",
         "Abram",
         "Adah",
@@ -356,7 +356,7 @@ object NameStrings {
         "Zephaniah"
     )
 
-    val ancientNubianFirstNames = listOf(
+    private val ancientNubianFirstNames = listOf(
         "Amanirenas",
         "Arakamani",
         "Aspelta",
@@ -374,7 +374,7 @@ object NameStrings {
         "Tanutamun"
     )
 
-    fun getAllNames(): List<String> {
+    private fun getAllNames(): List<String> {
         return romanFirstNames + ancientGreekFirstNames + ancientGallicFirstNames + ancientGermanicFirstNames + ancientEgyptianFirstNames + ancientDacianFirstNames + ancientThracianFirstNames + ancientPunicFirstNames + ancientSemiticFirstNames + ancientNubianFirstNames
     }
     fun getRandomName(): String {

@@ -1,6 +1,5 @@
 package com.doorxii.ludus.ui.cards
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
@@ -21,7 +20,7 @@ import com.doorxii.ludus.actions.combatactions.CombatAction
 
 object ActionCards {
 
-    @OptIn(ExperimentalFoundationApi::class)
+
     @Composable
     fun CombatActionCard(combatAction: CombatAction, modifier: Modifier = Modifier) {
 //        val configuration = LocalConfiguration.current

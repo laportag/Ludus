@@ -5,6 +5,4 @@ class CombatStats(
     val speed: Double,
     val technique: Double,
     val bloodlust: Double,
-) {
-
-}
+)

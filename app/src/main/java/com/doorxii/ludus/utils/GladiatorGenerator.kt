@@ -12,7 +12,7 @@ import kotlin.random.Random
 
 object GladiatorGenerator {
 
-    fun newGladiator(): Gladiator {
+    private fun newGladiator(): Gladiator {
         val glad = Gladiator()
         glad.id = Random.nextInt(200, 701)
         glad.name = getRandomName()
@@ -44,7 +44,7 @@ object GladiatorGenerator {
         return glad
     }
 
-    fun newGladiatorList(size: Int): MutableList<Gladiator> {
+    private fun newGladiatorList(size: Int): MutableList<Gladiator> {
         var count = 1
         val gladList = mutableListOf<Gladiator>()
         for (i in 1..size){
@@ -54,14 +54,14 @@ object GladiatorGenerator {
     }
 
     fun newGladiatorListWithLudusId(size:Int, ludusId: Int): MutableList<Gladiator> {
-        var list = newGladiatorList(size)
+        val list = newGladiatorList(size)
         for (gladiator in list){
             gladiator.ludusId = ludusId
         }
         return list
     }
 
-    fun getRandomAge():Double{
+    private fun getRandomAge():Double{
         val rangeStart = 15
         val rangeEnd = 40
         val biasRangeStart = 18
@@ -77,7 +77,7 @@ object GladiatorGenerator {
         return biasedRandomNumber.toDouble()
     }
 
-    fun getRandomStat(): Double{
+    private fun getRandomStat(): Double{
         val rangeStart = 20
         val rangeEnd = 100
         val biasRangeStart = 55

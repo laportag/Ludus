@@ -18,24 +18,10 @@ object EnumToEquipment {
         }
     }
 
-    fun weaponToEnum(weapon: Weapon): Weapons {
-        return when (weapon) {
-            is Gladius -> Weapons.GLADIUS
-            else -> Weapons.BAREFIST
-        }
-    }
-
     fun enumToArmour(armourEnum: Armours): Armour {
         return when (armourEnum){
             Armours.LIGHT_ARMOUR -> LightArmour()
             else -> Armourless()
-        }
-    }
-
-    fun armourToEnum(armour: Armour): Armours {
-        return when (armour) {
-            is LightArmour -> Armours.LIGHT_ARMOUR
-            else -> Armours.ARMOURLESS
         }
     }
 

@@ -2,10 +2,6 @@ package com.doorxii.ludus.ui.cards
 
 import android.icu.text.DecimalFormat
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.DraggableState
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.draggable
-import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -23,7 +19,7 @@ import com.doorxii.ludus.data.models.animal.Gladiator
 
 object GladiatorCards {
 
-    val decimalFormat = DecimalFormat("0.##")
+    private val decimalFormat = DecimalFormat("0.##")
 
     @Composable
     fun CombatGladiatorCard(gladiator: Gladiator){

@@ -19,7 +19,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -28,7 +27,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,9 +36,7 @@ import androidx.core.net.toUri
 import com.doorxii.ludus.combat.Combat
 import com.doorxii.ludus.data.db.AppDatabase
 import com.doorxii.ludus.data.db.GladiatorDao
-import com.doorxii.ludus.data.db.LudusDao
 import com.doorxii.ludus.data.models.animal.Gladiator
-import com.doorxii.ludus.data.models.ludus.Ludus
 import com.doorxii.ludus.ui.theme.LudusTheme
 import com.doorxii.ludus.utils.CombatSerialization.returnCombatFile
 import com.doorxii.ludus.utils.CombatSerialization.saveCombatJson
@@ -54,19 +50,18 @@ import java.io.File
 class MainActivity : androidx.activity.ComponentActivity() {
 
     private var combat: Combat? = null
-    var gladiatorList = mutableListOf<Gladiator>()
+    private var gladiatorList = mutableListOf<Gladiator>()
 
     private var isStartGameUIEnabled: Boolean = true
-    private var isActionUIEnabled: Boolean = false
 
-    lateinit var combatFile: File
+    private lateinit var combatFile: File
 
-    var text = mutableStateOf("TEST TEXT")
+    private var text = mutableStateOf("TEST TEXT")
 
-    val combatResultLauncher =
+    private val combatResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
-                Log.d(TAG, "Combat result: ${result.toString()}")
+                Log.d(TAG, "Combat result: $result")
                 val resultUri: Uri = result.data?.data!!
                 val resFile = File(resultUri.path!!)
                 val resCombat = Json.decodeFromString<Combat>(resFile.readText())
@@ -76,8 +71,8 @@ class MainActivity : androidx.activity.ComponentActivity() {
 
     @OptIn(DelicateCoroutinesApi::class)
     fun combatFinished(resCombat: Combat) {
-        Log.d(TAG, "Combat complete?: ${resCombat.isComplete.toString()}")
-        if (resCombat.gladiatorList.size == 0) {
+        Log.d(TAG, "Combat complete?: ${resCombat.isComplete}")
+        if (resCombat.gladiatorList.isEmpty()) {
             text.value = "No winner"
             Log.d(TAG, "No winner")
             return
@@ -101,13 +96,11 @@ class MainActivity : androidx.activity.ComponentActivity() {
         }
     }
 
-    var listA: MutableList<Gladiator> = mutableListOf()
-    var listB: MutableList<Gladiator> = mutableListOf()
-    var choiceA = mutableStateOf<Gladiator>(Gladiator())
-    var choiceB = mutableStateOf<Gladiator>(Gladiator())
+    private var choiceA = mutableStateOf(Gladiator())
+    private var choiceB = mutableStateOf(Gladiator())
 
 
-    fun startCombatActivity(gladiatorList: List<Gladiator>) {
+    private fun startCombatActivity(gladiatorList: List<Gladiator>) {
         combatFile = returnCombatFile(applicationContext)
         combat = Combat.init(gladiatorList)
         saveCombatJson(combat!!, combatFile)
@@ -121,7 +114,7 @@ class MainActivity : androidx.activity.ComponentActivity() {
         startActivity(intent)
     }
 
-    fun simCombat(gladiatorList: List<Gladiator>) {
+    private fun simCombat(gladiatorList: List<Gladiator>) {
         combat = Combat.init(gladiatorList)
         val res = combat!!.simCombat()
         text.value = "Sim: " + res.combatReport
@@ -130,16 +123,13 @@ class MainActivity : androidx.activity.ComponentActivity() {
     }
 
     lateinit var db: AppDatabase
-    lateinit var ludusDao: LudusDao
-    lateinit var gladiatorDao: GladiatorDao
-    lateinit var rome: Ludus
-    lateinit var capua: Ludus
+    private lateinit var gladiatorDao: GladiatorDao
 
-    var romeList = mutableListOf<Gladiator>()
-    var capuaList = mutableListOf<Gladiator>()
+    private var romeList = mutableListOf<Gladiator>()
+    private var capuaList = mutableListOf<Gladiator>()
 
-    @OptIn(DelicateCoroutinesApi::class)
-    fun initDb() {
+
+    private fun initDb() {
 //
 //        GlobalScope.launch(Dispatchers.IO) {
 //            db = Room.databaseBuilder(
@@ -214,7 +204,7 @@ class MainActivity : androidx.activity.ComponentActivity() {
 //        }
     }
 
-    fun updateLudusList() {
+    private fun updateLudusList() {
 //        GlobalScope.launch(Dispatchers.IO) {
 //            romeList = mutableListOf()
 //            for (gladiator in gladiatorDao.getByLudusId(rome.ludusId).toMutableList()) {
@@ -249,12 +239,11 @@ class MainActivity : androidx.activity.ComponentActivity() {
         }
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
     @Preview
     @Composable
 //    @Preview
     fun HomeScreen() {
-        var text by remember { mutableStateOf(text) }
+        val text by remember { mutableStateOf(text) }
         val scrollState = rememberScrollState()
 
         Column(

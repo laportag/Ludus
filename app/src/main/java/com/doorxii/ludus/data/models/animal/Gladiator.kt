@@ -5,7 +5,6 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.doorxii.ludus.actions.combatactions.CombatAction
 import com.doorxii.ludus.actions.combatactions.CombatActions
 import com.doorxii.ludus.data.models.equipment.Equipment
 import com.doorxii.ludus.data.models.ludus.Ludus
@@ -23,7 +22,7 @@ import kotlinx.serialization.Serializable
     ]
 )
 @Serializable
-class Gladiator() : Human() {
+class Gladiator: Human() {
     @PrimaryKey(autoGenerate = true)
     var gladiatorId: Int = 0
     var ludusId: Int = -1

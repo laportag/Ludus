@@ -34,7 +34,7 @@ object DatabaseManagement {
     suspend fun createDb(ludusName: String, context: Context): AppDatabase {
         Log.d(TAG, "createDb: $ludusName")
 
-        var ludusName = ludusName.replace(" ", "_")
+        val ludusName = ludusName.replace(" ", "_")
 
         // Validate the ludusName parameter
         if (ludusName.isEmpty() || ludusName.contains(Regex("[\\s\\W]"))) {
@@ -85,8 +85,8 @@ object DatabaseManagement {
         return db
     }
 
-    suspend fun populateDb(db: AppDatabase) {
-        var ludi = listOf("Ludus Magnus", "Capua", "Pergamum", "Alexandria", "Praeneste")
+    private suspend fun populateDb(db: AppDatabase) {
+        val ludi = listOf("Ludus Magnus", "Capua", "Pergamum", "Alexandria", "Praeneste")
         for (ludusName in ludi) {
             val newLudus = Ludus(ludusName)
             db.ludusDao().insertLudus(newLudus)

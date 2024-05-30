@@ -5,8 +5,7 @@ import com.doorxii.ludus.data.models.equipment.EquipmentType
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed class Armour(
-) :
+sealed class Armour:
     EquipmentItem() {
     override var equipmentType: EquipmentType = EquipmentType.ARMOUR
 }

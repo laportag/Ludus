@@ -5,9 +5,9 @@ import com.doorxii.ludus.data.models.ludus.Ludus
 import kotlinx.coroutines.flow.Flow
 
 class LudusRepository(db: AppDatabase) {
-    val db = db
-    val ludusDao = db.ludusDao()
-    val gladiatorDao = db.gladiatorDao()
+
+    private val ludusDao = db.ludusDao()
+    private val gladiatorDao = db.gladiatorDao()
 
     suspend fun addLudus(ludus: Ludus) = ludusDao.insertLudus(ludus)
 

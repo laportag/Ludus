@@ -7,10 +7,9 @@ import com.doorxii.ludus.utils.enums.EnumToAction.combatEnumToAction
 import kotlinx.serialization.Serializable
 
 @Serializable
-class CombatRound() {
+class CombatRound {
     private var gladiatorList: List<Gladiator> = mutableListOf()
     private var round: Int? = null
-    private var beginner: Gladiator? = null
     var roundReport: String = ""
 
     private fun determineBeginner(): Gladiator {
@@ -51,7 +50,7 @@ class CombatRound() {
 
         if (beginner == gladiatorList[0]) {
             // A Starts
-            val resA = combatEnumToAction(gladiatorList[0].action!!).act(mutableListOf(gladiatorList[0], gladiatorList[1]))!!
+            val resA = combatEnumToAction(gladiatorList[0].action!!).act(mutableListOf(gladiatorList[0], gladiatorList[1]))
             gladiatorList = updateFromCombatActionResult(resA)
             if (gladiatorList.size < 2) { return gladiatorList }
 
@@ -76,7 +75,7 @@ class CombatRound() {
         return listOf(gladiatorList[0], gladiatorList[1])
     }
     
-    fun updateFromCombatActionResult(result: CombatActionResult): List<Gladiator> {
+    private fun updateFromCombatActionResult(result: CombatActionResult): List<Gladiator> {
         val gladiatorList:List<Gladiator> = gladiatorList
         Log.d(TAG, "updating from action result...")
         Log.d(TAG, "CombatActionResult: $result")

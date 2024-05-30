@@ -10,9 +10,7 @@ import com.doorxii.ludus.utils.enums.EnumToAction.combatEnumToAction
 import kotlinx.serialization.Serializable
 
 @Serializable
-class Combat(
-
-) {
+class Combat{
     var gladiatorList: List<Gladiator> = listOf()
     var originalGladiatorList: List<Gladiator> = listOf()
     private var round: CombatRound? = null
@@ -44,7 +42,7 @@ class Combat(
 
             }
         }
-        return CombatResult(true, combatReport)
+        return CombatResult(combatReport)
     }
 
     private fun appendReport(str: String) {
@@ -56,7 +54,7 @@ class Combat(
         if (gladiatorList.size < 2) {
             appendReport("Combat over, ${gladiatorList[0].name} won in $roundNumber rounds")
             isComplete = true
-            return CombatResult(true, combatReport)
+            return CombatResult(combatReport)
 
         } else {
             userChoice = choice
@@ -74,11 +72,11 @@ class Combat(
                     appendReport("Combat over, ${gladiatorList[0].name} won in $roundNumber rounds")
                 }
                 isComplete = true
-                return CombatResult(true, combatReport)
+                return CombatResult(combatReport)
             }
         }
 
-        return CombatResult(false, combatReport)
+        return CombatResult(combatReport)
     }
 
     private fun runNewRound(

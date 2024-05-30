@@ -8,11 +8,10 @@ import com.doorxii.ludus.data.models.ludus.Ludus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 
-open class  LudusManagementActivityViewModel(): ViewModel() {
+open class  LudusManagementActivityViewModel: ViewModel() {
 
     private lateinit var ludusRepository: LudusRepository
     private val _playerLudus = MutableStateFlow<Ludus?>(null)
@@ -32,12 +31,6 @@ open class  LudusManagementActivityViewModel(): ViewModel() {
                 _playerLudus.value = ludus
                 Log.d(TAG, "playerLudus: $ludus")
             }
-        }
-    }
-
-    fun setPlayerLudus(){
-        viewModelScope.launch {
-            _playerLudus.value = ludusRepository.getPlayerLudus().first()
         }
     }
 
