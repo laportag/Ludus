@@ -10,7 +10,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -36,8 +39,9 @@ class LudusManagementActivity() : ComponentActivity() {
 
     lateinit var db: AppDatabase
     lateinit var repository: LudusRepository
-    var ludus = mutableStateOf<Ludus?>(null)
     lateinit var viewModel: LudusManagementActivityViewModel
+    val ludus = mutableStateOf<Ludus?>(null)
+    val ludusManagementView = mutableStateOf<LudusManagementViews>(LudusManagementViews.HOME)
 
     @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,32 +71,59 @@ class LudusManagementActivity() : ComponentActivity() {
                 LudusManagementLayout()
             }
         }
-
     }
-
-    fun launchBarracksManagement() {
-
-    }
-
-    fun launchGladiatorMarket() {
-
-    }
-
-    fun chooseEnemyLudus() {
-
-    }
-
-    @Composable
-    fun BarracksManagement(){
-
-    }
-
-
 
     @Preview
     @Composable
     fun LudusManagementLayout() {
 
+        Scaffold(
+            bottomBar = {
+                // Your bottom app bar content here
+                // For example:
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceAround
+                ) {
+                    Button(onClick = {
+                        ludusManagementView.value = LudusManagementViews.HOME
+                    }) {
+                        Text("Home")
+                    }
+                    Button(onClick = {
+                        ludusManagementView.value = LudusManagementViews.BARRACKS_MANAGEMENT
+                    }) {
+                        Text("Barracks")
+                    }
+                    Button(onClick = {
+                        ludusManagementView.value = LudusManagementViews.GLADIATOR_MARKET
+                    }) {
+                        Text("Market")
+                    }
+                    Row {
+                        Button(onClick = {
+                            ludusManagementView.value = LudusManagementViews.COMBAT_SELECT
+                        }) {
+                            Text("Combat")
+                        }
+                    }
+                }
+            }
+        ) { innerPadding ->
+            // Your main content goes here, using innerPadding
+            Log.d(TAG, innerPadding.toString())
+            when (ludusManagementView.value) {
+                LudusManagementViews.HOME -> { LudusManagementHome() }
+                LudusManagementViews.BARRACKS_MANAGEMENT -> { BarracksManagement() }
+                LudusManagementViews.GLADIATOR_MARKET -> { GladiatorMarket() }
+                LudusManagementViews.COMBAT_SELECT -> { CombatSelect() }
+            }
+        }
+
+    }
+
+    @Composable
+    fun LudusManagementHome(){
         if (ludus.value != null) {
             Column(
                 modifier = Modifier.fillMaxSize(),
@@ -100,21 +131,40 @@ class LudusManagementActivity() : ComponentActivity() {
                 verticalArrangement = Arrangement.Center
             ) {
                 Text("Ludus: ${ludus.value?.name}")
-                Button(onClick = { launchBarracksManagement() }) {
+                Button(onClick = {
+                    ludusManagementView.value = LudusManagementViews.BARRACKS_MANAGEMENT
+                }) {
                     Text("Manage Barracks")
                 }
-                Button(onClick = { launchGladiatorMarket() }) {
+                Button(onClick = {
+                    ludusManagementView.value = LudusManagementViews.GLADIATOR_MARKET
+                }) {
                     Text("Purchase Gladiators")
                 }
                 Row {
-                    Button(onClick = { chooseEnemyLudus() }) {
+                    Button(onClick = {
+                        ludusManagementView.value = LudusManagementViews.COMBAT_SELECT
+                    }) {
                         Text("Choose Enemy Ludus")
                     }
                 }
             }
         }
+    }
 
+    @Composable
+    fun BarracksManagement(){
+        Text("Barracks Management")
+    }
 
+    @Composable
+    fun GladiatorMarket(){
+        Text("Gladiator Market")
+    }
+
+    @Composable
+    fun CombatSelect(){
+        Text("Combat Select")
     }
 
     override fun finishActivity(requestCode: Int) {
