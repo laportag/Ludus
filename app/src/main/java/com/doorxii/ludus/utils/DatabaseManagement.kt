@@ -65,6 +65,12 @@ object DatabaseManagement {
         val ludus = Ludus(ludusName)
         ludus.playerLudus = true
         db.ludusDao().insertLudus(ludus)
+
+        val id = db.ludusDao().getLudusByName(ludus.name).first().ludusId
+        val newGladiators = GladiatorGenerator.newGladiatorListWithLudusId(7, id)
+        for (gladiator in newGladiators) {
+            db.gladiatorDao().insertGladiator(gladiator)
+        }
         populateDb(db)
 
         return db

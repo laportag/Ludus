@@ -13,11 +13,17 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -27,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -36,6 +43,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.doorxii.ludus.data.db.AppDatabase
 import com.doorxii.ludus.data.db.LudusRepository
+import com.doorxii.ludus.data.models.animal.Gladiator
 import com.doorxii.ludus.data.models.ludus.Ludus
 import com.doorxii.ludus.ui.theme.LudusTheme
 import com.doorxii.ludus.utils.DatabaseManagement.returnDb
@@ -46,11 +54,20 @@ class LudusManagementActivity : ComponentActivity() {
     lateinit var db: AppDatabase
     private lateinit var repository: LudusRepository
     private lateinit var viewModel: LudusManagementActivityViewModel
+
     val ludus = mutableStateOf<Ludus?>(null)
+
+    private val ludusManagementView = mutableStateOf(LudusManagementViews.HOME)
+
+
     private val allLudi = mutableStateOf<List<Ludus>>(emptyList())
     private val ludiExcludingPlayer = mutableStateOf<List<Ludus>>(emptyList())
-    private val ludusManagementView = mutableStateOf(LudusManagementViews.HOME)
+
     private val selectedEnemyLudus = mutableStateOf<Ludus?>(null)
+
+    val playerGladiators = mutableStateOf<List<Gladiator>>(emptyList())
+    private val selectedLudusGladiators = mutableStateOf<List<Gladiator>>(emptyList())
+    private val selectedCombatant = mutableStateOf<Gladiator?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,7 +91,8 @@ class LudusManagementActivity : ComponentActivity() {
         }
     }
 
-    fun observeFlows(){
+    fun observeFlows() {
+
         // All ludi
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -84,21 +102,44 @@ class LudusManagementActivity : ComponentActivity() {
                 }
             }
         }
+
         // Player Ludus
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.playerLudus.collect { playerLudus ->
                     Log.d(TAG, "obServeFlow playerLudus: $playerLudus")
                     ludus.value = playerLudus
+                    playerLudus?.ludusId?.let { viewModel.getPlayerGladiators(it) }
                 }
             }
         }
+
         // List of ludi excluding the player
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.ludiExcludingPlayer.collect {
                     Log.d(TAG, "obServeFlow ludiExcludingPlayer: $it")
                     ludiExcludingPlayer.value = it
+                }
+            }
+        }
+
+        // Gladiators of enemy ludus
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.gladiatorsByLudus.collect {
+                    Log.d(TAG, "obServeFlow enemyGladiators: $it")
+                    selectedLudusGladiators.value = it
+                }
+            }
+        }
+
+        // list of player gladiators
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.playerGladiators.collect {
+                    Log.d(TAG, "observeFlow player Gladiators: $it")
+                    playerGladiators.value = it
                 }
             }
         }
@@ -111,8 +152,6 @@ class LudusManagementActivity : ComponentActivity() {
         val playerLudus by viewModel.playerLudus.collectAsState(initial = null)
         Scaffold(
             bottomBar = {
-                // Your bottom app bar content here
-                // For example:
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceAround
@@ -208,6 +247,7 @@ class LudusManagementActivity : ComponentActivity() {
     fun CombatSelect() {
         val configuration = LocalConfiguration.current
         val screenHeight = configuration.screenHeightDp.dp
+        val screenWidth = configuration.screenWidthDp.dp
 
         var selectedLudus by remember { mutableStateOf<Ludus?>(null) }
         var expanded by remember { mutableStateOf(false) }
@@ -238,22 +278,88 @@ class LudusManagementActivity : ComponentActivity() {
                                 onClick = {
                                     expanded = false
                                     selectedLudus = ludus
+                                    viewModel.getGladiatorsByLudusId(ludus.ludusId)
                                 }
                             )
                         }
                     }
                 }
-            }
 
-            Text("Ludus Select")
+            }
+            Column(
+                Modifier
+                    .height(screenHeight * 14 / 15)
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text("Select Combatant")
+                Row {
+                    Column(
+                        Modifier
+                            .width(screenWidth / 2)
+                    ){
+                        Text(text = "Player")
+                        BarracksList(list = playerGladiators.value) {
+                            selectedCombatant.value = it
+                        }
+                    }
+                    Column(
+                        Modifier
+                            .width(screenWidth / 2)
+                    ) {
+                        Text(text = "Enemy")
+                        BarracksList(list = selectedLudusGladiators.value) {
+                            Log.d(TAG, "Enemy combatant: $it")
+                        }
+                    }
+                }
+            }
         }
 
-
     }
 
-    companion object {
-        const val TAG = "LudusManagementActivity"
+    @Composable
+    fun BarracksList(
+        list: List<Gladiator>,
+        onItemSelected: (Gladiator) -> Unit
+    ) {
+        LazyColumn {
+            items(list) { gladiator ->
+                SelectableItem(
+                    gladiator,
+                    onItemSelected
+                )
+            }
+        }
     }
+
+
+@Composable
+fun SelectableItem(
+    item: Gladiator,
+    onSelected: (Gladiator) -> Unit
+) {
+    val isSelected = item == selectedCombatant.value
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onSelected(item) },
+        shape = MaterialTheme.shapes.small,
+        tonalElevation = 4.dp,
+        color = if (isSelected) Color.LightGray else Color.Transparent
+    ) {
+        Text(
+            text = item.name,
+            modifier = Modifier.padding(16.dp)
+        )
+    }
+
+}
+
+companion object {
+    const val TAG = "LudusManagementActivity"
+}
 
 
 }
