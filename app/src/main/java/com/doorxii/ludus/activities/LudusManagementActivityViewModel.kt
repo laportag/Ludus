@@ -51,7 +51,7 @@ open class  LudusManagementActivityViewModel: ViewModel() {
                 Log.d(TAG, "getAllLudi: $ludusList")
                 _allLudi.value = ludusList
             }
-            _ludiExcludingPlayer.value = getLudiExcludingPlayer()
+            getLudiExcludingPlayer()
         }
 
         viewModelScope.launch {
@@ -79,8 +79,18 @@ open class  LudusManagementActivityViewModel: ViewModel() {
         return allLudi.value
     }
 
-    fun getLudiExcludingPlayer(): List<Ludus> {
-        return allLudi.value.filter { it != playerLudus.value }
+    fun getLudiExcludingPlayer() {
+        viewModelScope.launch {
+            val list = allLudi.value.toMutableList()
+            for (ludus in allLudi.value){
+                if (ludus.ludusId == playerLudus.value?.ludusId){
+                    list.remove(ludus)
+                }
+            }
+
+            _ludiExcludingPlayer.value = list
+            Log.d(TAG, "getLudiExcludingPlayer: ${ludiExcludingPlayer.value}")
+        }
     }
 
     fun getGladiatorsByLudusId(ludusId: Int): List<Gladiator> {

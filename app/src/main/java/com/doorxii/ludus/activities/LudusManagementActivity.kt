@@ -99,6 +99,7 @@ class LudusManagementActivity : ComponentActivity() {
                 viewModel.allLudi.collect {
                     Log.d(TAG, "obServeFlow allLudi: $it")
                     allLudi.value = it
+                    viewModel.getLudiExcludingPlayer()
                 }
             }
         }
@@ -110,6 +111,7 @@ class LudusManagementActivity : ComponentActivity() {
                     Log.d(TAG, "obServeFlow playerLudus: $playerLudus")
                     ludus.value = playerLudus
                     playerLudus?.ludusId?.let { viewModel.getPlayerGladiators(it) }
+                    viewModel.getLudiExcludingPlayer()
                 }
             }
         }
@@ -272,7 +274,7 @@ class LudusManagementActivity : ComponentActivity() {
                         expanded = expanded,
                         onDismissRequest = { expanded = false }
                     ) {
-                        allLudiList.forEach { ludus ->
+                        ludiExcludingPlayer.value.forEach { ludus ->
                             DropdownMenuItem(
                                 text = { Text(text = ludus.name) },
                                 onClick = {
