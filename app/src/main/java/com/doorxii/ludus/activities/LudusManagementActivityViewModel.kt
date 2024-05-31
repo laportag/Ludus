@@ -14,8 +14,15 @@ import kotlinx.coroutines.launch
 open class  LudusManagementActivityViewModel: ViewModel() {
 
     private lateinit var ludusRepository: LudusRepository
+
     private val _playerLudus = MutableStateFlow<Ludus?>(null)
     val playerLudus: StateFlow<Ludus?> = _playerLudus.asStateFlow()
+
+    private val _allLudi = MutableStateFlow<List<Ludus>>(emptyList())
+    val allLudi: StateFlow<List<Ludus>> = _allLudi.asStateFlow()
+
+    private val _ludiExcludingPlayer = MutableStateFlow<List<Ludus>>(emptyList())
+    val ludiExcludingPlayer: StateFlow<List<Ludus>> = _ludiExcludingPlayer.asStateFlow()
 
 
     init {
@@ -32,6 +39,13 @@ open class  LudusManagementActivityViewModel: ViewModel() {
                 Log.d(TAG, "playerLudus: $ludus")
             }
         }
+        viewModelScope.launch {
+            ludusRepository.getAllLudi().collect { ludusList ->
+                Log.d(TAG, "getAllLudi: $ludusList")
+                _allLudi.value = ludusList
+            }
+            _ludiExcludingPlayer.value = getLudiExcludingPlayer()
+        }
     }
 
     fun updatePlayerLudus(newLudus: Ludus) {
@@ -39,6 +53,20 @@ open class  LudusManagementActivityViewModel: ViewModel() {
             ludusRepository.updateLudus (newLudus)
             _playerLudus.value = newLudus // Update the local state
         }
+    }
+
+    fun getAllLudi(): List<Ludus>{
+        viewModelScope.launch {
+            ludusRepository.getAllLudi().collect { ludusList ->
+                Log.d(TAG, "getAllLudi: $ludusList")
+                _allLudi.value = ludusList
+            }
+        }
+        return allLudi.value
+    }
+
+    fun getLudiExcludingPlayer(): List<Ludus> {
+        return allLudi.value.filter { it != playerLudus.value }
     }
 
 
