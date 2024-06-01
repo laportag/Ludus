@@ -242,12 +242,14 @@ class LudusManagementActivity : ComponentActivity() {
     fun healAliveGladiators(list: List<Gladiator>) {
         for (gladiator in list) {
             if (gladiator.health < 100.0 && gladiator.health > 0.0) {
+                Log.d(TAG, "healing: ${gladiator.name}")
                 gladiator.health = 100.0
                 gladiator.stamina = 100.0
                 gladiator.morale = 100.0
                 viewModel.updateGladiator(gladiator)
             }
         }
+        viewModel.getPlayerGladiators(ludus.value!!.ludusId)
     }
 
     fun buyGladiator(gladiator: Gladiator){
@@ -339,11 +341,6 @@ class LudusManagementActivity : ComponentActivity() {
                 }) {
                     Text("Choose Enemy Ludus")
                 }
-            }
-            Button(onClick = {
-                healAliveGladiators(playerGladiators.value)
-            }) {
-                Text("Heal Player Gladiators")
             }
         }
     }
@@ -586,7 +583,7 @@ class LudusManagementActivity : ComponentActivity() {
                         Button(onClick = { /*TODO*/ }) {
                             Text("Check Stats")
                         }
-                        Button(onClick = { /*TODO*/ }) {
+                        Button(onClick = { healAliveGladiators(listOf(item)) }) {
                             Text("Heal")
                         }
                         Button(onClick = { /*TODO*/ }) {
