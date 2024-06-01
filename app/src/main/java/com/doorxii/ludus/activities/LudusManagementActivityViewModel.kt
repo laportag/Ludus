@@ -105,7 +105,13 @@ open class  LudusManagementActivityViewModel: ViewModel() {
         viewModelScope.launch {
             ludusRepository.getGladiatorsByLudusId(ludusId).collect { gladiators ->
                 Log.d(TAG, "getGladiatorsByLudusId $ludusId: $gladiators")
-                _gladiatorsByLudus.value = gladiators
+                val list = gladiators.toMutableList()
+                for (gladiator in gladiators){
+                    if (!gladiator.isAlive()){
+                        list.remove(gladiator)
+                    }
+                }
+                _gladiatorsByLudus.value = list
             }
         }
         return gladiatorsByLudus.value
@@ -115,7 +121,13 @@ open class  LudusManagementActivityViewModel: ViewModel() {
         viewModelScope.launch {
             ludusRepository.getGladiatorsByLudusId(id).collect { gladiators ->
                 Log.d(TAG, "getPlayerGladiators: $gladiators")
-                _playerGladiators.value = gladiators
+                val list = gladiators.toMutableList()
+                for (gladiator in gladiators){
+                    if (!gladiator.isAlive()){
+                        list.remove(gladiator)
+                    }
+                }
+                _playerGladiators.value = list
             }
         }
     }
