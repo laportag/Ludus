@@ -23,7 +23,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -53,7 +52,6 @@ import com.doorxii.ludus.data.models.ludus.Ludus
 import com.doorxii.ludus.ui.theme.LudusTheme
 import com.doorxii.ludus.utils.CombatSerialization
 import com.doorxii.ludus.utils.DatabaseManagement.returnDb
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import java.io.File
@@ -71,10 +69,8 @@ class LudusManagementActivity : ComponentActivity() {
 
     private val allLudi = mutableStateOf<List<Ludus>>(emptyList())
     private val ludiExcludingPlayer = mutableStateOf<List<Ludus>>(emptyList())
-
-    private val selectedEnemyLudus = mutableStateOf<Ludus?>(null)
-
-    val playerGladiators = mutableStateOf<List<Gladiator>>(emptyList())
+    private val selectedEnenmyLudus = mutableStateOf<Ludus?>(null)
+    private val playerGladiators = mutableStateOf<List<Gladiator>>(emptyList())
     private val selectedLudusGladiators = mutableStateOf<List<Gladiator>>(emptyList())
     private val selectedCombatant = mutableStateOf<Gladiator?>(null)
 
@@ -114,7 +110,7 @@ class LudusManagementActivity : ComponentActivity() {
         }
     }
 
-    fun observeFlows() {
+    private fun observeFlows() {
 
         // All ludi
         lifecycleScope.launch {
@@ -149,6 +145,16 @@ class LudusManagementActivity : ComponentActivity() {
             }
         }
 
+        // selected enemy ludus
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.selectedEnemyLudus.collect {
+                    Log.d(TAG, "obServeFlow selectedEnemyLudus: $it")
+                    selectedEnenmyLudus.value = it
+                }
+            }
+        }
+
         // Gladiators of enemy ludus
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -170,14 +176,14 @@ class LudusManagementActivity : ComponentActivity() {
         }
     }
 
-    fun startCombat() {
+    private fun startCombat() {
         Log.d(TAG, "Combatant: $selectedCombatant")
         val enemy = selectedLudusGladiators.value.random()
         val gladiatorList = listOf(selectedCombatant.value!!, enemy)
         combatFile = CombatSerialization.returnCombatFile(applicationContext)
         combat = Combat.init(gladiatorList)
         CombatSerialization.saveCombatJson(combat!!, combatFile)
-        Log.d(TAG, "combatfile: " + combatFile.readText())
+        Log.d(TAG, "combatFile: " + combatFile.readText())
         val uri = combatFile.toUri()
         val intent = Intent(this, CombatActivity::class.java)
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -186,39 +192,45 @@ class LudusManagementActivity : ComponentActivity() {
         startActivity(intent)
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
-    fun combatFinished(resCombat: Combat) {
+    private fun combatFinished(resCombat: Combat) {
         Log.d(TAG, "Combat complete?: ${resCombat.isComplete}")
         if (resCombat.gladiatorList.isEmpty()) {
-//            text.value = "No winner"
             Log.d(TAG, "No winner")
             return
         }
         val winner = resCombat.gladiatorList[0]
         Log.d(TAG, "Winner: ${winner.name}")
-//        text.value = "Winner: ${winner.name}"
 
 
-            for (gladiator in resCombat.originalGladiatorList) {
-                if (gladiator !in resCombat.gladiatorList) {
-                    // dead gladiators
-                    gladiator.health = 0.0
-                    viewModel.updateGladiator(gladiator)
-                }
-            }
-            for (gladiator in resCombat.gladiatorList) {
+        for (gladiator in resCombat.originalGladiatorList) {
+            if (gladiator !in resCombat.gladiatorList) {
+                // dead gladiators
+                gladiator.health = 0.0
                 viewModel.updateGladiator(gladiator)
+
             }
-//            updateLudusList()
+        }
+        for (gladiator in resCombat.gladiatorList) {
+            viewModel.updateGladiator(gladiator)
+        }
+        viewModel.getGladiatorsByLudusId(selectedEnenmyLudus.value!!.ludusId)
+        viewModel.getPlayerGladiators(ludus.value!!.ludusId)
 
     }
 
+    private fun simCombat() {
+        val enemy = selectedLudusGladiators.value.random()
+        val gladiatorList = listOf(selectedCombatant.value!!, enemy)
+        combat = Combat.init(gladiatorList)
+        val res = combat!!.simCombat()
+        Log.d(TAG, "res: " + res.combatReport)
+        combatFinished(combat!!)
+    }
 
 
     @Preview
     @Composable
     fun LudusManagementLayout() {
-        val allLudi by viewModel.allLudi.collectAsState(initial = emptyList())
         val playerLudus by viewModel.playerLudus.collectAsState(initial = null)
         Scaffold(
             bottomBar = {
@@ -301,6 +313,17 @@ class LudusManagementActivity : ComponentActivity() {
         }
     }
 
+    fun healAliveGladiators(list: List<Gladiator>){
+        for (gladiator in list) {
+            if (gladiator.health < 100.0 && gladiator.health > 0.0) {
+                gladiator.health = 100.0
+                gladiator.stamina = 100.0
+                gladiator.morale = 100.0
+                viewModel.updateGladiator(gladiator)
+            }
+        }
+    }
+
     @Composable
     fun BarracksManagement() {
         Text("Barracks Management")
@@ -311,7 +334,6 @@ class LudusManagementActivity : ComponentActivity() {
         Text("Gladiator Market")
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
     @Preview
     @Composable
     fun CombatSelect() {
@@ -319,9 +341,8 @@ class LudusManagementActivity : ComponentActivity() {
         val screenHeight = configuration.screenHeightDp.dp
         val screenWidth = configuration.screenWidthDp.dp
 
-        var selectedLudus by remember { mutableStateOf<Ludus?>(null) }
+        var selectedLudus by remember { mutableStateOf<Ludus?>(selectedEnenmyLudus.value) }
         var expanded by remember { mutableStateOf(false) }
-        val allLudiList by viewModel.allLudi.collectAsState(initial = emptyList())
         Column(
             Modifier.fillMaxSize(),
         ) {
@@ -335,7 +356,7 @@ class LudusManagementActivity : ComponentActivity() {
                         )
                 ) {
                     Text(
-                        text = selectedLudus?.name ?: "Select Enemy Ludus",
+                        text = selectedEnenmyLudus.value?.name ?: "Select Enemy Ludus",
                         modifier = Modifier.align(Alignment.Center)
                     )
                     DropdownMenu(
@@ -347,7 +368,7 @@ class LudusManagementActivity : ComponentActivity() {
                                 text = { Text(text = ludus.name) },
                                 onClick = {
                                     expanded = false
-                                    selectedLudus = ludus
+                                    viewModel.setSelectedEnemyLudus(ludus)
                                     viewModel.getGladiatorsByLudusId(ludus.ludusId)
                                 }
                             )
@@ -364,13 +385,16 @@ class LudusManagementActivity : ComponentActivity() {
                 verticalArrangement = Arrangement.Center
             ) {
                 Text("Select Combatant")
-                Row(Modifier.fillMaxWidth()
-                    .height(screenHeight * 12/15)) {
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .height(screenHeight * 12 / 15)
+                ) {
                     Column(
                         Modifier
                             .width(screenWidth / 2)
-                    ){
-                        Text(text = "Player")
+                    ) {
+                        Text(text = ludus.value?.name ?: "Player")
                         BarracksList(list = playerGladiators.value) {
                             selectedCombatant.value = it
                         }
@@ -379,18 +403,26 @@ class LudusManagementActivity : ComponentActivity() {
                         Modifier
                             .width(screenWidth / 2)
                     ) {
-                        Text(text = "Enemy")
+                        Text(text = selectedEnenmyLudus.value?.name ?: "Enemy")
                         BarracksList(list = selectedLudusGladiators.value) {
                             Log.d(TAG, "Enemy combatant: $it")
                         }
                     }
                 }
-                Button(onClick = {
-                    Log.d(TAG, "Combatant: $selectedCombatant")
-                    startCombat()
-                }) {
-                    Text("Start Combat")
+                Row {
+                    Button(onClick = {
+                        Log.d(TAG, "Combatant: $selectedCombatant")
+                        startCombat()
+                    }) {
+                        Text("Start Combat")
+                    }
+                    Button(onClick = {
+                        simCombat()
+                    }) {
+                        Text("Sim Combat")
+                    }
                 }
+
             }
         }
 
@@ -412,31 +444,31 @@ class LudusManagementActivity : ComponentActivity() {
     }
 
 
-@Composable
-fun SelectableItem(
-    item: Gladiator,
-    onSelected: (Gladiator) -> Unit
-) {
-    val isSelected = item == selectedCombatant.value
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onSelected(item) },
-        shape = MaterialTheme.shapes.small,
-        tonalElevation = 4.dp,
-        color = if (isSelected) Color.LightGray else Color.Transparent
+    @Composable
+    fun SelectableItem(
+        item: Gladiator,
+        onSelected: (Gladiator) -> Unit
     ) {
-        Text(
-            text = item.name,
-            modifier = Modifier.padding(16.dp)
-        )
+        val isSelected = item == selectedCombatant.value
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onSelected(item) },
+            shape = MaterialTheme.shapes.small,
+            tonalElevation = 4.dp,
+            color = if (isSelected) Color.LightGray else Color.Transparent
+        ) {
+            Text(
+                text = item.name,
+                modifier = Modifier.padding(16.dp)
+            )
+        }
+
     }
 
-}
-
-companion object {
-    const val TAG = "LudusManagementActivity"
-}
+    companion object {
+        const val TAG = "LudusManagementActivity"
+    }
 
 
 }

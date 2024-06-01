@@ -28,6 +28,9 @@ open class  LudusManagementActivityViewModel: ViewModel() {
     private val _playerGladiators = MutableStateFlow<List<Gladiator>>(emptyList())
     val playerGladiators: StateFlow<List<Gladiator>> = _playerGladiators.asStateFlow()
 
+    private val _selectedEnemyLudus = MutableStateFlow<Ludus?>(null)
+    val selectedEnemyLudus: StateFlow<Ludus?> = _selectedEnemyLudus.asStateFlow()
+
     private val _gladiatorsByLudus = MutableStateFlow<List<Gladiator>>(emptyList())
     val gladiatorsByLudus: StateFlow<List<Gladiator>> = _gladiatorsByLudus.asStateFlow()
 
@@ -60,6 +63,12 @@ open class  LudusManagementActivityViewModel: ViewModel() {
         }
 
 
+    }
+
+    fun setSelectedEnemyLudus(ludus: Ludus){
+        viewModelScope.launch {
+            _selectedEnemyLudus.value = ludus
+        }
     }
 
     fun updatePlayerLudus(newLudus: Ludus) {

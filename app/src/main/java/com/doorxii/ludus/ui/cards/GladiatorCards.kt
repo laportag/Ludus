@@ -35,7 +35,7 @@ object GladiatorCards {
             shape = RoundedCornerShape(8.dp)
         ){
             Column{
-                Text(text = gladiator.name)
+                Text(text = "${gladiator.name} : #${gladiator.id}")
                 Row {
                     Column {
                         Text("H: ${gladiator.health}/100")
