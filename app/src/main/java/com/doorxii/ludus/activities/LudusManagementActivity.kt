@@ -227,6 +227,17 @@ class LudusManagementActivity : ComponentActivity() {
         combatFinished(combat!!)
     }
 
+    fun healAliveGladiators(list: List<Gladiator>){
+        for (gladiator in list) {
+            if (gladiator.health < 100.0 && gladiator.health > 0.0) {
+                gladiator.health = 100.0
+                gladiator.stamina = 100.0
+                gladiator.morale = 100.0
+                viewModel.updateGladiator(gladiator)
+            }
+        }
+    }
+
 
     @Preview
     @Composable
@@ -310,23 +321,27 @@ class LudusManagementActivity : ComponentActivity() {
                     Text("Choose Enemy Ludus")
                 }
             }
-        }
-    }
-
-    fun healAliveGladiators(list: List<Gladiator>){
-        for (gladiator in list) {
-            if (gladiator.health < 100.0 && gladiator.health > 0.0) {
-                gladiator.health = 100.0
-                gladiator.stamina = 100.0
-                gladiator.morale = 100.0
-                viewModel.updateGladiator(gladiator)
+            Button(onClick = {
+                healAliveGladiators(playerGladiators.value)
+            }) {
+                Text("Heal Player Gladiators")
             }
         }
     }
 
+
     @Composable
     fun BarracksManagement() {
         Text("Barracks Management")
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ){
+            BarracksList(list = playerGladiators.value) {
+                Log.d(TAG, "Gladiator: $it")
+            }
+        }
     }
 
     @Composable
@@ -395,7 +410,7 @@ class LudusManagementActivity : ComponentActivity() {
                             .width(screenWidth / 2)
                     ) {
                         Text(text = ludus.value?.name ?: "Player")
-                        BarracksList(list = playerGladiators.value) {
+                        BarracksListShort(list = playerGladiators.value) {
                             selectedCombatant.value = it
                         }
                     }
@@ -404,7 +419,7 @@ class LudusManagementActivity : ComponentActivity() {
                             .width(screenWidth / 2)
                     ) {
                         Text(text = selectedEnenmyLudus.value?.name ?: "Enemy")
-                        BarracksList(list = selectedLudusGladiators.value) {
+                        BarracksListShort(list = selectedLudusGladiators.value) {
                             Log.d(TAG, "Enemy combatant: $it")
                         }
                     }
@@ -432,10 +447,25 @@ class LudusManagementActivity : ComponentActivity() {
     fun BarracksList(
         list: List<Gladiator>,
         onItemSelected: (Gladiator) -> Unit
+    ){
+        LazyColumn {
+            items(list) { gladiator ->
+                SelectableItemBarracksGladiator(
+                    gladiator,
+                    onItemSelected
+                )
+            }
+        }
+    }
+
+    @Composable
+    fun BarracksListShort(
+        list: List<Gladiator>,
+        onItemSelected: (Gladiator) -> Unit
     ) {
         LazyColumn {
             items(list) { gladiator ->
-                SelectableItem(
+                SelectableItemShort(
                     gladiator,
                     onItemSelected
                 )
@@ -445,7 +475,7 @@ class LudusManagementActivity : ComponentActivity() {
 
 
     @Composable
-    fun SelectableItem(
+    fun SelectableItemShort(
         item: Gladiator,
         onSelected: (Gladiator) -> Unit
     ) {
@@ -463,8 +493,57 @@ class LudusManagementActivity : ComponentActivity() {
                 modifier = Modifier.padding(16.dp)
             )
         }
-
     }
+
+    @Composable
+    fun SelectableItemBarracksGladiator(
+        item: Gladiator,
+        onSelected: (Gladiator) -> Unit
+    ) {
+
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onSelected(item) },
+            shape = MaterialTheme.shapes.small,
+            tonalElevation = 4.dp
+        ){
+            Column {
+                Row{
+                    Column {
+                        Text(
+                            text = item.name,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                        Text(
+                            text = "H: ${item.health}",
+                            modifier = Modifier.padding(16.dp)
+                        )
+                        Text(
+                            text = "S: ${item.stamina}",
+                            modifier = Modifier.padding(16.dp)
+                        )
+                        Text(
+                            text = "M: ${item.morale}",
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
+                    Column {
+                        Button(onClick = { /*TODO*/ }) {
+                            Text("Check Stats")
+                        }
+                        Button(onClick = { /*TODO*/ }) {
+                            Text("Heal")
+                        }
+                        Button(onClick = { /*TODO*/ }) {
+                            Text("Sell")
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 
     companion object {
         const val TAG = "LudusManagementActivity"
