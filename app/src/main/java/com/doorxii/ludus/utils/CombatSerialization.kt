@@ -24,13 +24,16 @@ object CombatSerialization {
     }
 
     fun returnCombatFile(context: Context): File {
-        val path = File(context.filesDir, "combat/combat.json")
-        val exists = path.exists()
-        if (!exists) {
+        val path = File(context.filesDir, "combat")
+        val file = File(path, "combat.json")
+        val pathExists = path.exists()
+        if (!pathExists) {
             path.mkdirs()
-            path.createNewFile()
         }
-        return path
+        if (!file.exists()) {
+            file.createNewFile()
+        }
+        return file
     }
 
     private const val TAG = "CombatSerialization"

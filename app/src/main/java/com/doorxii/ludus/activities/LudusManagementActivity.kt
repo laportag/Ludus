@@ -1,10 +1,13 @@
 package com.doorxii.ludus.activities
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,17 +40,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.doorxii.ludus.combat.Combat
 import com.doorxii.ludus.data.db.AppDatabase
 import com.doorxii.ludus.data.db.LudusRepository
 import com.doorxii.ludus.data.models.animal.Gladiator
 import com.doorxii.ludus.data.models.ludus.Ludus
 import com.doorxii.ludus.ui.theme.LudusTheme
+import com.doorxii.ludus.utils.CombatSerialization
 import com.doorxii.ludus.utils.DatabaseManagement.returnDb
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
+import java.io.File
 
 class LudusManagementActivity : ComponentActivity() {
 
@@ -68,6 +77,20 @@ class LudusManagementActivity : ComponentActivity() {
     val playerGladiators = mutableStateOf<List<Gladiator>>(emptyList())
     private val selectedLudusGladiators = mutableStateOf<List<Gladiator>>(emptyList())
     private val selectedCombatant = mutableStateOf<Gladiator?>(null)
+
+    private lateinit var combatFile: File
+    private var combat: Combat? = null
+
+    private val combatResultLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                Log.d(TAG, "Combat result: $result")
+                val resultUri: Uri = result.data?.data!!
+                val resFile = File(resultUri.path!!)
+                val resCombat = Json.decodeFromString<Combat>(resFile.readText())
+                combatFinished(resCombat)
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -146,6 +169,51 @@ class LudusManagementActivity : ComponentActivity() {
             }
         }
     }
+
+    fun startCombat() {
+        Log.d(TAG, "Combatant: $selectedCombatant")
+        val enemy = selectedLudusGladiators.value.random()
+        val gladiatorList = listOf(selectedCombatant.value!!, enemy)
+        combatFile = CombatSerialization.returnCombatFile(applicationContext)
+        combat = Combat.init(gladiatorList)
+        CombatSerialization.saveCombatJson(combat!!, combatFile)
+        Log.d(TAG, "combatfile: " + combatFile.readText())
+        val uri = combatFile.toUri()
+        val intent = Intent(this, CombatActivity::class.java)
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        intent.setDataAndType(uri, contentResolver.getType(uri))
+        combatResultLauncher.launch(intent)
+        startActivity(intent)
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    fun combatFinished(resCombat: Combat) {
+        Log.d(TAG, "Combat complete?: ${resCombat.isComplete}")
+        if (resCombat.gladiatorList.isEmpty()) {
+//            text.value = "No winner"
+            Log.d(TAG, "No winner")
+            return
+        }
+        val winner = resCombat.gladiatorList[0]
+        Log.d(TAG, "Winner: ${winner.name}")
+//        text.value = "Winner: ${winner.name}"
+
+
+            for (gladiator in resCombat.originalGladiatorList) {
+                if (gladiator !in resCombat.gladiatorList) {
+                    // dead gladiators
+                    gladiator.health = 0.0
+                    viewModel.updateGladiator(gladiator)
+                }
+            }
+            for (gladiator in resCombat.gladiatorList) {
+                viewModel.updateGladiator(gladiator)
+            }
+//            updateLudusList()
+
+    }
+
+
 
     @Preview
     @Composable
@@ -296,7 +364,8 @@ class LudusManagementActivity : ComponentActivity() {
                 verticalArrangement = Arrangement.Center
             ) {
                 Text("Select Combatant")
-                Row {
+                Row(Modifier.fillMaxWidth()
+                    .height(screenHeight * 12/15)) {
                     Column(
                         Modifier
                             .width(screenWidth / 2)
@@ -315,6 +384,12 @@ class LudusManagementActivity : ComponentActivity() {
                             Log.d(TAG, "Enemy combatant: $it")
                         }
                     }
+                }
+                Button(onClick = {
+                    Log.d(TAG, "Combatant: $selectedCombatant")
+                    startCombat()
+                }) {
+                    Text("Start Combat")
                 }
             }
         }

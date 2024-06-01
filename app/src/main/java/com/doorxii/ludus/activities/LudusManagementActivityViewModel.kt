@@ -87,7 +87,6 @@ open class  LudusManagementActivityViewModel: ViewModel() {
                     list.remove(ludus)
                 }
             }
-
             _ludiExcludingPlayer.value = list
             Log.d(TAG, "getLudiExcludingPlayer: ${ludiExcludingPlayer.value}")
         }
@@ -109,6 +108,12 @@ open class  LudusManagementActivityViewModel: ViewModel() {
                 Log.d(TAG, "getPlayerGladiators: $gladiators")
                 _playerGladiators.value = gladiators
             }
+        }
+    }
+
+    fun updateGladiator(gladiator: Gladiator) {
+        viewModelScope.launch {
+            ludusRepository.updateGladiator(gladiator)
         }
     }
 
