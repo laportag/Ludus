@@ -36,9 +36,9 @@ import com.doorxii.ludus.ui.cards.DropTarget
 import com.doorxii.ludus.ui.cards.GladiatorCards
 import com.doorxii.ludus.ui.cards.LongPressDraggable
 import com.doorxii.ludus.ui.theme.LudusTheme
+import com.doorxii.ludus.utils.CombatSerialization.readCombatFromFile
 import com.doorxii.ludus.utils.CombatSerialization.saveCombatJson
 import com.doorxii.ludus.utils.enums.EnumToAction.combatEnumListToActionList
-import kotlinx.serialization.json.Json
 import java.io.File
 
 class CombatActivity: ComponentActivity() {
@@ -68,8 +68,8 @@ class CombatActivity: ComponentActivity() {
     private fun readCombatFromJson(): Combat {
         val uri = intent.data
         combatFile = File(uri!!.path!!)
-        val combatJson = combatFile.readText()
-        val combat = Json.decodeFromString<Combat>(combatJson)
+//        val combatJson = combatFile.readText()
+        val combat = readCombatFromFile(combatFile)
         return combat
     }
 

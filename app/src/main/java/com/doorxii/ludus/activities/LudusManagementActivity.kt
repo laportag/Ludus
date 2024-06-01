@@ -12,6 +12,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -177,8 +178,8 @@ class LudusManagementActivity : ComponentActivity() {
     }
 
     private fun startCombat() {
-        Log.d(TAG, "Combatant: $selectedCombatant")
         val enemy = selectedLudusGladiators.value.random()
+        Log.d(TAG, "Combatant: ${selectedCombatant.value?.name}, enemy: ${enemy.name}")
         val gladiatorList = listOf(selectedCombatant.value!!, enemy)
         combatFile = CombatSerialization.returnCombatFile(applicationContext)
         combat = Combat.init(gladiatorList)
@@ -277,19 +278,19 @@ class LudusManagementActivity : ComponentActivity() {
             Log.d(TAG, innerPadding.toString())
             when (ludusManagementView.value) {
                 LudusManagementViews.HOME -> {
-                    playerLudus?.let { LudusManagementHome(it) }
+                    playerLudus?.let { LudusManagementHome(innerPadding, it) }
                 }
 
                 LudusManagementViews.BARRACKS_MANAGEMENT -> {
-                    BarracksManagement()
+                    BarracksManagement(innerPadding)
                 }
 
                 LudusManagementViews.GLADIATOR_MARKET -> {
-                    GladiatorMarket()
+                    GladiatorMarket(innerPadding)
                 }
 
                 LudusManagementViews.COMBAT_SELECT -> {
-                    CombatSelect()
+                    CombatSelect(innerPadding)
                 }
             }
         }
@@ -297,9 +298,10 @@ class LudusManagementActivity : ComponentActivity() {
     }
 
     @Composable
-    fun LudusManagementHome(playerLudus: Ludus) {
+    fun LudusManagementHome(parentPadding: PaddingValues, playerLudus: Ludus) {
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize()
+                .padding(parentPadding),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -331,10 +333,10 @@ class LudusManagementActivity : ComponentActivity() {
 
 
     @Composable
-    fun BarracksManagement() {
-        Text("Barracks Management")
+    fun BarracksManagement(parentPadding: PaddingValues) {
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize()
+                .padding(parentPadding),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ){
@@ -345,13 +347,20 @@ class LudusManagementActivity : ComponentActivity() {
     }
 
     @Composable
-    fun GladiatorMarket() {
-        Text("Gladiator Market")
+    fun GladiatorMarket(parentPadding: PaddingValues) {
+
+        Column(
+            modifier = Modifier.fillMaxSize()
+                .padding(parentPadding),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ){
+            Text("Gladiator Market")
+        }
     }
 
-    @Preview
     @Composable
-    fun CombatSelect() {
+    fun CombatSelect(parentPadding: PaddingValues) {
         val configuration = LocalConfiguration.current
         val screenHeight = configuration.screenHeightDp.dp
         val screenWidth = configuration.screenWidthDp.dp
@@ -359,7 +368,8 @@ class LudusManagementActivity : ComponentActivity() {
         var selectedLudus by remember { mutableStateOf<Ludus?>(selectedEnenmyLudus.value) }
         var expanded by remember { mutableStateOf(false) }
         Column(
-            Modifier.fillMaxSize(),
+            Modifier.fillMaxSize()
+                .padding(parentPadding),
         ) {
             Row {
                 Box(

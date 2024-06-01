@@ -1,8 +1,10 @@
 package com.doorxii.ludus.data.models.animal
 
 import android.util.Log
+import kotlinx.serialization.Serializable
 
 
+@Serializable
 abstract class Human : Animal() {
     var name: String = ""
     var age: Double = 0.0
