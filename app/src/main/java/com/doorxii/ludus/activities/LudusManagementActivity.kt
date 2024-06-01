@@ -50,6 +50,7 @@ import com.doorxii.ludus.data.db.AppDatabase
 import com.doorxii.ludus.data.db.LudusRepository
 import com.doorxii.ludus.data.models.animal.Gladiator
 import com.doorxii.ludus.data.models.ludus.Ludus
+import com.doorxii.ludus.ui.CombatResultAlert
 import com.doorxii.ludus.ui.theme.LudusTheme
 import com.doorxii.ludus.utils.CombatSerialization
 import com.doorxii.ludus.utils.DatabaseManagement.returnDb
@@ -78,6 +79,9 @@ class LudusManagementActivity : ComponentActivity() {
 
     private lateinit var combatFile: File
     private var combat: Combat? = null
+
+    private val combatResultAlertEnabled = mutableStateOf(false)
+    private val combatResultText = mutableStateOf("")
 
     private val combatResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -227,7 +231,8 @@ class LudusManagementActivity : ComponentActivity() {
         }
         viewModel.getGladiatorsByLudusId(selectedEnenmyLudus.value!!.ludusId)
         viewModel.getPlayerGladiators(ludus.value!!.ludusId)
-
+        combatResultAlertEnabled.value = true
+        combatResultText.value = resCombat.combatReport
     }
 
     private fun simCombat() {
@@ -252,7 +257,7 @@ class LudusManagementActivity : ComponentActivity() {
         viewModel.getPlayerGladiators(ludus.value!!.ludusId)
     }
 
-    fun buyGladiator(gladiator: Gladiator){
+    fun buyGladiator(gladiator: Gladiator) {
         Log.d(TAG, "buyGladiator: $gladiator")
         viewModel.addGladiatorToPlayer(gladiator)
     }
@@ -262,6 +267,7 @@ class LudusManagementActivity : ComponentActivity() {
     @Composable
     fun LudusManagementLayout() {
         val playerLudus by viewModel.playerLudus.collectAsState(initial = null)
+        val showAlert by remember { combatResultAlertEnabled }
         Scaffold(
             bottomBar = {
                 Row(
@@ -291,9 +297,17 @@ class LudusManagementActivity : ComponentActivity() {
                         }
                     }
                 }
+
+
             }
         ) { innerPadding ->
             Log.d(TAG, innerPadding.toString())
+
+            if (showAlert) {
+
+                CombatResultAlertDialogue()
+            }
+
             when (ludusManagementView.value) {
                 LudusManagementViews.HOME -> {
                     playerLudus?.let { LudusManagementHome(innerPadding, it) }
@@ -310,9 +324,20 @@ class LudusManagementActivity : ComponentActivity() {
                 LudusManagementViews.COMBAT_SELECT -> {
                     CombatSelect(innerPadding)
                 }
+
             }
         }
 
+    }
+
+    @Composable
+    fun CombatResultAlertDialogue() {
+        val showAlert by remember { combatResultAlertEnabled }
+        combat?.let {
+            CombatResultAlert().CombatResultAlertDialog(showPopup = showAlert, combat = it) {
+                combatResultAlertEnabled.value = false
+            }
+        }
     }
 
     @Composable
