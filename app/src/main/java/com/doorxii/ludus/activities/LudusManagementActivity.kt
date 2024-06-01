@@ -74,6 +74,7 @@ class LudusManagementActivity : ComponentActivity() {
     private val playerGladiators = mutableStateOf<List<Gladiator>>(emptyList())
     private val selectedLudusGladiators = mutableStateOf<List<Gladiator>>(emptyList())
     private val selectedCombatant = mutableStateOf<Gladiator?>(null)
+    private var marketGladiatorList = mutableStateOf<List<Gladiator>>(emptyList())
 
     private lateinit var combatFile: File
     private var combat: Combat? = null
@@ -175,6 +176,16 @@ class LudusManagementActivity : ComponentActivity() {
                 }
             }
         }
+
+        // market list
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.marketGladiatorList.collect {
+                    Log.d(TAG, "observeFlow marketList: $it")
+                    marketGladiatorList.value = it
+                }
+            }
+        }
     }
 
     private fun startCombat() {
@@ -228,7 +239,7 @@ class LudusManagementActivity : ComponentActivity() {
         combatFinished(combat!!)
     }
 
-    fun healAliveGladiators(list: List<Gladiator>){
+    fun healAliveGladiators(list: List<Gladiator>) {
         for (gladiator in list) {
             if (gladiator.health < 100.0 && gladiator.health > 0.0) {
                 gladiator.health = 100.0
@@ -237,6 +248,11 @@ class LudusManagementActivity : ComponentActivity() {
                 viewModel.updateGladiator(gladiator)
             }
         }
+    }
+
+    fun buyGladiator(gladiator: Gladiator){
+        Log.d(TAG, "buyGladiator: $gladiator")
+        viewModel.addGladiatorToPlayer(gladiator)
     }
 
 
@@ -300,7 +316,8 @@ class LudusManagementActivity : ComponentActivity() {
     @Composable
     fun LudusManagementHome(parentPadding: PaddingValues, playerLudus: Ludus) {
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
                 .padding(parentPadding),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
@@ -335,11 +352,12 @@ class LudusManagementActivity : ComponentActivity() {
     @Composable
     fun BarracksManagement(parentPadding: PaddingValues) {
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
                 .padding(parentPadding),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
-        ){
+        ) {
             BarracksList(list = playerGladiators.value) {
                 Log.d(TAG, "Gladiator: $it")
             }
@@ -350,12 +368,16 @@ class LudusManagementActivity : ComponentActivity() {
     fun GladiatorMarket(parentPadding: PaddingValues) {
 
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
                 .padding(parentPadding),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
-        ){
+        ) {
             Text("Gladiator Market")
+            MarketList(list = marketGladiatorList.value) {
+
+            }
         }
     }
 
@@ -368,7 +390,8 @@ class LudusManagementActivity : ComponentActivity() {
         var selectedLudus by remember { mutableStateOf<Ludus?>(selectedEnenmyLudus.value) }
         var expanded by remember { mutableStateOf(false) }
         Column(
-            Modifier.fillMaxSize()
+            Modifier
+                .fillMaxSize()
                 .padding(parentPadding),
         ) {
             Row {
@@ -457,10 +480,29 @@ class LudusManagementActivity : ComponentActivity() {
     fun BarracksList(
         list: List<Gladiator>,
         onItemSelected: (Gladiator) -> Unit
-    ){
-        LazyColumn {
+    ) {
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
             items(list) { gladiator ->
                 SelectableItemBarracksGladiator(
+                    gladiator,
+                    onItemSelected
+                )
+            }
+        }
+    }
+
+    @Composable
+    fun MarketList(
+        list: List<Gladiator>,
+        onItemSelected: (Gladiator) -> Unit
+    ) {
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(list) { gladiator ->
+                SelectableItemMarketGladiator(
                     gladiator,
                     onItemSelected
                 )
@@ -473,7 +515,9 @@ class LudusManagementActivity : ComponentActivity() {
         list: List<Gladiator>,
         onItemSelected: (Gladiator) -> Unit
     ) {
-        LazyColumn {
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
             items(list) { gladiator ->
                 SelectableItemShort(
                     gladiator,
@@ -517,9 +561,9 @@ class LudusManagementActivity : ComponentActivity() {
                 .clickable { onSelected(item) },
             shape = MaterialTheme.shapes.small,
             tonalElevation = 4.dp
-        ){
+        ) {
             Column {
-                Row{
+                Row {
                     Column {
                         Text(
                             text = item.name,
@@ -547,6 +591,61 @@ class LudusManagementActivity : ComponentActivity() {
                         }
                         Button(onClick = { /*TODO*/ }) {
                             Text("Sell")
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun SelectableItemMarketGladiator(
+        item: Gladiator,
+        onSelected: (Gladiator) -> Unit
+    ) {
+
+
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onSelected(item) },
+            shape = MaterialTheme.shapes.small,
+            tonalElevation = 4.dp
+        ) {
+            Column {
+                Row {
+                    Column {
+                        Text(
+                            text = item.name,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                        Text(
+                            text = "Height: ${item.height}",
+                            modifier = Modifier.padding(16.dp)
+                        )
+                        Text(
+                            text = "Age: ${item.age}",
+                            modifier = Modifier.padding(16.dp)
+                        )
+
+                    }
+                    Column {
+                        Text(
+                            text = "Strength: ${item.strength}",
+                            modifier = Modifier.padding(16.dp)
+                        )
+                        Text(
+                            text = "Speed: ${item.speed}",
+                            modifier = Modifier.padding(16.dp)
+                        )
+                        Text(
+                            text = "Technique: ${item.technique}",
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
+                    Column {
+                        Button(onClick = { buyGladiator(item) }) {
+                            Text("Buy")
                         }
                     }
                 }

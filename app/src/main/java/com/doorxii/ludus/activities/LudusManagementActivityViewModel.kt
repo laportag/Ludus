@@ -6,13 +6,14 @@ import androidx.lifecycle.viewModelScope
 import com.doorxii.ludus.data.db.LudusRepository
 import com.doorxii.ludus.data.models.animal.Gladiator
 import com.doorxii.ludus.data.models.ludus.Ludus
+import com.doorxii.ludus.utils.GladiatorGenerator.newGladiatorList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 
-open class  LudusManagementActivityViewModel: ViewModel() {
+open class LudusManagementActivityViewModel : ViewModel() {
 
     private lateinit var ludusRepository: LudusRepository
 
@@ -34,14 +35,17 @@ open class  LudusManagementActivityViewModel: ViewModel() {
     private val _gladiatorsByLudus = MutableStateFlow<List<Gladiator>>(emptyList())
     val gladiatorsByLudus: StateFlow<List<Gladiator>> = _gladiatorsByLudus.asStateFlow()
 
+    private val _marketGladiatorList = MutableStateFlow<List<Gladiator>>(emptyList())
+    val marketGladiatorList: StateFlow<List<Gladiator>> = _marketGladiatorList.asStateFlow()
+
 
     init {
         Log.d(TAG, "init vm")
 
     }
 
-    fun start(repo: LudusRepository){
-        ludusRepository  = repo
+    fun start(repo: LudusRepository) {
+        ludusRepository = repo
         viewModelScope.launch {
             // Fetch initial data from the database
             ludusRepository.getPlayerLudus().collect { ludus ->
@@ -62,10 +66,11 @@ open class  LudusManagementActivityViewModel: ViewModel() {
 
         }
 
+        generateMarketGladiatorList()
 
     }
 
-    fun setSelectedEnemyLudus(ludus: Ludus){
+    fun setSelectedEnemyLudus(ludus: Ludus) {
         viewModelScope.launch {
             _selectedEnemyLudus.value = ludus
         }
@@ -73,12 +78,12 @@ open class  LudusManagementActivityViewModel: ViewModel() {
 
     fun updatePlayerLudus(newLudus: Ludus) {
         viewModelScope.launch {
-            ludusRepository.updateLudus (newLudus)
+            ludusRepository.updateLudus(newLudus)
             _playerLudus.value = newLudus // Update the local state
         }
     }
 
-    fun getAllLudi(): List<Ludus>{
+    fun getAllLudi(): List<Ludus> {
         viewModelScope.launch {
             ludusRepository.getAllLudi().collect { ludusList ->
                 Log.d(TAG, "getAllLudi: $ludusList")
@@ -91,8 +96,8 @@ open class  LudusManagementActivityViewModel: ViewModel() {
     fun getLudiExcludingPlayer() {
         viewModelScope.launch {
             val list = allLudi.value.toMutableList()
-            for (ludus in allLudi.value){
-                if (ludus.ludusId == playerLudus.value?.ludusId){
+            for (ludus in allLudi.value) {
+                if (ludus.ludusId == playerLudus.value?.ludusId) {
                     list.remove(ludus)
                 }
             }
@@ -106,8 +111,8 @@ open class  LudusManagementActivityViewModel: ViewModel() {
             ludusRepository.getGladiatorsByLudusId(ludusId).collect { gladiators ->
                 Log.d(TAG, "getGladiatorsByLudusId $ludusId: $gladiators")
                 val list = gladiators.toMutableList()
-                for (gladiator in gladiators){
-                    if (!gladiator.isAlive()){
+                for (gladiator in gladiators) {
+                    if (!gladiator.isAlive()) {
                         list.remove(gladiator)
                     }
                 }
@@ -122,8 +127,8 @@ open class  LudusManagementActivityViewModel: ViewModel() {
             ludusRepository.getGladiatorsByLudusId(id).collect { gladiators ->
                 Log.d(TAG, "getPlayerGladiators: $gladiators")
                 val list = gladiators.toMutableList()
-                for (gladiator in gladiators){
-                    if (!gladiator.isAlive()){
+                for (gladiator in gladiators) {
+                    if (!gladiator.isAlive()) {
                         list.remove(gladiator)
                     }
                 }
@@ -135,6 +140,36 @@ open class  LudusManagementActivityViewModel: ViewModel() {
     fun updateGladiator(gladiator: Gladiator) {
         viewModelScope.launch {
             ludusRepository.updateGladiator(gladiator)
+        }
+    }
+
+    fun generateMarketGladiatorList() {
+        viewModelScope.launch {
+            val list = newGladiatorList(5)
+            _marketGladiatorList.value = list
+        }
+    }
+
+    fun addGladiatorToPlayer(gladiator: Gladiator){
+        Log.d(TAG, "addGladiatorToPlayer: $gladiator")
+        viewModelScope.launch {
+            Log.d(TAG, "addGladiatorToPlayer id: $gladiator.ludusId")
+            gladiator.ludusId = playerLudus.value?.ludusId!!
+            ludusRepository.insertGladiator(gladiator)
+            getPlayerGladiators(playerLudus.value?.ludusId ?: 0)
+        }
+        removeGladiatorFromMarketList(gladiator)
+    }
+
+    fun removeGladiatorFromMarketList(gladiator: Gladiator){
+        viewModelScope.launch {
+            val list = marketGladiatorList.value.toMutableList()
+            for (marketGladiator in marketGladiatorList.value) {
+                if (marketGladiator.ludusId != -1) {
+                    list.remove(marketGladiator)
+                }
+            }
+            _marketGladiatorList.value = list
         }
     }
 
