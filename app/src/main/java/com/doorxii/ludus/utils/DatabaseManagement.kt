@@ -107,7 +107,7 @@ object DatabaseManagement {
     }
 
     @OptIn(DelicateCoroutinesApi::class)
-    fun deleteDb(dbName: String, context: Context) {
+    fun deleteDb(dbName: String, context: Context, callback: (Boolean) -> Unit) {
         GlobalScope.launch(Dispatchers.IO) {
             val db = Room.databaseBuilder(
                 context,
@@ -119,6 +119,7 @@ object DatabaseManagement {
             val jFile = File(file.parentFile, "${file.name}-journal")
             file.delete()
             jFile.delete()
+            callback(true)
         }
 
     }

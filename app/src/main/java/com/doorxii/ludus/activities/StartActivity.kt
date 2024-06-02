@@ -225,8 +225,9 @@ class StartActivity : ComponentActivity() {
                                         }) { Text("Load") }
                                         Button(onClick = {
                                             Log.d(TAG, "deleting: $database")
-                                            deleteDb(database, applicationContext)
-                                            viewModel.setDatabases(getAllDatabases(applicationContext))
+                                            deleteDb(database, applicationContext){
+                                                viewModel.setDatabases(getAllDatabases(applicationContext))
+                                            }
                                         }) { Text("Delete") }
                                     }
                                 }
