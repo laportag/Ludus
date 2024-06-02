@@ -30,6 +30,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.doorxii.ludus.data.db.AppDatabase
 import com.doorxii.ludus.ui.theme.LudusTheme
 import com.doorxii.ludus.utils.DatabaseManagement.createDb
@@ -43,11 +47,20 @@ import kotlinx.coroutines.launch
 
 class StartActivity : ComponentActivity() {
 
+    private lateinit var viewModel: StartActivityViewModel
+
+    private var databases = mutableStateOf(listOf<String>())
+
     private var newDialogueVisible = false
     private var loadDialogueVisible = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        viewModel = ViewModelProvider(this)[StartActivityViewModel::class.java]
+        observeFlows()
+        viewModel.setDatabases(getAllDatabases(applicationContext))
+
 
         enableEdgeToEdge()
         setContent {
@@ -58,6 +71,17 @@ class StartActivity : ComponentActivity() {
         }
 
         Log.d(TAG, "dbs: ${getAllDatabases(applicationContext)}")
+    }
+
+    private fun observeFlows(){
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.databases.collect {
+                    Log.d(TAG, "dbs: $it")
+                    databases.value = it
+                }
+            }
+        }
     }
 
     private fun launchLudusManagement(name: String, db: AppDatabase) {
@@ -103,7 +127,7 @@ class StartActivity : ComponentActivity() {
     @Composable
     fun NewLudusDialogue(visibleCallback: (Boolean) -> Unit = { newDialogueVisible = it }) {
         var ludusName by remember { mutableStateOf("") }
-        val databases = getAllDatabases(applicationContext)
+        val databases by remember { mutableStateOf(databases) }
 
         AlertDialog(
             onDismissRequest = {
@@ -119,7 +143,7 @@ class StartActivity : ComponentActivity() {
                         }
                         visibleCallback(false)
                     },
-                    enabled = ludusName.isNotEmpty() && ludusName !in databases.map { it }
+                    enabled = ludusName.isNotEmpty() && ludusName !in databases.value.map { it }
                 ) {
                     Text("Create")
                 }
@@ -155,7 +179,7 @@ class StartActivity : ComponentActivity() {
         visibleCallback: (Boolean) -> Unit = { loadDialogueVisible = it }
     ) {
 
-        val databases = remember { mutableStateOf(getAllDatabases(applicationContext)) }
+        val databases = remember { databases }
         val selectedDb = remember { mutableStateOf("") }
         AlertDialog(
             modifier = Modifier.fillMaxWidth(),
@@ -200,20 +224,18 @@ class StartActivity : ComponentActivity() {
                                             visibleCallback(false)
                                         }) { Text("Load") }
                                         Button(onClick = {
+                                            Log.d(TAG, "deleting: $database")
                                             deleteDb(database, applicationContext)
-                                            databases.value = getAllDatabases(applicationContext)
+                                            viewModel.setDatabases(getAllDatabases(applicationContext))
                                         }) { Text("Delete") }
                                     }
                                 }
-
                             }
-
                         }
                     }
                 }
             }
         )
-
     }
 
 

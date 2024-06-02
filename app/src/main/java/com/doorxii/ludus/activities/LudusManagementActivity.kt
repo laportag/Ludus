@@ -304,7 +304,6 @@ class LudusManagementActivity : ComponentActivity() {
             Log.d(TAG, innerPadding.toString())
 
             if (showAlert) {
-
                 CombatResultAlertDialogue()
             }
 
