@@ -485,7 +485,7 @@ class LudusManagementActivity : ComponentActivity() {
                     }
                     Button(onClick = {
                         simCombat()
-                    }) {
+                    }, enabled = selectedEnenmyLudus.value != null && selectedCombatant.value != null) {
                         Text("Sim Combat")
                     }
                 }
