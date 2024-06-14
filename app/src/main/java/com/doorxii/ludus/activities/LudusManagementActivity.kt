@@ -407,8 +407,6 @@ class LudusManagementActivity : ComponentActivity() {
         val configuration = LocalConfiguration.current
         val screenHeight = configuration.screenHeightDp.dp
         val screenWidth = configuration.screenWidthDp.dp
-
-        var selectedLudus by remember { mutableStateOf<Ludus?>(selectedEnenmyLudus.value) }
         var expanded by remember { mutableStateOf(false) }
         Column(
             Modifier
@@ -482,7 +480,7 @@ class LudusManagementActivity : ComponentActivity() {
                     Button(onClick = {
                         Log.d(TAG, "Combatant: $selectedCombatant")
                         startCombat()
-                    }) {
+                    }, enabled = selectedEnenmyLudus.value != null && selectedCombatant.value != null) {
                         Text("Start Combat")
                     }
                     Button(onClick = {
