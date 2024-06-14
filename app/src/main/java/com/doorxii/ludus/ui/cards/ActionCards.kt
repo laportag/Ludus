@@ -22,24 +22,48 @@ object ActionCards {
 
 
     @Composable
-    fun CombatActionCard(combatAction: CombatAction, modifier: Modifier = Modifier) {
+    fun CombatActionCard(
+        combatAction: CombatAction,
+        modifier: Modifier = Modifier,
+        enabled: Boolean = true
+    ) {
 //        val configuration = LocalConfiguration.current
 //        val screenHeight = configuration.screenHeightDp.dp
-        DragTarget(modifier = Modifier.fillMaxSize(), dataToDrop = combatAction.actionEnum) {
-        Card(
-            modifier = modifier
-                .aspectRatio(9f / 16f)
-                .background(color = Color(0xFFD3D3D3), RoundedCornerShape(8.dp))
-                .padding(4.dp),
-            shape = RoundedCornerShape(8.dp)
+        DragTarget(
+            modifier = Modifier.fillMaxSize(),
+            dataToDrop = combatAction.actionEnum,
+            enabled = enabled
         ) {
-            Column(
-                modifier = Modifier.padding(8.dp)
+            Card(
+                modifier = modifier
+                    .aspectRatio(9f / 16f)
+                    .background(color = Color(0xFFD3D3D3), RoundedCornerShape(8.dp))
+                    .padding(4.dp),
+                shape = RoundedCornerShape(8.dp)
             ) {
+                Column(
+                    modifier = Modifier.padding(8.dp)
+                ) {
 
-                    Text(combatAction.name, modifier = Modifier.padding(2.dp))
-                    Text(combatAction.description, modifier = Modifier.padding(2.dp))
-                    Text(combatAction.staminaCost.toString(), modifier = Modifier.padding(2.dp))
+                    Text(
+                        combatAction.name,
+                        modifier = Modifier.padding(2.dp),
+                        color = Color.LightGray
+                    )
+                    Text(
+                        combatAction.description,
+                        modifier = Modifier.padding(2.dp),
+                        color = Color.LightGray
+                    )
+                    Text(
+                        combatAction.staminaCost.toString(),
+                        modifier = Modifier.padding(2.dp),
+                        color = if (!enabled) {
+                            Color.Red
+                        } else {
+                            Color.LightGray
+                        }
+                    )
                 }
 
             }
@@ -47,7 +71,11 @@ object ActionCards {
     }
 
     @Composable
-    fun CardRow(cardList: List<CombatAction>, modifier: Modifier = Modifier) {
+    fun CardRow(
+        cardList: List<CombatAction>,
+        modifier: Modifier = Modifier,
+        playerStamina: Double
+    ) {
         val configuration = LocalConfiguration.current
         val screenHeight = configuration.screenHeightDp.dp
         LazyRow(
@@ -56,7 +84,11 @@ object ActionCards {
 //                .fillMaxSize()
         ) {
             items(cardList) { card ->
-                CombatActionCard(combatAction = card, modifier)
+                CombatActionCard(
+                    combatAction = card,
+                    modifier,
+                    enabled = card.staminaCost <= playerStamina
+                )
             }
         }
     }

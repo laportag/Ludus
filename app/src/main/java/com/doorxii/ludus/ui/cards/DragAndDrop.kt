@@ -4,7 +4,13 @@ import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
@@ -55,6 +61,7 @@ fun LongPressDraggable(
 fun <T> DragTarget(
     modifier: Modifier,
     dataToDrop: T,
+    enabled: Boolean = true,
     content: @Composable (() -> Unit)
 ) {
 
@@ -66,22 +73,24 @@ fun <T> DragTarget(
             currentPosition = it.localToWindow(Offset.Zero)
         }
         .pointerInput(Unit) {
-            detectDragGesturesAfterLongPress(onDragStart = {
+            if (enabled) {
+                detectDragGesturesAfterLongPress(onDragStart = {
 //            detectDragGestures(onDragStart = {
-                currentState.dataToDrop = dataToDrop
-                currentState.isDragging = true
-                currentState.dragPosition = currentPosition + it
-                currentState.draggableComposable = content
-            }, onDrag = { change, dragAmount ->
-                change.consume()
-                currentState.dragOffset += Offset(dragAmount.x, dragAmount.y)
-            }, onDragEnd = {
-                currentState.isDragging = false
-                currentState.dragOffset = Offset.Zero
-            }, onDragCancel = {
-                currentState.dragOffset = Offset.Zero
-                currentState.isDragging = false
-            })
+                    currentState.dataToDrop = dataToDrop
+                    currentState.isDragging = true
+                    currentState.dragPosition = currentPosition + it
+                    currentState.draggableComposable = content
+                }, onDrag = { change, dragAmount ->
+                    change.consume()
+                    currentState.dragOffset += Offset(dragAmount.x, dragAmount.y)
+                }, onDragEnd = {
+                    currentState.isDragging = false
+                    currentState.dragOffset = Offset.Zero
+                }, onDragCancel = {
+                    currentState.dragOffset = Offset.Zero
+                    currentState.isDragging = false
+                })
+            }
         }) {
         content()
     }

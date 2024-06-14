@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
@@ -43,7 +44,7 @@ import java.io.File
 
 class CombatActivity: ComponentActivity() {
 
-    private var combat: Combat? = null
+    private var combat = mutableStateOf<Combat?>(null)
     private var choice: CombatActions? = null
     private var text = mutableStateOf("")
     private lateinit var combatFile: File
@@ -52,8 +53,8 @@ class CombatActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        combat = readCombatFromJson()
-        Log.d(TAG, "combat null?: " + combat!!.gladiatorList)
+        combat.value = readCombatFromJson()
+        Log.d(TAG, "combat null?: " + combat.value!!.gladiatorList)
 
         enableEdgeToEdge()
         setContent {
@@ -118,19 +119,20 @@ class CombatActivity: ComponentActivity() {
                     choice = combatAction
                     Log.d(TAG, "choice dropped: $droppedChoice")
                 }
-                playCardonDrop(combatAction)
+                playCardOnDrop(combatAction)
 //                var roundResult = combat!!.playCombatRound(choice)
 //                battleText += roundResult.combatReport
 
                 Column(
                     modifier = Modifier
                         .height(screenHeight * 0.65f)
+                        .background(bgColor)
 
                 ) {
-                    for (gladiator in combat!!.gladiatorList){
+                    for (gladiator in combat.value!!.gladiatorList){
                         GladiatorCards.CombatGladiatorCard(gladiator)
                     }
-                    if (combat!!.gladiatorList.size < 2){
+                    if (combat.value!!.gladiatorList.size < 2){
                         Text("Combat over")
                         Button(onClick = { combatCompleted() }) {
                             Text("Finish Combat")
@@ -153,20 +155,20 @@ class CombatActivity: ComponentActivity() {
             val actionCardModifier =
                 Modifier
                     .height(screenHeight * 0.3f)
-            ActionCards.CardRow(combatEnumListToActionList(combatActions), actionCardModifier)
+            ActionCards.CardRow(combatEnumListToActionList(combatActions), actionCardModifier, combat.value!!.gladiatorList[0].stamina)
         }
     }
 
-    private fun playCardonDrop(combatAction: CombatActions?) {
+    private fun playCardOnDrop(combatAction: CombatActions?) {
 
         if (choice != null) {
             Log.d(TAG, "choice: $choice")
             if (combatAction != null) {
-                val roundResult = combat!!.playCombatRound(combatAction)
+                val roundResult = combat.value!!.playCombatRound(combatAction)
                 Log.d(TAG, "roundResult: " + roundResult.combatReport)
-                Log.d(TAG, "combat: " + combat.toString())
+                Log.d(TAG, "combat: " + combat.value.toString())
                 text.value = roundResult.combatReport
-                if (combat!!.isComplete) {
+                if (combat.value!!.isComplete) {
                     combatCompleted()
                 }
             }
@@ -176,8 +178,8 @@ class CombatActivity: ComponentActivity() {
 
     private fun combatCompleted(){
         Log.d(TAG, "combat completed")
-        val report = combat?.combatReport
-        saveCombatJson(combat!!, combatFile)
+        val report = combat.value?.combatReport
+        saveCombatJson(combat.value!!, combatFile)
         val data = Intent().apply {
             addFlags(FLAG_GRANT_READ_URI_PERMISSION)
             setDataAndType(combatFile.toUri(), contentResolver.getType(combatFile.toUri()))
