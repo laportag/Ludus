@@ -15,7 +15,7 @@ object Dice {
         return rollResultList
     }
 
-    fun totalRolls(rollList: List<Int>, modifier: Double): Double{
+    fun totalRolls(rollList: List<Int>, modifier: Double = 0.0): Double{
         var rollTotal = 0.0
         for (roll in rollList){
             rollTotal += roll

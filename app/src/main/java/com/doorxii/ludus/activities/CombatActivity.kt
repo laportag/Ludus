@@ -9,9 +9,11 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -32,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.doorxii.ludus.actions.combatactions.CombatActions
 import com.doorxii.ludus.combat.Combat
+import com.doorxii.ludus.data.models.animal.Gladiator
 import com.doorxii.ludus.ui.cards.ActionCards
 import com.doorxii.ludus.ui.cards.DropTarget
 import com.doorxii.ludus.ui.cards.GladiatorCards
@@ -119,7 +122,7 @@ class CombatActivity: ComponentActivity() {
                     choice = combatAction
                     Log.d(TAG, "choice dropped: $droppedChoice")
                 }
-                playCardOnDrop(combatAction)
+//                playCardOnDrop(combatAction)
 //                var roundResult = combat!!.playCombatRound(choice)
 //                battleText += roundResult.combatReport
 
@@ -130,6 +133,22 @@ class CombatActivity: ComponentActivity() {
 
                 ) {
                     for (gladiator in combat.value!!.gladiatorList){
+
+                        DropTarget<Gladiator>(modifier = Modifier.fillMaxWidth()){ gladiatorIsInBound, targetGladiator ->
+                            val gladiatorBgColor = if (gladiatorIsInBound) {
+                                Color.Yellow // Highlight when action card is over gladiator card
+                            } else {
+                                Color.White
+                            }
+                            if (combatAction != null && targetGladiator != null) {
+                                playCardOnDrop(combatAction, targetGladiator)
+                            }
+                            Box(modifier = Modifier.background(gladiatorBgColor)) {
+                                GladiatorCards.CombatGladiatorCard(gladiator)
+                            }
+
+                        }
+
                         GladiatorCards.CombatGladiatorCard(gladiator)
                     }
                     if (combat.value!!.gladiatorList.size < 2){
@@ -159,12 +178,12 @@ class CombatActivity: ComponentActivity() {
         }
     }
 
-    private fun playCardOnDrop(combatAction: CombatActions?) {
+    private fun playCardOnDrop(combatAction: CombatActions?, target: Gladiator?) {
 
-        if (choice != null) {
-            Log.d(TAG, "choice: $choice")
+        if (choice != null && target != null) {
+            Log.d(TAG, "choice: $choice target: ${target.name}")
             if (combatAction != null) {
-                val roundResult = combat.value!!.playCombatRound(combatAction)
+                val roundResult = combat.value!!.playCombatRound(combatAction, target)
                 Log.d(TAG, "roundResult: " + roundResult.combatReport)
                 Log.d(TAG, "combat: " + combat.value.toString())
                 text.value = roundResult.combatReport
