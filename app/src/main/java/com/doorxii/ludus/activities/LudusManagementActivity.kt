@@ -20,6 +20,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
@@ -429,49 +432,22 @@ class LudusManagementActivity : ComponentActivity() {
 
     @Composable
     fun CombatSelect(parentPadding: PaddingValues) {
-        val configuration = LocalConfiguration.current
-        val screenHeight = configuration.screenHeightDp.dp
-        val screenWidth = configuration.screenWidthDp.dp
-        var expanded by remember { mutableStateOf(false) }
         Column(
             Modifier
                 .fillMaxSize()
-                .padding(parentPadding),
+                .padding(parentPadding)
         ) {
-            Row {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(screenHeight / 15)
-                        .clickable(
-                            onClick = { expanded = true }
-                        )
-                ) {
-                    Text(
-                        text = selectedEnemyLudus.value?.name ?: "Select Enemy Ludus",
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-                    DropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false }
-                    ) {
-                        ludiExcludingPlayer.value.forEach { ludus ->
-                            DropdownMenuItem(
-                                text = { Text(text = ludus.name) },
-                                onClick = {
-                                    expanded = false
-                                    viewModel.setSelectedEnemyLudus(ludus)
-                                    viewModel.getGladiatorsByLudusId(ludus.ludusId)
-                                }
-                            )
-                        }
-                    }
-                }
-
+            LudusSelectionBar(
+                selectedEnemyLudus = selectedEnemyLudus.value,
+                ludiExcludingPlayer = ludiExcludingPlayer.value
+            ) { ludus ->
+                viewModel.setSelectedEnemyLudus(ludus)
+                viewModel.getGladiatorsByLudusId(ludus.ludusId)
             }
+
             Column(
                 Modifier
-                    .height(screenHeight * 14 / 15)
+                    .height(LocalConfiguration.current.screenHeightDp.dp * 14 / 15)
                     .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
@@ -480,54 +456,136 @@ class LudusManagementActivity : ComponentActivity() {
                 Row(
                     Modifier
                         .fillMaxWidth()
-                        .height(screenHeight * 12 / 15)
+                        .height(LocalConfiguration.current.screenHeightDp.dp * 12 / 15)
                 ) {
-                    Column(
-                        Modifier
-                            .width(screenWidth / 2)
-                    ) {
-                        Text(text = ludus.value?.name ?: "Player")
-                        BarracksListShort(list = playerGladiators.value) { gladiator ->
-                            val currentSelection = selectedPlayerGladiators.value
-                            selectedPlayerGladiators.value = if (currentSelection.contains(gladiator)) {
-                                currentSelection - gladiator
-                            } else {
-                                currentSelection + gladiator
-                            }
+                    PlayerGladiatorsDisplay(
+                        playerLudus = ludus.value,
+                        playerGladiators = playerGladiators.value,
+                        selectedPlayerGladiators = selectedPlayerGladiators.value
+                    ) { gladiator ->
+                        val currentSelection = selectedPlayerGladiators.value
+                        selectedPlayerGladiators.value = if (currentSelection.contains(gladiator)) {
+                            currentSelection - gladiator
+                        } else {
+                            currentSelection + gladiator
                         }
                     }
-                    Column(
-                        Modifier
-                            .width(screenWidth / 2)
-                    ) {
-                        Text(text = selectedEnemyLudus.value?.name ?: "Enemy")
-                        BarracksListShort(list = gladiatorsInSelectedEnemyLudus.value) { gladiator ->
-                            val currentSelection = selectedEnemyGladiators.value
-                            selectedEnemyGladiators.value = if (currentSelection.contains(gladiator)) {
-                                currentSelection - gladiator
-                            } else {
-                                currentSelection + gladiator
-                            }
+                    EnemyGladiatorsDisplay(
+                        selectedEnemyLudus = selectedEnemyLudus.value,
+                        enemyGladiators = gladiatorsInSelectedEnemyLudus.value,
+                        selectedEnemyGladiators = selectedEnemyGladiators.value
+                    ) { gladiator ->
+                        val currentSelection = selectedEnemyGladiators.value
+                        selectedEnemyGladiators.value = if (currentSelection.contains(gladiator)) {
+                            currentSelection - gladiator
+                        } else {
+                            currentSelection + gladiator
                         }
                     }
                 }
-                Row {
-                    Button(onClick = {
-                        Log.d(TAG, "Combatants: ${selectedPlayerGladiators.value.joinToString(", ") { it?.name ?: "" }} ")
+                InitiateCombatBar(
+                    onStartCombat = {
+                        Log.d(TAG, "Combatants: ${selectedPlayerGladiators.value.joinToString(", ") { it!!.name }} ")
                         startCombat()
-                    }, enabled = selectedEnemyLudus.value != null && selectedPlayerGladiators.value.isNotEmpty()) {
-                        Text("Start Combat")
-                    }
-                    Button(onClick = {
+                    },
+                    onSimCombat = {
                         simCombat()
-                    }, enabled = selectedEnemyLudus.value != null && selectedPlayerGladiators.value.isNotEmpty()) {
-                        Text("Sim Combat")
-                    }
-                }
-
+                    },
+                    isEnabled = selectedEnemyLudus.value != null && selectedPlayerGladiators.value.isNotEmpty()
+                )
             }
         }
+    }
 
+    @Composable
+    fun PlayerGladiatorsDisplay(
+        playerLudus: Ludus?,
+        playerGladiators: List<Gladiator>,
+        selectedPlayerGladiators: List<Gladiator?>,
+        onGladiatorSelected: (Gladiator) -> Unit
+    ) {
+        Column(
+            Modifier
+                .width(LocalConfiguration.current.screenWidthDp.dp / 2)
+        ) {
+            Text(text = playerLudus?.name ?: "Player")
+            // Use LazyVerticalGrid here
+            BarracksListShort(
+                list = playerGladiators,
+                selectedGladiators = selectedPlayerGladiators, // Pass the Set here
+                onItemSelected = onGladiatorSelected
+            )
+        }
+    }
+
+    @Composable
+    fun EnemyGladiatorsDisplay(
+        selectedEnemyLudus: Ludus?,
+        enemyGladiators: List<Gladiator>,
+        selectedEnemyGladiators: List<Gladiator?>,
+        onGladiatorSelected: (Gladiator) -> Unit
+    ) {
+        Column(
+            Modifier
+                .width(LocalConfiguration.current.screenWidthDp.dp / 2) // Assuming you have screenWidth available
+        ) {
+            Text(text = selectedEnemyLudus?.name ?: "Enemy")
+            BarracksListShort(
+                list = enemyGladiators,
+                selectedGladiators = selectedEnemyGladiators,
+                onItemSelected = onGladiatorSelected
+            )
+        }
+    }
+
+    @Composable
+    fun LudusSelectionBar(
+        selectedEnemyLudus: Ludus?,
+        ludiExcludingPlayer: List<Ludus>,
+        onLudusSelected: (Ludus) -> Unit
+    ) {
+        var expanded by remember { mutableStateOf(false) }
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(LocalConfiguration.current.screenHeightDp.dp / 15) // Assuming you have screenHeight available
+                .clickable { expanded = true }
+        ) {
+            Text(
+                text = selectedEnemyLudus?.name ?: "Select Enemy Ludus",
+                modifier = Modifier.align(Alignment.Center)
+            )
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                ludiExcludingPlayer.forEach { ludus ->
+                    DropdownMenuItem(
+                        text = { Text(text = ludus.name) },
+                        onClick = {
+                            expanded = false
+                            onLudusSelected(ludus)
+                        }
+                    )
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun InitiateCombatBar(
+        onStartCombat: () -> Unit,
+        onSimCombat: () -> Unit,
+        isEnabled: Boolean
+    ) {
+        Row {
+            Button(onClick = onStartCombat, enabled = isEnabled) {
+                Text("Start Combat")
+            }
+            Button(onClick = onSimCombat, enabled = isEnabled) {
+                Text("Sim Combat")
+            }
+        }
     }
 
     @Composable
@@ -567,16 +625,19 @@ class LudusManagementActivity : ComponentActivity() {
     @Composable
     fun BarracksListShort(
         list: List<Gladiator>,
+        selectedGladiators: List<Gladiator?>, // Add selectedGladiators parameter
         onItemSelected: (Gladiator) -> Unit
     ) {
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(1),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(list) { gladiator ->
-                val isSelected = selectedPlayerGladiators.value.contains(gladiator)
+                val isSelected = selectedGladiators.contains(gladiator) // Check if selected
                 SelectableItemShort(
                     gladiator,
-                    isSelected,
+                    isSelected, // Pass isSelected state
                     onItemSelected
                 )
             }
