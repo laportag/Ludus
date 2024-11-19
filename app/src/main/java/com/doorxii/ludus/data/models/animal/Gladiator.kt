@@ -5,7 +5,9 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.doorxii.ludus.actions.combatactions.CombatActions
+import androidx.room.TypeConverters
+import com.doorxii.ludus.actions.combatactions.ChosenAction
+import com.doorxii.ludus.data.db.ChosenActionTypeConverter
 import com.doorxii.ludus.data.models.equipment.Equipment
 import com.doorxii.ludus.data.models.ludus.Ludus
 import kotlinx.serialization.Serializable
@@ -32,6 +34,7 @@ class Gladiator: Human() {
     var speed: Double = 60.0
     var technique: Double = 60.0
     var bloodlust: Double = 60.0
+
     @Embedded
     var equipment: Equipment = Equipment()
     var humanControlled: Boolean = false
@@ -39,7 +42,8 @@ class Gladiator: Human() {
     var attack = calculateAttack()
     var defence = calculateDefence()
 
-    var action: CombatActions? = null
+    @TypeConverters(ChosenActionTypeConverter::class)
+    var action: ChosenAction? = null
 
     private fun calculateAttack(): Double {
         val fatigue = 100 - ((morale + stamina) / 200)

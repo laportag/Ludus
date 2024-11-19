@@ -2,21 +2,21 @@ package com.doorxii.ludus.combat
 
 import android.util.Log
 import com.doorxii.ludus.actions.CombatBehaviour
-import com.doorxii.ludus.actions.combatactions.CombatAction
-import com.doorxii.ludus.actions.combatactions.CombatActions
+import com.doorxii.ludus.actions.combatactions.ChosenAction
 import com.doorxii.ludus.data.models.animal.Gladiator
+import com.doorxii.ludus.utils.dice.Dice
+import com.doorxii.ludus.utils.dice.DiceTypes
 import com.doorxii.ludus.utils.enums.EnumToAction.combatActionToEnum
-import com.doorxii.ludus.utils.enums.EnumToAction.combatEnumToAction
 import kotlinx.serialization.Serializable
 
 @Serializable
-class Combat{
-    var gladiatorList: List<Gladiator> = listOf()
-    var originalGladiatorList: List<Gladiator> = listOf()
+class Combat {
+    var playerGladiatorList: List<Gladiator> = listOf()
+    var enemyGladiatorList: List<Gladiator> = listOf()
+    var originalPlayerGladiatorList: List<Gladiator> = listOf()
+    var originalEnemyGladiatorList: List<Gladiator> = listOf()
     private var round: CombatRound? = null
     private var roundNumber: Int = 0
-    private var userChoice: CombatActions? = null
-    private var enemyChoice: CombatActions? = null
     var isComplete = false
     lateinit var combatName: String
     lateinit var combatReport: String
@@ -24,25 +24,33 @@ class Combat{
     fun simCombat(): CombatResult {
         appendReport("Sim Combat started")
         while (!isComplete) {
-            userChoice = combatActionToEnum(CombatBehaviour.basicActionPicker(gladiatorList[0]))
-            enemyChoice = combatActionToEnum(CombatBehaviour.basicActionPicker(gladiatorList[1]))
-            gladiatorList = runNewRound(
-                gladiatorList,
-                combatEnumToAction(userChoice!!),
-                combatEnumToAction(enemyChoice!!)
-            )
-
-            if (gladiatorList.size < 2) {
-                if (gladiatorList.isEmpty()) {
-                    appendReport("Combat over, both dead in $roundNumber rounds")
-                } else {
-                    appendReport("Combat over, ${gladiatorList[0].name} won in $roundNumber rounds")
-                }
-                isComplete = true
-
+            val playerChoices: MutableList<ChosenAction> = mutableListOf()
+            for (gladiator in enemyGladiatorList) {
+                playerChoices.add(
+                    ChosenAction(
+                        gladiator.gladiatorId,
+                        enemyTargetSelector().gladiatorId,
+                        combatActionToEnum(CombatBehaviour.basicActionPicker(gladiator))
+                    )
+                )
             }
+            val enemyChoices: MutableList<ChosenAction> = mutableListOf()
+            for (gladiator in enemyGladiatorList) {
+                enemyChoices.add(
+                    ChosenAction(
+                        gladiator.gladiatorId,
+                        enemyTargetSelector().gladiatorId,
+                        combatActionToEnum(CombatBehaviour.basicActionPicker(gladiator))
+                    )
+                )
+            }
+            val roundResult = runNewRound(playerChoices, enemyChoices)
+            playerGladiatorList = roundResult.playerGladiatorList
+            enemyGladiatorList = roundResult.enemyGladiatorList
+            isComplete = !isCombatStillGoing()
+            nullGladiatorActions()
         }
-        return CombatResult(combatReport)
+        return CombatResult(playerGladiatorList, enemyGladiatorList, combatReport)
     }
 
     private fun appendReport(str: String) {
@@ -50,70 +58,107 @@ class Combat{
         combatReport += "$str\n"
     }
 
-    fun playCombatRound(choice: CombatActions): CombatResult {
-        if (gladiatorList.size < 2) {
-            appendReport("Combat over, ${gladiatorList[0].name} won in $roundNumber rounds")
-            isComplete = true
-            return CombatResult(combatReport)
-
+    private fun isCombatStillGoing(): Boolean {
+        if (playerGladiatorList.isEmpty()) {
+            appendReport("Combat over, player lost in $roundNumber rounds")
+            return false
+        } else if (enemyGladiatorList.isEmpty()) {
+            appendReport("Combat over, player won in $roundNumber rounds")
+            return false
         } else {
-            userChoice = choice
-            enemyChoice = combatActionToEnum(CombatBehaviour.basicActionPicker(gladiatorList[1]))
-
-            gladiatorList = runNewRound(
-                gladiatorList,
-                combatEnumToAction(userChoice!!),
-                combatEnumToAction(enemyChoice!!)
-            )
-            if (gladiatorList.size < 2) {
-                if (gladiatorList.isEmpty()) {
-                    appendReport("Combat over, both dead in $roundNumber rounds")
-                } else {
-                    appendReport("Combat over, ${gladiatorList[0].name} won in $roundNumber rounds")
-                }
-                isComplete = true
-                return CombatResult(combatReport)
-            }
+            return true
         }
+    }
 
-        return CombatResult(combatReport)
+    private fun enemyTargetSelector(): Gladiator {
+        val lowestHealthGladiator = playerGladiatorList.minByOrNull { it.health }
+        val randomFactor = Dice.totalRolls(Dice.roll(1, DiceTypes.D100))
+        return if (randomFactor <= 40 && lowestHealthGladiator != null) { // 40% chance to target lowest health
+            lowestHealthGladiator
+        } else {
+            playerGladiatorList.random() // Otherwise, choose randomly
+        }
+    }
+
+    fun playCombatRound(playerChoices: List<ChosenAction>): CombatResult {
+        if (!isCombatStillGoing()) {
+            isComplete = true
+            return CombatResult(playerGladiatorList, enemyGladiatorList, combatReport)
+        } else {
+            // enemy gladiator choices
+            val enemyChoices: MutableList<ChosenAction> = mutableListOf()
+            for (gladiator in enemyGladiatorList) {
+                enemyChoices.add(
+                    ChosenAction(
+                        gladiator.gladiatorId,
+                        enemyTargetSelector().gladiatorId,
+                        combatActionToEnum(CombatBehaviour.basicActionPicker(gladiator))
+                    )
+                )
+            }
+            val combatRoundResult: CombatRoundResult = runNewRound(playerChoices, enemyChoices)
+            playerGladiatorList = combatRoundResult.playerGladiatorList
+            enemyGladiatorList = combatRoundResult.enemyGladiatorList
+            isComplete = !isCombatStillGoing()
+        }
+        return CombatResult(playerGladiatorList, enemyGladiatorList, combatReport)
     }
 
     private fun runNewRound(
-        gladiatorList: List<Gladiator>,
-        actionA: CombatAction,
-        actionB: CombatAction
-    ): List<Gladiator> {
-        var gladiatorList = gladiatorList
-        roundNumber++
-        gladiatorList[0].action = combatActionToEnum(actionA)
-        gladiatorList[1].action = combatActionToEnum(actionB)
-        appendReport("Round $roundNumber: ${gladiatorList[0].name}:${gladiatorList[0].action.toString()} vs ${gladiatorList[1].name}: ${gladiatorList[1].action?.name}")
-        if (gladiatorList.size <= 1) {
-            return gladiatorList
+        playerChoices: List<ChosenAction>,
+        enemyChoices: List<ChosenAction>
+    ): CombatRoundResult {
+        if (!isCombatStillGoing()) {
+            return CombatRoundResult(playerGladiatorList, enemyGladiatorList)
         }
-        round = CombatRound.init(gladiatorList, roundNumber)
-        gladiatorList = round!!.run(gladiatorList)
+        roundNumber++
+        appendReport("Round $roundNumber: ${playerGladiatorList.joinToString { it.name } + " vs " + enemyGladiatorList.joinToString { it.name }}")
 
+        val allChoices = playerChoices + enemyChoices
+        val chosenActionMap = allChoices.associateBy { it.actingGladiatorID }
+
+        for (gladiator in playerGladiatorList) {
+            val chosenAction = chosenActionMap[gladiator.gladiatorId]
+            if (chosenAction != null) {
+                gladiator.action = chosenAction
+            }
+        }
+        for (gladiator in enemyGladiatorList) {
+            val chosenAction = chosenActionMap[gladiator.gladiatorId]
+            if (chosenAction != null) {
+                gladiator.action = chosenAction
+            }
+        }
+
+        round = CombatRound.init(playerGladiatorList, enemyGladiatorList, roundNumber)
+        val roundResult = round!!.run()
         appendReport(round!!.roundReport)
         nullGladiatorActions()
-        return gladiatorList
+        return roundResult
     }
 
     private fun nullGladiatorActions() {
-        for (gladiator in gladiatorList) {
+        for (gladiator in playerGladiatorList) {
+            gladiator.action = null
+        }
+        for (gladiator in enemyGladiatorList) {
             gladiator.action = null
         }
     }
 
-
     companion object {
         const val TAG = "Combat"
-        fun init(gladiatorList: List<Gladiator>): Combat {
+        fun init(
+            playerGladiatorList: List<Gladiator?>,
+            enemyGladiatorList: List<Gladiator?>
+        ): Combat {
             val combat = Combat()
-            combat.gladiatorList = gladiatorList
-            combat.originalGladiatorList = gladiatorList
-            combat.combatName = "Combat: ${gladiatorList[0].name} vs ${gladiatorList[1].name}"
+            combat.playerGladiatorList = playerGladiatorList as List<Gladiator>
+            combat.originalPlayerGladiatorList = playerGladiatorList
+            combat.enemyGladiatorList = enemyGladiatorList as List<Gladiator>
+            combat.originalEnemyGladiatorList = enemyGladiatorList
+            combat.combatName =
+                "Combat: ${playerGladiatorList.joinToString { it.name } + " vs " + enemyGladiatorList.joinToString { it.name }}"
             combat.combatReport = "${combat.combatName}\n"
             return combat
         }

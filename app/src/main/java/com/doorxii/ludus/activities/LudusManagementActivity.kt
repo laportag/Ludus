@@ -71,10 +71,11 @@ class LudusManagementActivity : ComponentActivity() {
 
     private val allLudi = mutableStateOf<List<Ludus>>(emptyList())
     private val ludiExcludingPlayer = mutableStateOf<List<Ludus>>(emptyList())
-    private val selectedEnenmyLudus = mutableStateOf<Ludus?>(null)
+    private val selectedEnemyLudus = mutableStateOf<Ludus?>(null)
     private val playerGladiators = mutableStateOf<List<Gladiator>>(emptyList())
-    private val selectedLudusGladiators = mutableStateOf<List<Gladiator>>(emptyList())
-    private val selectedCombatant = mutableStateOf<Gladiator?>(null)
+    private val gladiatorsInSelectedEnemyLudus = mutableStateOf<List<Gladiator>>(emptyList())
+    private val selectedPlayerGladiators = mutableStateOf<List<Gladiator?>>(emptyList())
+    private val selectedEnemyGladiators = mutableStateOf<List<Gladiator?>>(emptyList())
     private var marketGladiatorList = mutableStateOf<List<Gladiator>>(emptyList())
 
     private lateinit var combatFile: File
@@ -156,7 +157,7 @@ class LudusManagementActivity : ComponentActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.selectedEnemyLudus.collect {
                     Log.d(TAG, "obServeFlow selectedEnemyLudus: $it")
-                    selectedEnenmyLudus.value = it
+                    selectedEnemyLudus.value = it
                 }
             }
         }
@@ -166,7 +167,7 @@ class LudusManagementActivity : ComponentActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.gladiatorsByLudus.collect {
                     Log.d(TAG, "obServeFlow enemyGladiators: $it")
-                    selectedLudusGladiators.value = it
+                    gladiatorsInSelectedEnemyLudus.value = it
                 }
             }
         }
@@ -177,6 +178,7 @@ class LudusManagementActivity : ComponentActivity() {
                 viewModel.playerGladiators.collect {
                     Log.d(TAG, "observeFlow player Gladiators: $it")
                     playerGladiators.value = it
+
                 }
             }
         }
@@ -193,11 +195,12 @@ class LudusManagementActivity : ComponentActivity() {
     }
 
     private fun startCombat() {
-        val enemy = selectedLudusGladiators.value.random()
-        Log.d(TAG, "Combatant: ${selectedCombatant.value?.name}, enemy: ${enemy.name}")
-        val gladiatorList = listOf(selectedCombatant.value!!, enemy)
+//        val enemy = gladiatorsInSelectedEnemyLudus.value.random()
+//        Log.d(TAG, "Combatant: ${selectedPlayerGladiators.value?.name}, enemy: ${enemy.name}")
+//        val gladiatorList = listOf(selectedPlayerGladiators.value!!, enemy)
+
         combatFile = CombatSerialization.returnCombatFile(applicationContext)
-        combat = Combat.init(gladiatorList)
+        combat = Combat.init(selectedPlayerGladiators.value, selectedEnemyGladiators.value)
         CombatSerialization.saveCombatJson(combat!!, combatFile)
         Log.d(TAG, "combatFile: " + combatFile.readText())
         val uri = combatFile.toUri()
@@ -210,35 +213,57 @@ class LudusManagementActivity : ComponentActivity() {
 
     private fun combatFinished(resCombat: Combat) {
         Log.d(TAG, "Combat complete?: ${resCombat.isComplete}")
-        if (resCombat.gladiatorList.isEmpty()) {
+        var winners = emptyList<Gladiator>()
+        if (resCombat.playerGladiatorList.isEmpty() && resCombat.enemyGladiatorList.isEmpty()) {
             Log.d(TAG, "No winner")
             return
         }
-        val winner = resCombat.gladiatorList[0]
-        Log.d(TAG, "Winner: ${winner.name}")
+        else if (resCombat.playerGladiatorList.isEmpty()) {
+            Log.d(TAG, "Player loses")
+            winners = resCombat.enemyGladiatorList
+        }
+        else if (resCombat.enemyGladiatorList.isEmpty()) {
+            Log.d(TAG, "Player wins")
+            winners = resCombat.playerGladiatorList
+        }
+        else {
+            Log.d(TAG, "Combat still going, shouldn't have returned here")
+        }
 
+        Log.d(TAG, "Winners: ${winners.joinToString(", " ) {it.name}}")
 
-        for (gladiator in resCombat.originalGladiatorList) {
-            if (gladiator !in resCombat.gladiatorList) {
+        // update player ludus
+        for (gladiator in resCombat.originalPlayerGladiatorList) {
+            if (gladiator !in resCombat.playerGladiatorList) {
                 // dead gladiators
                 gladiator.health = 0.0
                 viewModel.updateGladiator(gladiator)
-
             }
         }
-        for (gladiator in resCombat.gladiatorList) {
+        for (gladiator in resCombat.playerGladiatorList) {
             viewModel.updateGladiator(gladiator)
         }
-        viewModel.getGladiatorsByLudusId(selectedEnenmyLudus.value!!.ludusId)
+        // update enemy ludus
+        for (gladiator in resCombat.originalEnemyGladiatorList) {
+            if (gladiator !in resCombat.enemyGladiatorList) {
+                // dead gladiators
+                gladiator.health = 0.0
+                viewModel.updateGladiator(gladiator)
+            }
+        }
+        for (gladiator in resCombat.enemyGladiatorList) {
+            viewModel.updateGladiator(gladiator)
+        }
+        viewModel.getGladiatorsByLudusId(selectedEnemyLudus.value!!.ludusId)
         viewModel.getPlayerGladiators(ludus.value!!.ludusId)
         combatResultAlertEnabled.value = true
         combatResultText.value = resCombat.combatReport
     }
 
     private fun simCombat() {
-        val enemy = selectedLudusGladiators.value.random()
-        val gladiatorList = listOf(selectedCombatant.value!!, enemy)
-        combat = Combat.init(gladiatorList)
+//        val enemy = gladiatorsInSelectedEnemyLudus.value.random()
+
+        combat = Combat.init(selectedPlayerGladiators.value, selectedPlayerGladiators.value)
         val res = combat!!.simCombat()
         Log.d(TAG, "res: " + res.combatReport)
         combatFinished(combat!!)
@@ -423,7 +448,7 @@ class LudusManagementActivity : ComponentActivity() {
                         )
                 ) {
                     Text(
-                        text = selectedEnenmyLudus.value?.name ?: "Select Enemy Ludus",
+                        text = selectedEnemyLudus.value?.name ?: "Select Enemy Ludus",
                         modifier = Modifier.align(Alignment.Center)
                     )
                     DropdownMenu(
@@ -451,7 +476,7 @@ class LudusManagementActivity : ComponentActivity() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                Text("Select Combatant")
+                Text("Select Combatants")
                 Row(
                     Modifier
                         .fillMaxWidth()
@@ -462,30 +487,40 @@ class LudusManagementActivity : ComponentActivity() {
                             .width(screenWidth / 2)
                     ) {
                         Text(text = ludus.value?.name ?: "Player")
-                        BarracksListShort(list = playerGladiators.value) {
-                            selectedCombatant.value = it
+                        BarracksListShort(list = playerGladiators.value) { gladiator ->
+                            val currentSelection = selectedPlayerGladiators.value
+                            selectedPlayerGladiators.value = if (currentSelection.contains(gladiator)) {
+                                currentSelection - gladiator
+                            } else {
+                                currentSelection + gladiator
+                            }
                         }
                     }
                     Column(
                         Modifier
                             .width(screenWidth / 2)
                     ) {
-                        Text(text = selectedEnenmyLudus.value?.name ?: "Enemy")
-                        BarracksListShort(list = selectedLudusGladiators.value) {
-                            Log.d(TAG, "Enemy combatant: $it")
+                        Text(text = selectedEnemyLudus.value?.name ?: "Enemy")
+                        BarracksListShort(list = gladiatorsInSelectedEnemyLudus.value) { gladiator ->
+                            val currentSelection = selectedEnemyGladiators.value
+                            selectedEnemyGladiators.value = if (currentSelection.contains(gladiator)) {
+                                currentSelection - gladiator
+                            } else {
+                                currentSelection + gladiator
+                            }
                         }
                     }
                 }
                 Row {
                     Button(onClick = {
-                        Log.d(TAG, "Combatant: $selectedCombatant")
+                        Log.d(TAG, "Combatants: ${selectedPlayerGladiators.value.joinToString(", ") { it?.name ?: "" }} ")
                         startCombat()
-                    }, enabled = selectedEnenmyLudus.value != null && selectedCombatant.value != null) {
+                    }, enabled = selectedEnemyLudus.value != null && selectedPlayerGladiators.value.isNotEmpty()) {
                         Text("Start Combat")
                     }
                     Button(onClick = {
                         simCombat()
-                    }, enabled = selectedEnenmyLudus.value != null && selectedCombatant.value != null) {
+                    }, enabled = selectedEnemyLudus.value != null && selectedPlayerGladiators.value.isNotEmpty()) {
                         Text("Sim Combat")
                     }
                 }
@@ -538,8 +573,10 @@ class LudusManagementActivity : ComponentActivity() {
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(list) { gladiator ->
+                val isSelected = selectedPlayerGladiators.value.contains(gladiator)
                 SelectableItemShort(
                     gladiator,
+                    isSelected,
                     onItemSelected
                 )
             }
@@ -550,16 +587,18 @@ class LudusManagementActivity : ComponentActivity() {
     @Composable
     fun SelectableItemShort(
         item: Gladiator,
+        isSelected: Boolean,
         onSelected: (Gladiator) -> Unit
     ) {
-        val isSelected = item == selectedCombatant.value
+        val backgroundColour = if (isSelected) Color.LightGray else Color.Transparent
+
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { onSelected(item) },
             shape = MaterialTheme.shapes.small,
             tonalElevation = 4.dp,
-            color = if (isSelected) Color.LightGray else Color.Transparent
+            color = backgroundColour
         ) {
             Text(
                 text = item.name,

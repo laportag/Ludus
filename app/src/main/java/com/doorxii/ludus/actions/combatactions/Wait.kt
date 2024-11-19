@@ -9,10 +9,10 @@ class Wait : CombatAction {
     override val staminaCost: Double = -20.0
     override val actionEnum: CombatActions = CombatActions.WAIT
 
-    override fun act(gladiatorList: List<Gladiator>): CombatActionResult {
+    override fun act(actor: Gladiator, target: Gladiator): CombatActionResult {
         return CombatActionResult(
-            gladiatorList[0],
-            gladiatorList[1],
+            actor,
+            target,
             0.0,
             staminaCost
         )

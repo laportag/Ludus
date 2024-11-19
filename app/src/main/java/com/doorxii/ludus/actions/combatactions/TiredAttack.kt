@@ -12,8 +12,8 @@ class TiredAttack: CombatAction {
     override val staminaCost: Double = -5.0
     override val actionEnum: CombatActions = CombatActions.TIRED_ATTACK
 
-    override fun act(gladiatorList: List<Gladiator>): CombatActionResult {
-        val combatDifference = gladiatorList[0].attack - gladiatorList[1].defence
+    override fun act(actor: Gladiator, target: Gladiator): CombatActionResult {
+        val combatDifference = actor.attack - target.defence
         Log.d(TAG, "Combat difference: $combatDifference")
 
         var defenderDamageTaken: Double = when (combatDifference) {
@@ -32,8 +32,8 @@ class TiredAttack: CombatAction {
         }
         defenderDamageTaken /= 2
         return CombatActionResult(
-            gladiatorList[0],
-            gladiatorList[1],
+            actor,
+            target,
             defenderDamageTaken,
             staminaCost
         )

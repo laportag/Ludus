@@ -5,6 +5,7 @@ object Dice {
         val diceSize = when(diceType){
             DiceTypes.D6 -> 6
             DiceTypes.D20 -> 20
+            DiceTypes.D100 -> 100
         }
         val rollResultList = mutableListOf<Int>()
 
