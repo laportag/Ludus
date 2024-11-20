@@ -121,8 +121,9 @@ class CombatActivity : ComponentActivity() {
         LaunchedEffect(combat.value) {
             if (combat.value != null) {
                 viewModel.resetGladiatorActions() // Reset for new combat
-                val initialActions = combat.value!!.playerGladiatorList.associateWith { null }
-                viewModel.updateGladiatorAction(initialActions)
+                for (gladiator in combat.value!!.playerGladiatorList) {
+                    viewModel.updateGladiatorAction(gladiator, null)
+                }
             }
         }
 
@@ -157,7 +158,8 @@ class CombatActivity : ComponentActivity() {
                                 )
                                 val chosenAct = ChosenAction(actingGladiator!!.gladiatorId, target.gladiatorId, action)
 //                                actingGladiator!!.action = chosenAct
-                                viewModel.updateGladiatorAction(mapOf(actingGladiator!! to chosenAct))
+
+                                viewModel.updateGladiatorAction(actingGladiator!!, chosenAct)
                                 if (viewModel.haveAllGladiatorsHadATurn()) {
                                     makePlayerTurn(viewModel.gladiatorActions.value.values.toList().filterNotNull())
                                     viewModel.resetGladiatorActions()
