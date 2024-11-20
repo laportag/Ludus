@@ -8,15 +8,26 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -25,9 +36,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.core.net.toUri
+import androidx.lifecycle.ViewModelProvider
 import com.doorxii.ludus.actions.combatactions.ChosenAction
 import com.doorxii.ludus.actions.combatactions.CombatActions
 import com.doorxii.ludus.combat.Combat
@@ -39,10 +51,12 @@ import com.doorxii.ludus.ui.cards.LongPressDraggable
 import com.doorxii.ludus.ui.theme.LudusTheme
 import com.doorxii.ludus.utils.CombatSerialization.readCombatFromFile
 import com.doorxii.ludus.utils.CombatSerialization.saveCombatJson
-import com.doorxii.ludus.utils.enums.EnumToAction.combatEnumListToActionList
+import com.doorxii.ludus.utils.enums.EnumToAction
 import java.io.File
 
 class CombatActivity : ComponentActivity() {
+
+    private lateinit var viewModel: CombatActivityViewModel
 
     private var combat = mutableStateOf<Combat?>(null)
 
@@ -54,6 +68,7 @@ class CombatActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        viewModel = ViewModelProvider(this)[CombatActivityViewModel::class.java]
         combat.value = readCombatFromJson()
         Log.d(TAG, "combat null?: " + combat.value!!.combatName)
 
@@ -61,7 +76,7 @@ class CombatActivity : ComponentActivity() {
         setContent {
             LudusTheme {
                 LongPressDraggable(modifier = Modifier.fillMaxSize()) {
-                    CombatLayout()
+                    CombatLayout(viewModel)
                 }
             }
         }
@@ -80,180 +95,168 @@ class CombatActivity : ComponentActivity() {
         super.finishActivity(requestCode)
     }
 
-
-    @Preview
     @Composable
-    fun CombatLayout() {
+    fun CombatLayout(viewModel: CombatActivityViewModel) {
 
         val battleText: String by remember { text }
-
-        var expanded by remember { mutableStateOf(false) }
 
         val combatActions =
             listOf(CombatActions.BASIC_ATTACK, CombatActions.TIRED_ATTACK, CombatActions.WAIT)
 
-//        val droppedChoice: CombatActions? by remember {
-//            mutableStateOf(choice)
-//        }
+        var actingGladiator by remember {
+            mutableStateOf(
+                combat.value?.playerGladiatorList?.getOrNull(
+                    0
+                )
+            )
+        }
+//        var chosenActions by remember { mutableStateOf<List<ChosenAction>>(emptyList()) }
 
-        val scrollState = rememberScrollState()
+//        var currentPlayerIndex by remember { mutableIntStateOf(0) }
 
-        val configuration = LocalConfiguration.current
-        val screenHeight = configuration.screenHeightDp.dp
+        var showDialog by remember { mutableStateOf(false) }
 
-        var actingGladiator by remember { mutableStateOf<Gladiator?>(null) }
-        var chosenActions by remember { mutableStateOf<List<ChosenAction>>(emptyList()) }
-        var currentPlayerIndex by remember { mutableStateOf(0) }
+        var gladiatorActions by remember { mutableStateOf<Map<Gladiator, ChosenAction?>>(emptyMap()) }
 
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Bottom
+        LaunchedEffect(combat.value) {
+            if (combat.value != null) {
+                viewModel.resetGladiatorActions() // Reset for new combat
+                val initialActions = combat.value!!.playerGladiatorList.associateWith { null }
+                viewModel.updateGladiatorAction(initialActions)
+            }
+        }
 
-        ) {
+        if (combat.value != null) {
 
-            val actionCardModifier = Modifier.height(screenHeight * 0.3f)
-            ActionCards.CardRow(combatEnumListToActionList(combatActions), actionCardModifier, actingGladiator?.stamina
-                ?: 0.0)
+            gladiatorActions = combat.value!!.playerGladiatorList.associateWith { null }
 
-            // Player Gladiator Row
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                for ((index, gladiator) in combat.value!!.playerGladiatorList.withIndex()) {
-                    PlayerGladiatorCardWithActionSelection(gladiator, index == currentPlayerIndex, chosenActions) { action, target ->
-                        // Update chosenActions when an action is selected
-                        chosenActions = chosenActions + ChosenAction(
-                            gladiator.gladiatorId,
-                            target.gladiatorId,
-                            action
-                        )
-                        if (chosenActions.size == combat.value!!.playerGladiatorList.size) {
-                            // Trigger playCardOnDrop if actions selected for all player gladiators
-                            playCardOnDrop(chosenActions)
-                            chosenActions = emptyList() // Reset chosenActions
-                            currentPlayerIndex = 0 // Reset currentPlayerIndex
-                        } else {
-                            currentPlayerIndex++ // Move to the next player gladiator
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Bottom
+
+            ) {
+
+                val actionCardModifier =
+                    Modifier.height(LocalConfiguration.current.screenHeightDp.dp * 0.3f)
+
+
+                // Enemy Gladiator Grid
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2), // Two columns
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth() // Fill available width
+                ) {
+                    items(combat.value!!.enemyGladiatorList) { gladiator ->
+                        EnemyGladiatorCardWithDropTarget(gladiator) { action, target ->
+                            if (actingGladiator != null) {
+                                Log.d(
+                                    TAG,
+                                    "actor: ${actingGladiator?.name} action: $action target: ${target.name}"
+                                )
+                                val chosenAct = ChosenAction(actingGladiator!!.gladiatorId, target.gladiatorId, action)
+//                                actingGladiator!!.action = chosenAct
+                                viewModel.updateGladiatorAction(mapOf(actingGladiator!! to chosenAct))
+                                if (viewModel.haveAllGladiatorsHadATurn()) {
+                                    makePlayerTurn(viewModel.gladiatorActions.value.values.toList().filterNotNull())
+                                    viewModel.resetGladiatorActions()
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // row for spacer
+                Spacer(modifier = Modifier.weight(1f))
+
+                // Action Cards
+                ActionCards.CardRow(
+                    EnumToAction.combatEnumListToActionList(combatActions),
+                    actionCardModifier,
+                    actingGladiator?.stamina
+                        ?: 0.0
+                )
+
+                // Buttons Bar
+                Row() {
+                    Button(onClick = { showDialog = true }) {
+                        Text(text = "Show Battle Report")
+                    }
+                }
+
+                // Gladiator Turn Bar
+                Row() {
+                    Text(text = "Name for turn")
+                }
+
+                // Player Gladiator Grid
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2), // Two columns
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth() // Fill available width
+                ) {
+                    items(combat.value!!.playerGladiatorList) { gladiator ->
+                        PlayerGladiatorCardWithActionSelection(
+                            gladiator,
+                            gladiator == actingGladiator
+                        ) { clickedGladiator ->
+                            if (!viewModel.hasGladiatorHadATurn(clickedGladiator)){
+                                actingGladiator = clickedGladiator
+                            }
                         }
                     }
                 }
             }
-            // Enemy Gladiator Row
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                for (gladiator in combat.value!!.enemyGladiatorList) {
-                    EnemyGladiatorCardWithDropTarget(gladiator) { action, target ->
-                        // You might not need this lambda here if playCardOnDrop is triggered automatically
+        } else {
+            Text("Loading combat data...")
+        }
+        if (showDialog) {
+            Dialog(
+                onDismissRequest = { showDialog = false }
+            ) {
+                Card { // Use a Card for better visual appearance
+                    Column(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .verticalScroll(rememberScrollState()) // Make text scrollable
+                    ) {
+                        Text(text = battleText)
+
+                        Button(onClick = { showDialog = false }) {
+                            Text("Close")
+                        }
                     }
                 }
             }
-
-
-
-
-
-
-
-//            DropTarget<CombatActions>(modifier = Modifier.height(screenHeight * 0.65f)) { isInBound, combatAction ->
-//                // when card dropped
-//                val bgColor = if (isInBound) {
-//                    Color.Red
-//                } else {
-//                    Color.White
-//                }
-//                if (combatAction != null) {
-//                    choice = combatAction
-//                    Log.d(TAG, "choice dropped: $droppedChoice")
-//                }
-////                playCardOnDrop(combatAction)
-////                var roundResult = combat!!.playCombatRound(choice)
-////                battleText += roundResult.combatReport
-//
-//                Column(
-//                    modifier = Modifier
-//                        .height(screenHeight * 0.65f)
-//                        .background(bgColor)
-//
-//                ) {
-//                    for (gladiator in combat.value!!.playerGladiatorList) {
-//                        DropTarget<Gladiator>(modifier = Modifier.fillMaxWidth()) { gladiatorIsInBound, targetGladiator ->
-//                            val gladiatorBgColor = if (gladiatorIsInBound) {
-//                                Color.Yellow // Highlight when action card is over gladiator card
-//                            } else {
-//                                Color.White
-//                            }
-//                            if (combatAction != null && targetGladiator != null) {
-//                                chosenActions = chosenActions + ChosenAction(
-//                                    gladiator,
-//                                    targetGladiator,
-//                                    combatAction
-//                                )
-////                                playCardOnDrop(combatAction, targetGladiator)
-//                            }
-//                            Box(modifier = Modifier.background(gladiatorBgColor)) {
-//                                GladiatorCards.CombatGladiatorCard(gladiator)
-//                            }
-//
-//                        }
-//
-//                        GladiatorCards.CombatGladiatorCard(gladiator)
-//                    }
-//                    for (gladiator in combat.value!!.enemyGladiatorList) {
-//                        DropTarget<CombatActions>(modifier = Modifier.fillMaxWidth()) { gladiatorIsInBound, targetGladiator ->
-//
-//                        }
-//                        if (combat.value!!.gladiatorList.size < 2) {
-//                            Text("Combat over")
-//                            Button(onClick = { combatCompleted() }) {
-//                                Text("Finish Combat")
-//                            }
-//                        }
-//
-//
-//
-//                        TextField(
-//                            value = battleText,
-//                            onValueChange = {},
-//                            modifier = Modifier
-////                        .fillMaxSize()
-//                                .verticalScroll(scrollState)
-//                                .aspectRatio(16f / 9f)
-//                                .height(screenHeight * 0.2f)
-//                        )
-//                    }
-//                }
-//                val actionCardModifier =
-//                    Modifier
-//                        .height(screenHeight * 0.3f)
-//                ActionCards.CardRow(
-//                    combatEnumListToActionList(combatActions),
-//                    actionCardModifier,
-//                    combat.value!!.playerGladiatorList[0].stamina
-//                )
-//            }
         }
     }
 
     @Composable
     fun PlayerGladiatorCardWithActionSelection(
-        gladiator: Gladiator,
+        playerGladiator: Gladiator,
         isCurrentTurn: Boolean,
-        chosenActions: List<ChosenAction>,
-        onActionSelected: (CombatActions, Gladiator) -> Unit
+        onGladiatorClicked: (Gladiator) -> Unit
     ) {
         val gladiatorBgColor = if (isCurrentTurn) {
-            Color.Yellow // Highlight current player gladiator
+            Color.Green // Highlight current player gladiator
         } else {
             Color.White
         }
-
-        // Apply background color to visually indicate the current player turn
-        Box(modifier = Modifier.background(gladiatorBgColor)) {
-            GladiatorCards.CombatGladiatorCard(gladiator)
+        Box(modifier = Modifier
+            .background(gladiatorBgColor)
+            .clickable {
+                onGladiatorClicked(playerGladiator)
+            }
+        ) {
+            GladiatorCards.CombatGladiatorCard(playerGladiator)
         }
     }
 
     @Composable
     fun EnemyGladiatorCardWithDropTarget(
-        gladiator: Gladiator,
+        enemyGladiator: Gladiator,
         onActionDropped: (CombatActions, Gladiator) -> Unit
     ) {
         DropTarget<CombatActions>(modifier = Modifier.fillMaxWidth()) { gladiatorIsInBound, combatAction ->
@@ -262,19 +265,18 @@ class CombatActivity : ComponentActivity() {
             } else {
                 Color.White
             }
-            // This onActionDropped call is optional if playCardOnDrop is handled elsewhere
-//        if (combatAction != null) {
-//            onActionDropped(combatAction, gladiator)
-//        }
+            // Callback to handle the dropped action
+            if (combatAction != null) {
+                onActionDropped(combatAction, enemyGladiator)
+            }
             Box(modifier = Modifier.background(gladiatorBgColor)) {
-                GladiatorCards.CombatGladiatorCard(gladiator)
+                GladiatorCards.CombatGladiatorCard(enemyGladiator)
             }
 
         }
     }
 
-    private fun playCardOnDrop(gladiatorActions: List<ChosenAction>) {
-
+    private fun makePlayerTurn(gladiatorActions: List<ChosenAction>) {
         if (gladiatorActions.isNotEmpty()) {
             val roundResult = combat.value!!.playCombatRound(gladiatorActions)
             Log.d(TAG, "roundResult: " + roundResult.combatReport)
@@ -289,7 +291,7 @@ class CombatActivity : ComponentActivity() {
 
     private fun combatCompleted() {
         Log.d(TAG, "combat completed")
-        val report = combat.value?.combatReport
+//        val report = combat.value?.combatReport
         saveCombatJson(combat.value!!, combatFile)
         val data = Intent().apply {
             addFlags(FLAG_GRANT_READ_URI_PERMISSION)

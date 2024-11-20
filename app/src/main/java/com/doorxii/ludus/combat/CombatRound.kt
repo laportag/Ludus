@@ -23,6 +23,7 @@ class CombatRound {
         }.map {
             mapOf(it.key to it.value)
         }.toMutableList().sortedByDescending { it.values.maxOrNull() }
+        Log.d(TAG, "round order: $roundOrder")
     }
 
     private fun determineGladiatorInitiative(gladiator: Gladiator): Double {
@@ -65,12 +66,20 @@ class CombatRound {
 //        var gladiatorList = playerGladiatorList + enemyGladiatorList
         roundOrder.forEach { map ->
             val gladiatorId = map.keys.first()
+
             val gladiator = playerGladiatorList.find { it.gladiatorId == gladiatorId }
                 ?: enemyGladiatorList.find { it.gladiatorId == gladiatorId }
-            val target =
-                playerGladiatorList.find { gladiator?.action!!.targetGladiatorID != gladiatorId }
-                    ?: enemyGladiatorList.find { gladiator?.action!!.targetGladiatorID != gladiatorId }
-            if (gladiator != null) {
+            if (gladiator == null) {
+                Log.d(TAG, "retrieved gladiator from round order is null ")
+            } else {
+                Log.d(TAG, "gladiator: ${gladiator.gladiatorId} ${gladiator.name} ${gladiator.action?.actionName ?: "no action"} ${gladiator.action?.targetGladiatorID ?: "no target"}")
+
+                val target =
+                    playerGladiatorList.find { it.gladiatorId == gladiator.action?.targetGladiatorID }
+                    ?: enemyGladiatorList.find { it.gladiatorId == gladiator.action?.targetGladiatorID }
+
+                Log.d(TAG, "target: ${target?.gladiatorId ?: "no target"} ${target?.name ?: "no target"}")
+
                 updateFromCombatActionResult(
                     combatEnumToAction(gladiator.action!!.action).act(
                         gladiator,
@@ -78,7 +87,9 @@ class CombatRound {
                     )
                 )
                 isCombatStillGoing()
+
             }
+
         }
 
         appendReport(
