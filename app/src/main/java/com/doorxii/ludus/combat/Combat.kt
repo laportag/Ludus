@@ -158,8 +158,8 @@ class Combat {
             combat.enemyGladiatorList = enemyGladiatorList as List<Gladiator>
             combat.originalEnemyGladiatorList = enemyGladiatorList
             combat.combatName =
-                "Combat: ${playerGladiatorList.joinToString { it.name } + " vs " + enemyGladiatorList.joinToString { it.name }}"
-            combat.combatReport = "${combat.combatName}\n"
+                "C${playerGladiatorList.joinToString { it.name } + " vs " + enemyGladiatorList.joinToString { it.name }}"
+            combat.combatReport = "${combat.combatName}\n\n"
             return combat
         }
     }

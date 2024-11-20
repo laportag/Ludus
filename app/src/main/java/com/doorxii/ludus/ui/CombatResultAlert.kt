@@ -11,21 +11,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.doorxii.ludus.combat.Combat
 
 class CombatResultAlert {
 
     @Composable
     fun CombatResultAlertDialog(
         showPopup: Boolean,
-        combat: Combat,
+        combatReport: String,
         onDismissRequest: () -> Unit
     ) {
         if (showPopup) {
             AlertDialog(
                 onDismissRequest = onDismissRequest,
                 title = { Text("Combat Report") },
-                text = { CombatResultAlertContent(combat) },
+                text = { CombatResultAlertContent(combatReport) },
                 confirmButton = {
                     Button(onClick = onDismissRequest) {
                         Text("Close")
@@ -36,7 +35,7 @@ class CombatResultAlert {
     }
 
     @Composable
-    fun CombatResultAlertContent(combat: Combat) {
+    fun CombatResultAlertContent(combatReport: String) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -51,7 +50,7 @@ class CombatResultAlert {
             ) {
                 items(1) { // Only one item for the report text
                     Text(
-                        text = combat.combatReport,
+                        text = combatReport,
                         modifier = Modifier.padding(8.dp)
                     )
                 }

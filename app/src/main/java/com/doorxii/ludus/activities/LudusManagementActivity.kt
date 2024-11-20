@@ -213,6 +213,8 @@ class LudusManagementActivity : ComponentActivity() {
 
     private fun combatFinished(resCombat: Combat) {
         Log.d(TAG, "Combat complete?: ${resCombat.isComplete}")
+
+
         var winners = emptyList<Gladiator>()
         if (resCombat.playerGladiatorList.isEmpty() && resCombat.enemyGladiatorList.isEmpty()) {
             Log.d(TAG, "No winner")
@@ -232,38 +234,24 @@ class LudusManagementActivity : ComponentActivity() {
 
         Log.d(TAG, "Winners: ${winners.joinToString(", " ) {it.name}}")
 
-        // update player ludus
-        for (gladiator in resCombat.originalPlayerGladiatorList) {
-            if (gladiator !in resCombat.playerGladiatorList) {
-                // dead gladiators
-                gladiator.health = 0.0
-                viewModel.updateGladiator(gladiator)
+        val allGladiators = resCombat.originalPlayerGladiatorList + resCombat.originalEnemyGladiatorList
+        allGladiators.forEach { gladiator ->
+            if (gladiator !in resCombat.playerGladiatorList && gladiator !in resCombat.enemyGladiatorList) {
+                gladiator.health = 0.0 // Mark dead gladiators
             }
-        }
-        for (gladiator in resCombat.playerGladiatorList) {
-            viewModel.updateGladiator(gladiator)
-        }
-        // update enemy ludus
-        for (gladiator in resCombat.originalEnemyGladiatorList) {
-            if (gladiator !in resCombat.enemyGladiatorList) {
-                // dead gladiators
-                gladiator.health = 0.0
-                viewModel.updateGladiator(gladiator)
-            }
-        }
-        for (gladiator in resCombat.enemyGladiatorList) {
             viewModel.updateGladiator(gladiator)
         }
         viewModel.getGladiatorsByLudusId(selectedEnemyLudus.value!!.ludusId)
         viewModel.getPlayerGladiators(ludus.value!!.ludusId)
-        combatResultAlertEnabled.value = true
         combatResultText.value = resCombat.combatReport
+        combatResultAlertEnabled.value = true
+        Log.d(TAG, "combatResultText: $combatResultText")
     }
 
     private fun simCombat() {
-//        val enemy = gladiatorsInSelectedEnemyLudus.value.random()
-
-        combat = Combat.init(selectedPlayerGladiators.value, selectedPlayerGladiators.value)
+        combat = Combat.init(selectedPlayerGladiators.value, selectedEnemyGladiators.value)
+        selectedPlayerGladiators.value = emptyList()
+        selectedEnemyGladiators.value = emptyList()
         val res = combat!!.simCombat()
         Log.d(TAG, "res: " + res.combatReport)
         combatFinished(combat!!)
@@ -357,8 +345,8 @@ class LudusManagementActivity : ComponentActivity() {
     @Composable
     fun CombatResultAlertDialogue() {
         val showAlert by remember { combatResultAlertEnabled }
-        combat?.let {
-            CombatResultAlert().CombatResultAlertDialog(showPopup = showAlert, combat = it) {
+        combatResultText.value.let {
+            CombatResultAlert().CombatResultAlertDialog(showPopup = showAlert, combatReport = it) {
                 combatResultAlertEnabled.value = false
             }
         }
@@ -674,7 +662,6 @@ class LudusManagementActivity : ComponentActivity() {
         item: Gladiator,
         onSelected: (Gladiator) -> Unit
     ) {
-
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
@@ -682,36 +669,22 @@ class LudusManagementActivity : ComponentActivity() {
             shape = MaterialTheme.shapes.small,
             tonalElevation = 4.dp
         ) {
-            Column {
-                Row {
-                    Column {
-                        Text(
-                            text = item.name,
-                            modifier = Modifier.padding(16.dp)
-                        )
-                        Text(
-                            text = "H: ${item.health}",
-                            modifier = Modifier.padding(16.dp)
-                        )
-                        Text(
-                            text = "S: ${item.stamina}",
-                            modifier = Modifier.padding(16.dp)
-                        )
-                        Text(
-                            text = "M: ${item.morale}",
-                            modifier = Modifier.padding(16.dp)
-                        )
+            Row(modifier = Modifier.padding(16.dp)) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(text = item.name)
+                    Text(text = "H: ${item.health}")
+                    Text(text = "S: ${item.stamina}")
+                    Text(text = "M: ${item.morale}")
+                }
+                Column {
+                    Button(onClick = { /*TODO*/ }) {
+                        Text("Check Stats")
                     }
-                    Column {
-                        Button(onClick = { /*TODO*/ }) {
-                            Text("Check Stats")
-                        }
-                        Button(onClick = { healAliveGladiators(listOf(item)) }) {
-                            Text("Heal")
-                        }
-                        Button(onClick = { /*TODO*/ }) {
-                            Text("Sell")
-                        }
+                    Button(onClick = { /* healAliveGladiators(listOf(item)) */ }) {
+                        Text("Heal")
+                    }
+                    Button(onClick = { /*TODO*/ }) {
+                        Text("Sell")
                     }
                 }
             }
@@ -723,8 +696,6 @@ class LudusManagementActivity : ComponentActivity() {
         item: Gladiator,
         onSelected: (Gladiator) -> Unit
     ) {
-
-
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
@@ -732,51 +703,24 @@ class LudusManagementActivity : ComponentActivity() {
             shape = MaterialTheme.shapes.small,
             tonalElevation = 4.dp
         ) {
-            Column {
-                Row {
-                    Column {
-                        Text(
-                            text = item.name,
-                            modifier = Modifier.padding(16.dp)
-                        )
-                        Text(
-                            text = "Height: ${item.height}",
-                            modifier = Modifier.padding(16.dp)
-                        )
-                        Text(
-                            text = "Age: ${item.age}",
-                            modifier = Modifier.padding(16.dp)
-                        )
-
-                    }
-                    Column {
-                        Text(
-                            text = "Strength: ${item.strength}",
-                            modifier = Modifier.padding(16.dp)
-                        )
-                        Text(
-                            text = "Speed: ${item.speed}",
-                            modifier = Modifier.padding(16.dp)
-                        )
-                        Text(
-                            text = "Technique: ${item.technique}",
-                            modifier = Modifier.padding(16.dp)
-                        )
-                    }
-                    Column {
-                        Button(onClick = { buyGladiator(item) }) {
-                            Text("Buy")
-                        }
-                    }
+            Row(modifier = Modifier.padding(16.dp)) { // Apply padding to the Row
+                Column(modifier = Modifier.weight(1f)) { // Make the first Column take available space
+                    Text(text = item.name)
+                    Text(text = "Height: ${item.height}")
+                    Text(text = "Age: ${item.age}")
+                }
+                Column(modifier = Modifier.weight(1f)) { // Make the second Column take available space
+                    Text(text = "Strength: ${item.strength}")
+                    Text(text = "Speed: ${item.speed}")
+                    Text(text = "Technique: ${item.technique}")
+                }
+                Button(onClick = { /* buyGladiator(item) */ }) { // Assuming buyGladiator is defined elsewhere
+                    Text("Buy")
                 }
             }
         }
     }
-
-
     companion object {
         const val TAG = "LudusManagementActivity"
     }
-
-
 }
