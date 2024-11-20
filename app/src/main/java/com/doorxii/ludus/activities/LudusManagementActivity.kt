@@ -206,6 +206,8 @@ class LudusManagementActivity : ComponentActivity() {
         val intent = Intent(this, CombatActivity::class.java)
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         intent.setDataAndType(uri, contentResolver.getType(uri))
+        selectedPlayerGladiators.value = emptyList()
+        selectedEnemyGladiators.value = emptyList()
         combatResultLauncher.launch(intent)
     }
 
@@ -461,8 +463,10 @@ class LudusManagementActivity : ComponentActivity() {
                         val currentSelection = selectedPlayerGladiators.value
                         selectedPlayerGladiators.value = if (currentSelection.contains(gladiator)) {
                             currentSelection - gladiator
-                        } else {
+                        } else if (!currentSelection.any { it?.gladiatorId == gladiator.gladiatorId }) { // Check for duplicates
                             currentSelection + gladiator
+                        } else {
+                            currentSelection // If duplicate, do nothing
                         }
                     }
                     EnemyGladiatorsDisplay(
@@ -473,8 +477,10 @@ class LudusManagementActivity : ComponentActivity() {
                         val currentSelection = selectedEnemyGladiators.value
                         selectedEnemyGladiators.value = if (currentSelection.contains(gladiator)) {
                             currentSelection - gladiator
-                        } else {
+                        } else if (!currentSelection.any { it?.gladiatorId == gladiator.gladiatorId }) { // Check for duplicates
                             currentSelection + gladiator
+                        } else {
+                            currentSelection // If duplicate, do nothing
                         }
                     }
                 }
