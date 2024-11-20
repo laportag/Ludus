@@ -198,10 +198,6 @@ class LudusManagementActivity : ComponentActivity() {
     }
 
     private fun startCombat() {
-//        val enemy = gladiatorsInSelectedEnemyLudus.value.random()
-//        Log.d(TAG, "Combatant: ${selectedPlayerGladiators.value?.name}, enemy: ${enemy.name}")
-//        val gladiatorList = listOf(selectedPlayerGladiators.value!!, enemy)
-
         combatFile = CombatSerialization.returnCombatFile(applicationContext)
         combat = Combat.init(selectedPlayerGladiators.value, selectedEnemyGladiators.value)
         CombatSerialization.saveCombatJson(combat!!, combatFile)
@@ -211,7 +207,6 @@ class LudusManagementActivity : ComponentActivity() {
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         intent.setDataAndType(uri, contentResolver.getType(uri))
         combatResultLauncher.launch(intent)
-        startActivity(intent)
     }
 
     private fun combatFinished(resCombat: Combat) {

@@ -35,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -64,6 +65,8 @@ class CombatActivity : ComponentActivity() {
     private var text = mutableStateOf("")
     private lateinit var combatFile: File
 
+    private var isFinished by mutableStateOf(false)
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,9 +77,18 @@ class CombatActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         setContent {
+
             LudusTheme {
                 LongPressDraggable(modifier = Modifier.fillMaxSize()) {
-                    CombatLayout(viewModel)
+                    if (!isFinished){
+                        CombatLayout(viewModel)
+                    }
+                }
+            }
+
+            LaunchedEffect(combat.value) {
+                if (combat.value != null) {
+                    resetActions()
                 }
             }
         }
@@ -118,14 +130,7 @@ class CombatActivity : ComponentActivity() {
 
         var gladiatorActions by remember { mutableStateOf<Map<Gladiator, ChosenAction?>>(emptyMap()) }
 
-        LaunchedEffect(combat.value) {
-            if (combat.value != null) {
-                viewModel.resetGladiatorActions() // Reset for new combat
-                for (gladiator in combat.value!!.playerGladiatorList) {
-                    viewModel.updateGladiatorAction(gladiator, null)
-                }
-            }
-        }
+
 
         if (combat.value != null) {
 
@@ -160,9 +165,12 @@ class CombatActivity : ComponentActivity() {
 //                                actingGladiator!!.action = chosenAct
 
                                 viewModel.updateGladiatorAction(actingGladiator!!, chosenAct)
+                                actingGladiator = findNextAvailableGladiator()
                                 if (viewModel.haveAllGladiatorsHadATurn()) {
                                     makePlayerTurn(viewModel.gladiatorActions.value.values.toList().filterNotNull())
-                                    viewModel.resetGladiatorActions()
+                                    resetActions()
+                                    actingGladiator = findNextAvailableGladiator()
+                                    showDialog = true
                                 }
                             }
                         }
@@ -246,9 +254,13 @@ class CombatActivity : ComponentActivity() {
         } else {
             Color.White
         }
+        val hadTurn = viewModel.hasGladiatorHadATurn(playerGladiator)
         Box(modifier = Modifier
             .background(gladiatorBgColor)
-            .clickable {
+            .graphicsLayer {
+                alpha = if (hadTurn) 0.5f else 1f
+            }
+            .clickable (enabled = !hadTurn) {
                 onGladiatorClicked(playerGladiator)
             }
         ) {
@@ -278,6 +290,13 @@ class CombatActivity : ComponentActivity() {
         }
     }
 
+    private fun resetActions(){
+        viewModel.resetGladiatorActions() // Reset for new combat
+        for (gladiator in combat.value!!.playerGladiatorList) {
+            viewModel.updateGladiatorAction(gladiator, null)
+        }
+    }
+
     private fun makePlayerTurn(gladiatorActions: List<ChosenAction>) {
         if (gladiatorActions.isNotEmpty()) {
             val roundResult = combat.value!!.playCombatRound(gladiatorActions)
@@ -287,8 +306,11 @@ class CombatActivity : ComponentActivity() {
             if (combat.value!!.isComplete) {
                 combatCompleted()
             }
-//            choice = null
         }
+    }
+
+    private fun findNextAvailableGladiator(): Gladiator? {
+        return combat.value?.playerGladiatorList?.firstOrNull { !viewModel.hasGladiatorHadATurn(it) }
     }
 
     private fun combatCompleted() {
@@ -300,7 +322,9 @@ class CombatActivity : ComponentActivity() {
             setDataAndType(combatFile.toUri(), contentResolver.getType(combatFile.toUri()))
         }
         setResult(RESULT_OK, data)
+        isFinished = true
         finish()
+        Log.d(TAG, "combat completed finish")
     }
 
     companion object {

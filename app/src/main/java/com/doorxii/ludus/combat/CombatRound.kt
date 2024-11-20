@@ -79,78 +79,24 @@ class CombatRound {
                     ?: enemyGladiatorList.find { it.gladiatorId == gladiator.action?.targetGladiatorID }
 
                 Log.d(TAG, "target: ${target?.gladiatorId ?: "no target"} ${target?.name ?: "no target"}")
-
-                updateFromCombatActionResult(
-                    combatEnumToAction(gladiator.action!!.action).act(
-                        gladiator,
-                        target!!
+                // only act if target exists
+                if (target != null){
+                    updateFromCombatActionResult(
+                        combatEnumToAction(gladiator.action!!.action).act(
+                            gladiator,
+                            target
+                        )
                     )
-                )
+                }
                 isCombatStillGoing()
-
             }
-
         }
-
         appendReport(
             "Combat round $round result: ${playerGladiatorList.joinToString { "${it.name} - health: ${it.health}" } + " vs " + enemyGladiatorList.joinToString { "${it.name} - health: ${it.health}" }}"
         )
         return CombatRoundResult(playerGladiatorList, enemyGladiatorList)
     }
 
-    //    private fun updateFromCombatActionResult(result: CombatActionResult): CombatRoundResult {
-//        Log.d(TAG, "updating from action result: $result")
-//        // reduce health and stamina
-//        result.actor.stamina -= result.deltaStamina
-//        result.target.health -= result.deltaHealth
-//
-//        playerGladiatorList = playerGladiatorList.map { gladiator ->
-//            if (gladiator.gladiatorId == result.actor.gladiatorId) {
-//                gladiator.stamina -= result.deltaStamina // Update actor's stamina directly
-//                gladiator // Return the modified gladiator
-//            } else if (gladiator.gladiatorId == result.target.gladiatorId) {
-//                gladiator.health -= result.deltaHealth // Update target's health directly
-//                gladiator // Return the modified gladiator
-//            } else {
-//                gladiator // Keep gladiator unchanged if not involved in the action
-//            }
-//        }
-//
-//        enemyGladiatorList = enemyGladiatorList.map { gladiator ->
-//            if (gladiator.gladiatorId == result.actor.gladiatorId) {
-//                gladiator.stamina -= result.deltaStamina
-//                gladiator
-//            } else if (gladiator.gladiatorId == result.target.gladiatorId) {
-//                gladiator.health -= result.deltaHealth
-//                gladiator
-//            } else {
-//                gladiator
-//            }
-//        }
-//
-//        // remove dead gladiators
-//        val aliveList = mutableListOf<Gladiator>()
-//        val deadList = mutableListOf<Gladiator>()
-//        for (gladiator in playerGladiatorList){
-//            if (!gladiator.isAlive()){
-//                appendReport("Gladiator ${gladiator.name} is dead")
-//                deadList.add(gladiator)
-//            }
-//            else {
-//                aliveList.add(gladiator)
-//            }
-//        }
-//        for (gladiator in enemyGladiatorList){
-//            if (!gladiator.isAlive()){
-//                appendReport("Gladiator ${gladiator.name} is dead")
-//                deadList.add(gladiator)
-//            }
-//            else {
-//                aliveList.add(gladiator)
-//            }
-//        }
-//        return CombatRoundResult(playerGladiatorList, enemyGladiatorList)
-//    }
     private fun updateFromCombatActionResult(result: CombatActionResult): CombatRoundResult {
         Log.d(TAG, "updating from action result: $result")
 
