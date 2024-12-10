@@ -52,6 +52,8 @@ import com.doorxii.ludus.ui.cards.LongPressDraggable
 import com.doorxii.ludus.ui.theme.LudusTheme
 import com.doorxii.ludus.utils.CombatSerialization.readCombatFromFile
 import com.doorxii.ludus.utils.CombatSerialization.saveCombatJson
+import com.doorxii.ludus.utils.dice.Dice
+import com.doorxii.ludus.utils.dice.DiceTypes
 import com.doorxii.ludus.utils.enums.EnumToAction
 import java.io.File
 
@@ -333,8 +335,18 @@ class CombatActivity : ComponentActivity() {
         }
     }
 
-    private fun missioGranted(gladiator: Gladiator, ): Boolean {
-        return true
+    private fun missioGranted(gladiator: Gladiator, ):  Boolean {
+        val governorGenerosity = 80.0
+        val luck = Dice.totalRolls(Dice.roll(1, DiceTypes.D100))
+        var missioScore = 20.0 + luck
+        missioScore += gladiator.attack * (0.25 + luck/100)
+        missioScore += gladiator.defence * (0.15 + luck/100)
+        missioScore -= when {
+            gladiator.morale > 80 -> 40.0
+            gladiator.morale < 5 -> 20.0
+            else -> 10.0
+        }
+        return missioScore >= governorGenerosity
     }
 
     private fun combatCompleted() {
