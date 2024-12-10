@@ -304,6 +304,7 @@ class CombatActivity : ComponentActivity() {
             Log.d(TAG, "combat: " + combat.value.toString())
             text.value = roundResult.combatReport
             if (combat.value!!.isComplete) {
+                handleSubmissions()
                 combatCompleted()
             }
         }
@@ -311,6 +312,29 @@ class CombatActivity : ComponentActivity() {
 
     private fun findNextAvailableGladiator(): Gladiator? {
         return combat.value?.playerGladiatorList?.firstOrNull { !viewModel.hasGladiatorHadATurn(it) }
+    }
+
+    private fun handleSubmissions() {
+        Log.d(TAG, "handle submissions")
+        val allSubmittedGladiators = combat.value!!.submittedEnemyGladiatorList + combat.value!!.submittedPlayerGladiatorList
+        allSubmittedGladiators.forEach { gladiator ->
+            val listToAddTo = if (gladiator in combat.value!!.originalEnemyGladiatorList) {
+                combat.value!!.enemyGladiatorList
+            } else {
+                combat.value!!.playerGladiatorList
+            }
+
+            if (missioGranted(gladiator)) {
+                combat.value!!.appendReport("${gladiator.name}: missio")
+                listToAddTo.add(gladiator)
+            } else {
+                combat.value!!.appendReport("${gladiator.name}: sine missio")
+            }
+        }
+    }
+
+    private fun missioGranted(gladiator: Gladiator, ): Boolean {
+        return true
     }
 
     private fun combatCompleted() {

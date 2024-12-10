@@ -63,7 +63,6 @@ class CombatRound {
             return CombatRoundResult(playerGladiatorList, enemyGladiatorList)
         }
         determineRoundOrder()
-//        var gladiatorList = playerGladiatorList + enemyGladiatorList
         roundOrder.forEach { map ->
             val gladiatorId = map.keys.first()
 
@@ -110,6 +109,8 @@ class CombatRound {
         enemyGladiatorList = enemyGladiatorList.filter {
             it.isAlive().also { alive -> if (!alive) appendReport("Gladiator ${it.name} is dead") }
         }
+
+        // TODO - morale drops here
 
         return CombatRoundResult(playerGladiatorList, enemyGladiatorList)
     }

@@ -11,10 +11,12 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 class Combat {
-    var playerGladiatorList: List<Gladiator> = listOf()
-    var enemyGladiatorList: List<Gladiator> = listOf()
+    var playerGladiatorList: MutableList<Gladiator> = mutableListOf()
+    var enemyGladiatorList: MutableList<Gladiator> = mutableListOf()
     var originalPlayerGladiatorList: List<Gladiator> = listOf()
     var originalEnemyGladiatorList: List<Gladiator> = listOf()
+    var submittedPlayerGladiatorList: List<Gladiator> = listOf()
+    var submittedEnemyGladiatorList: List<Gladiator> = listOf()
     private var round: CombatRound? = null
     private var roundNumber: Int = 0
     var isComplete = false
@@ -45,15 +47,15 @@ class Combat {
                 )
             }
             val roundResult = runNewRound(playerChoices, enemyChoices)
-            playerGladiatorList = roundResult.playerGladiatorList
-            enemyGladiatorList = roundResult.enemyGladiatorList
+            playerGladiatorList = roundResult.playerGladiatorList.toMutableList()
+            enemyGladiatorList = roundResult.enemyGladiatorList.toMutableList()
             isComplete = !isCombatStillGoing()
             nullGladiatorActions()
         }
         return CombatResult(playerGladiatorList, enemyGladiatorList, combatReport)
     }
 
-    private fun appendReport(str: String) {
+    fun appendReport(str: String) {
         Log.d(TAG, str)
         combatReport += "$str\n"
     }
@@ -97,8 +99,8 @@ class Combat {
                 )
             }
             val combatRoundResult: CombatRoundResult = runNewRound(playerChoices, enemyChoices)
-            playerGladiatorList = combatRoundResult.playerGladiatorList
-            enemyGladiatorList = combatRoundResult.enemyGladiatorList
+            playerGladiatorList = combatRoundResult.playerGladiatorList.toMutableList()
+            enemyGladiatorList = combatRoundResult.enemyGladiatorList.toMutableList()
             isComplete = !isCombatStillGoing()
         }
         return CombatResult(playerGladiatorList, enemyGladiatorList, combatReport)
@@ -153,9 +155,9 @@ class Combat {
             enemyGladiatorList: List<Gladiator?>
         ): Combat {
             val combat = Combat()
-            combat.playerGladiatorList = playerGladiatorList as List<Gladiator>
+            combat.playerGladiatorList = playerGladiatorList as MutableList<Gladiator>
             combat.originalPlayerGladiatorList = playerGladiatorList
-            combat.enemyGladiatorList = enemyGladiatorList as List<Gladiator>
+            combat.enemyGladiatorList = enemyGladiatorList as MutableList<Gladiator>
             combat.originalEnemyGladiatorList = enemyGladiatorList
             combat.combatName =
                 "C${playerGladiatorList.joinToString { it.name } + " vs " + enemyGladiatorList.joinToString { it.name }}"
