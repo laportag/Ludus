@@ -346,6 +346,11 @@ class CombatActivity : ComponentActivity() {
             gladiator.morale < 5 -> 20.0
             else -> 10.0
         }
+        missioScore += when {
+            gladiator.bloodlust >= 90 -> gladiator.bloodlust/10
+            gladiator.bloodlust <= 50 -> -(gladiator.bloodlust/10)
+            else -> 0.0
+        }
         return missioScore >= governorGenerosity
     }
 

@@ -1,5 +1,6 @@
 package com.doorxii.ludus.data.models.animal
 
+import android.util.Log
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
@@ -71,6 +72,15 @@ class Gladiator: Human() {
         val total = equipment.getDefenceBonus()
 //        Log.d(TAG, "getEquipmentDefenceBonus: $total")
         return total
+    }
+
+    fun hasNoMorale(): Boolean {
+        if (morale <= 0) {
+            Log.d(TAG, "$name has no morale")
+            return true
+        } else {
+            return false
+        }
     }
 
     fun updateMorale(morale: Double) {

@@ -58,9 +58,10 @@ class CombatRound {
     }
 
     fun run(): CombatRoundResult {
+        var res = CombatRoundResult(playerGladiatorList, enemyGladiatorList)
 
         if (!isCombatStillGoing()) {
-            return CombatRoundResult(playerGladiatorList, enemyGladiatorList)
+            return res
         }
         determineRoundOrder()
         roundOrder.forEach { map ->
@@ -79,8 +80,9 @@ class CombatRound {
 
                 Log.d(TAG, "target: ${target?.gladiatorId ?: "no target"} ${target?.name ?: "no target"}")
                 // only act if target exists
+
                 if (target != null){
-                    updateFromCombatActionResult(
+                    res = updateFromCombatActionResult(
                         combatEnumToAction(gladiator.action!!.action).act(
                             gladiator,
                             target
@@ -93,7 +95,7 @@ class CombatRound {
         appendReport(
             "Combat round $round result: ${playerGladiatorList.joinToString { "${it.name} - health: ${it.health}" } + " vs " + enemyGladiatorList.joinToString { "${it.name} - health: ${it.health}" }}"
         )
-        return CombatRoundResult(playerGladiatorList, enemyGladiatorList)
+        return res
     }
 
     private fun updateFromCombatActionResult(result: CombatActionResult): CombatRoundResult {
@@ -102,17 +104,31 @@ class CombatRound {
         result.actor.stamina -= result.deltaStamina
         result.target.health -= result.deltaHealth
 
-        // Update player and enemy lists, removing dead gladiators
-        playerGladiatorList = playerGladiatorList.filter {
-            it.isAlive().also { alive -> if (!alive) appendReport("Gladiator ${it.name} is dead") }
-        }
-        enemyGladiatorList = enemyGladiatorList.filter {
-            it.isAlive().also { alive -> if (!alive) appendReport("Gladiator ${it.name} is dead") }
+        val submittedPlayerGladiatorList = mutableListOf<Gladiator>()
+        val submittedEnemyGladiatorList = mutableListOf<Gladiator>()
+
+        // Update player and enemy lists, removing dead and submitted gladiators
+        playerGladiatorList = playerGladiatorList.filter { gladiator ->
+            val isAlive = gladiator.isAlive().also { alive -> if (!alive) appendReport("Gladiator ${gladiator.name} is dead") }
+            if (isAlive && gladiator.hasNoMorale()) {
+                submittedPlayerGladiatorList.add(gladiator)
+                false // false on the filter lambda will remove the gladiator from playerGladiatorList
+            } else {
+                isAlive // Keep in playerGladiatorList if alive and not submitted
+            }
         }
 
-        // TODO - morale drops here
+        enemyGladiatorList = enemyGladiatorList.filter { gladiator ->
+            val isAlive = gladiator.isAlive().also { alive -> if (!alive) appendReport("Gladiator ${gladiator.name} is dead") }
+            if (isAlive && gladiator.hasNoMorale()) {
+                submittedEnemyGladiatorList.add(gladiator)
+                false // Remove from enemyGladiatorList if submitted
+            } else {
+                isAlive // Keep in enemyGladiatorList if alive and not submitted
+            }
+        }
 
-        return CombatRoundResult(playerGladiatorList, enemyGladiatorList)
+        return CombatRoundResult(playerGladiatorList, enemyGladiatorList, submittedPlayerGladiatorList, submittedEnemyGladiatorList)
     }
 
 

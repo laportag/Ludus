@@ -15,8 +15,8 @@ class Combat {
     var enemyGladiatorList: MutableList<Gladiator> = mutableListOf()
     var originalPlayerGladiatorList: List<Gladiator> = listOf()
     var originalEnemyGladiatorList: List<Gladiator> = listOf()
-    var submittedPlayerGladiatorList: List<Gladiator> = listOf()
-    var submittedEnemyGladiatorList: List<Gladiator> = listOf()
+    var submittedPlayerGladiatorList: MutableList<Gladiator> = mutableListOf()
+    var submittedEnemyGladiatorList: MutableList<Gladiator> = mutableListOf()
     private var round: CombatRound? = null
     private var roundNumber: Int = 0
     var isComplete = false
@@ -47,12 +47,18 @@ class Combat {
                 )
             }
             val roundResult = runNewRound(playerChoices, enemyChoices)
-            playerGladiatorList = roundResult.playerGladiatorList.toMutableList()
-            enemyGladiatorList = roundResult.enemyGladiatorList.toMutableList()
-            isComplete = !isCombatStillGoing()
+            updateListsFromCombatRoundResult(roundResult)
             nullGladiatorActions()
         }
         return CombatResult(playerGladiatorList, enemyGladiatorList, combatReport)
+    }
+
+    private fun updateListsFromCombatRoundResult(roundResult: CombatRoundResult){
+        playerGladiatorList = roundResult.playerGladiatorList.toMutableList()
+        enemyGladiatorList = roundResult.enemyGladiatorList.toMutableList()
+        submittedPlayerGladiatorList = roundResult.submittedPlayerGladiatorList.toMutableList()
+        submittedEnemyGladiatorList = roundResult.submittedEnemyGladiatorList.toMutableList()
+        isComplete = !isCombatStillGoing()
     }
 
     fun appendReport(str: String) {
@@ -99,9 +105,7 @@ class Combat {
                 )
             }
             val combatRoundResult: CombatRoundResult = runNewRound(playerChoices, enemyChoices)
-            playerGladiatorList = combatRoundResult.playerGladiatorList.toMutableList()
-            enemyGladiatorList = combatRoundResult.enemyGladiatorList.toMutableList()
-            isComplete = !isCombatStillGoing()
+            updateListsFromCombatRoundResult(combatRoundResult)
         }
         return CombatResult(playerGladiatorList, enemyGladiatorList, combatReport)
     }
@@ -111,7 +115,7 @@ class Combat {
         enemyChoices: List<ChosenAction>
     ): CombatRoundResult {
         if (!isCombatStillGoing()) {
-            return CombatRoundResult(playerGladiatorList, enemyGladiatorList)
+            return CombatRoundResult(playerGladiatorList, enemyGladiatorList, submittedPlayerGladiatorList, submittedEnemyGladiatorList)
         }
         roundNumber++
         appendReport("Round $roundNumber: ${playerGladiatorList.joinToString { it.name } + " vs " + enemyGladiatorList.joinToString { it.name }}")
@@ -119,18 +123,8 @@ class Combat {
         val allChoices = playerChoices + enemyChoices
         val chosenActionMap = allChoices.associateBy { it.actingGladiatorID }
 
-        for (gladiator in playerGladiatorList) {
-            val chosenAction = chosenActionMap[gladiator.gladiatorId]
-            if (chosenAction != null) {
-                gladiator.action = chosenAction
-            }
-        }
-        for (gladiator in enemyGladiatorList) {
-            val chosenAction = chosenActionMap[gladiator.gladiatorId]
-            if (chosenAction != null) {
-                gladiator.action = chosenAction
-            }
-        }
+        playerGladiatorList.forEach { it.action = chosenActionMap[it.gladiatorId] }
+        enemyGladiatorList.forEach { it.action = chosenActionMap[it.gladiatorId] }
 
         round = CombatRound.init(playerGladiatorList, enemyGladiatorList, roundNumber)
         val roundResult = round!!.run()
@@ -155,12 +149,10 @@ class Combat {
             enemyGladiatorList: List<Gladiator?>
         ): Combat {
             val combat = Combat()
-            combat.playerGladiatorList = playerGladiatorList as MutableList<Gladiator>
-            combat.originalPlayerGladiatorList = playerGladiatorList
-            combat.enemyGladiatorList = enemyGladiatorList as MutableList<Gladiator>
-            combat.originalEnemyGladiatorList = enemyGladiatorList
+            combat.playerGladiatorList.addAll(playerGladiatorList.filterNotNull())
+            combat.enemyGladiatorList.addAll(enemyGladiatorList.filterNotNull())
             combat.combatName =
-                "C${playerGladiatorList.joinToString { it.name } + " vs " + enemyGladiatorList.joinToString { it.name }}"
+                combat.playerGladiatorList.joinToString { it.name } + " vs " + combat.enemyGladiatorList.joinToString { it.name }
             combat.combatReport = "${combat.combatName}\n\n"
             return combat
         }
