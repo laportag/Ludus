@@ -83,10 +83,6 @@ class Gladiator: Human() {
         }
     }
 
-    fun updateMorale(morale: Double) {
-        this.morale = morale
-    }
-
     companion object {
         private const val TAG = "Gladiator"
     }

@@ -53,7 +53,7 @@ class Combat {
         return CombatResult(playerGladiatorList, enemyGladiatorList, combatReport)
     }
 
-    private fun updateListsFromCombatRoundResult(roundResult: CombatRoundResult){
+    private fun updateListsFromCombatRoundResult(roundResult: CombatRoundResult) {
         playerGladiatorList = roundResult.playerGladiatorList.toMutableList()
         enemyGladiatorList = roundResult.enemyGladiatorList.toMutableList()
         submittedPlayerGladiatorList = roundResult.submittedPlayerGladiatorList.toMutableList()
@@ -106,8 +106,38 @@ class Combat {
             }
             val combatRoundResult: CombatRoundResult = runNewRound(playerChoices, enemyChoices)
             updateListsFromCombatRoundResult(combatRoundResult)
+            for (gladiator in playerGladiatorList) {
+                updateMoraleAfterRound(gladiator)
+            }
+            for (gladiator in enemyGladiatorList) {
+                updateMoraleAfterRound(gladiator)
+            }
         }
         return CombatResult(playerGladiatorList, enemyGladiatorList, combatReport)
+    }
+
+    private fun updateMoraleAfterRound(updatingGladiator: Gladiator) {
+        val isPlayer = updatingGladiator in playerGladiatorList
+        val ownList = if (isPlayer) playerGladiatorList else enemyGladiatorList
+        val otherList = if (isPlayer) enemyGladiatorList else playerGladiatorList
+        val originalList = if (isPlayer) originalPlayerGladiatorList else originalEnemyGladiatorList
+
+        // Outnumbered modifier
+        updatingGladiator.morale += (ownList.count() - otherList.count()) * 3.0
+
+        // Mourning modifier
+        updatingGladiator.morale -= (originalList.count() - ownList.count()) * 5.0
+
+        // Combat strength modifier
+        val totalDifference = ownList.sumOf { it.attack + it.defence } - otherList.sumOf { it.attack + it.defence }
+        updatingGladiator.morale += when {
+            totalDifference > 0 -> 1.0
+            totalDifference < 0 -> -2.0
+            else -> 0.0
+        }
+
+        // Ensure morale is between 5 and 100
+        updatingGladiator.morale = updatingGladiator.morale.coerceIn(5.0, 120.0)
     }
 
     private fun runNewRound(
@@ -115,7 +145,12 @@ class Combat {
         enemyChoices: List<ChosenAction>
     ): CombatRoundResult {
         if (!isCombatStillGoing()) {
-            return CombatRoundResult(playerGladiatorList, enemyGladiatorList, submittedPlayerGladiatorList, submittedEnemyGladiatorList)
+            return CombatRoundResult(
+                playerGladiatorList,
+                enemyGladiatorList,
+                submittedPlayerGladiatorList,
+                submittedEnemyGladiatorList
+            )
         }
         roundNumber++
         appendReport("Round $roundNumber: ${playerGladiatorList.joinToString { it.name } + " vs " + enemyGladiatorList.joinToString { it.name }}")
