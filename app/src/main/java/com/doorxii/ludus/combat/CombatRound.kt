@@ -103,6 +103,7 @@ class CombatRound {
 
         result.actor.stamina -= result.deltaStamina
         result.target.health -= result.deltaHealth
+        result.target.morale -= result.deltaHealth/2
 
         val submittedPlayerGladiatorList = mutableListOf<Gladiator>()
         val submittedEnemyGladiatorList = mutableListOf<Gladiator>()

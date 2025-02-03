@@ -47,6 +47,12 @@ class Combat {
                 )
             }
             val roundResult = runNewRound(playerChoices, enemyChoices)
+            for (gladiator in playerGladiatorList) {
+                updateMoraleAfterRound(gladiator)
+            }
+            for (gladiator in enemyGladiatorList) {
+                updateMoraleAfterRound(gladiator)
+            }
             updateListsFromCombatRoundResult(roundResult)
             nullGladiatorActions()
         }
@@ -123,7 +129,9 @@ class Combat {
         val originalList = if (isPlayer) originalPlayerGladiatorList else originalEnemyGladiatorList
 
         // Outnumbered modifier
-        updatingGladiator.morale += (ownList.count() - otherList.count()) * 3.0
+        if (ownList.count() > otherList.count()){
+            updatingGladiator.morale += (ownList.count() - otherList.count()) * 3.0
+        }
 
         // Mourning modifier
         updatingGladiator.morale -= (originalList.count() - ownList.count()) * 5.0
@@ -135,6 +143,12 @@ class Combat {
             totalDifference < 0 -> -2.0
             else -> 0.0
         }
+
+        // low health modifier
+        if (updatingGladiator.health <= 50) {
+            updatingGladiator.morale += (1 - (updatingGladiator.health/100)) * 5
+        }
+
 
         // Ensure morale is between 5 and 100
         updatingGladiator.morale = updatingGladiator.morale.coerceIn(5.0, 120.0)

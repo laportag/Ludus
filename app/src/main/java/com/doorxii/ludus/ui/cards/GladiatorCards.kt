@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
@@ -30,25 +31,28 @@ object GladiatorCards {
             modifier = Modifier
                 .aspectRatio(16f / 7f)
                 .background(color = Color(0xFFD3D3D3), RoundedCornerShape(8.dp))
-                .height(screenHeight * 0.125f)
-                .padding(4.dp),
+                .height(screenHeight * 1/6)
+                .wrapContentSize()
+                .padding(2.dp),
             shape = RoundedCornerShape(8.dp)
         ){
-            Column{
+            Column(
+                modifier = Modifier.padding(1.dp)
+            ){
                 Text(text = "${gladiator.name} : #${gladiator.id}")
                 Row {
                     Column {
                         Text("H: ${gladiator.health}/100")
                         Text("S: ${gladiator.stamina}/100")
                         Text("M: ${gladiator.morale}/100")
-                        Text("A: ${decimalFormat.format(gladiator.attack)}")
-                        Text("D: ${decimalFormat.format(gladiator.defence)}")
+                        Text("At: ${decimalFormat.format(gladiator.attack)}")
+                        Text("De: ${decimalFormat.format(gladiator.defence)}")
                     }
                     Column {
-                        Text("S: ${gladiator.strength}/100")
+                        Text("St: ${gladiator.strength}/100")
                         Text("Sp: ${gladiator.speed}/100")
-                        Text("T: ${gladiator.technique}/100")
-                        Text("B: ${gladiator.bloodlust}/100")
+                        Text("Te: ${gladiator.technique}/100")
+                        Text("Bl: ${gladiator.bloodlust}/100")
                     }
                     Text("pic")
 

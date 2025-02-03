@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -115,7 +116,7 @@ class CombatActivity : ComponentActivity() {
         val battleText: String by remember { text }
 
         val combatActions =
-            listOf(CombatActions.BASIC_ATTACK, CombatActions.TIRED_ATTACK, CombatActions.WAIT)
+            listOf(CombatActions.BASIC_ATTACK, CombatActions.TIRED_ATTACK, CombatActions.WAIT, CombatActions.MISSIO)
 
         var actingGladiator by remember {
             mutableStateOf(
@@ -154,7 +155,9 @@ class CombatActivity : ComponentActivity() {
                     columns = GridCells.Fixed(2), // Two columns
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.fillMaxWidth() // Fill available width
+                    modifier = Modifier
+                        .fillMaxWidth() // Fill available width
+                        .wrapContentHeight()
                 ) {
                     items(combat.value!!.enemyGladiatorList) { gladiator ->
                         EnemyGladiatorCardWithDropTarget(gladiator) { action, target ->
