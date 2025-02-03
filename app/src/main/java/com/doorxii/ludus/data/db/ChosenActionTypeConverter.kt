@@ -1,7 +1,7 @@
 package com.doorxii.ludus.data.db
 
 import androidx.room.TypeConverter
-import com.doorxii.ludus.actions.combatactions.ChosenAction
+import com.doorxii.ludus.utils.actions.combatactions.ChosenAction
 import kotlinx.serialization.json.Json
 
 class ChosenActionTypeConverter {

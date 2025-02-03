@@ -13,17 +13,17 @@
         android:theme="@style/Theme.Ludus"
          >
         <activity
-            android:name=".activities.CombatActivity"
+            android:name=".ui.activities.CombatActivity"
             android:exported="true"
             android:label="@string/title_activity_combat"
             android:theme="@style/Theme.Ludus" />
         <activity
-            android:name=".activities.LudusManagementActivity"
+            android:name=".ui.activities.LudusManagementActivity"
             android:exported="true"
             android:label="StartActivity"
             android:theme="@style/Theme.Ludus" />
         <activity
-            android:name=".activities.StartActivity"
+            android:name=".ui.activities.StartActivity"
             android:exported="true"
             android:label="LudusManagementActivity"
             android:theme="@style/Theme.Ludus" >

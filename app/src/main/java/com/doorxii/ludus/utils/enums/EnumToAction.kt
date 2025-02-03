@@ -1,11 +1,11 @@
 package com.doorxii.ludus.utils.enums
 
-import com.doorxii.ludus.actions.combatactions.BasicAttack
-import com.doorxii.ludus.actions.combatactions.CombatAction
-import com.doorxii.ludus.actions.combatactions.CombatActions
-import com.doorxii.ludus.actions.combatactions.Missio
-import com.doorxii.ludus.actions.combatactions.TiredAttack
-import com.doorxii.ludus.actions.combatactions.Wait
+import com.doorxii.ludus.utils.actions.combatactions.BasicAttack
+import com.doorxii.ludus.utils.actions.combatactions.CombatAction
+import com.doorxii.ludus.utils.actions.combatactions.CombatActions
+import com.doorxii.ludus.utils.actions.combatactions.Missio
+import com.doorxii.ludus.utils.actions.combatactions.TiredAttack
+import com.doorxii.ludus.utils.actions.combatactions.Wait
 
 object EnumToAction {
     fun combatEnumToAction(choice: CombatActions): CombatAction {
@@ -23,7 +23,8 @@ object EnumToAction {
             is TiredAttack -> CombatActions.TIRED_ATTACK
             is Wait -> CombatActions.WAIT
             is Missio -> CombatActions.MISSIO
-            else -> {CombatActions.WAIT}
+            else -> {
+                CombatActions.WAIT}
         }
     }
 
