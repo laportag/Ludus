@@ -6,24 +6,14 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.doorxii.ludus.data.db.AppDatabase
-import com.doorxii.ludus.ui.components.LoadLudusDialogue
-import com.doorxii.ludus.ui.components.NewLudusDialogue
+import com.doorxii.ludus.ui.components.screens.StartActivityScreen
 import com.doorxii.ludus.ui.theme.LudusTheme
 import com.doorxii.ludus.utils.DatabaseManagement.getAllDatabases
 import kotlinx.coroutines.launch
@@ -34,8 +24,8 @@ class StartActivity : ComponentActivity() {
 
     private var databases = mutableStateOf(listOf<String>())
 
-    private var newDialogueVisible = false
-    private var loadDialogueVisible = false
+    private var newDialogueVisible = mutableStateOf(false)
+    private var loadDialogueVisible = mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,14 +34,20 @@ class StartActivity : ComponentActivity() {
         observeFlows()
         viewModel.setDatabases(getAllDatabases(applicationContext))
 
-
         enableEdgeToEdge()
         setContent {
             LudusTheme {
-                StartMenu()
+                StartActivityScreen(
+                    newDialogueState = remember { newDialogueVisible },
+                    loadDialogueState = remember { loadDialogueVisible },
+                    databases = databases.value,
+                    launchLudusManagement = { ludus, db ->
+                        launchLudusManagement(ludus, db)
+                    },
+                    viewModel = viewModel
+                )
             }
         }
-
         Log.d(TAG, "dbs: ${getAllDatabases(applicationContext)}")
     }
 
@@ -70,48 +66,6 @@ class StartActivity : ComponentActivity() {
         val intent = Intent(this, LudusManagementActivity::class.java)
         intent.putExtra("db_name", name)
         startActivity(intent)
-    }
-
-    @Preview
-    @Composable
-    fun StartMenu() {
-
-        val newDialogueState = remember { mutableStateOf(newDialogueVisible) }
-        val loadDialogueState = remember { mutableStateOf(loadDialogueVisible) }
-
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Button(onClick = { newDialogueState.value = true }) {
-                Text("New Ludus")
-            }
-            Button(onClick = { loadDialogueState.value = true }) {
-                Text("Load Ludus")
-            }
-
-        }
-        if (newDialogueState.value) {
-            NewLudusDialogue(
-                databases = databases.value,
-                visibleCallback = { newDialogueState.value = it },
-                launchLudusManagement = { ludus, db ->
-                    launchLudusManagement(ludus, db)
-                }
-            )
-        }
-        if (loadDialogueState.value) {
-
-            LoadLudusDialogue(
-                databasesList = databases.value,
-                viewModel = viewModel,
-                visibleCallback = { loadDialogueState.value = it },
-                launchLudusManagement = { ludus, db ->
-                    launchLudusManagement(ludus, db)
-                }
-            )
-        }
     }
 
     companion object {
