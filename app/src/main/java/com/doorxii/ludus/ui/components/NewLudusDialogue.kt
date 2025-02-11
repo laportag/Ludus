@@ -24,7 +24,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun NewLudusDialogue(
     visibleCallback: (Boolean) -> Unit,
-    databases: List<String>,
     launchLudusManagement: (String, AppDatabase) -> Unit
 ) {
     var ludusName by remember { mutableStateOf("") }
@@ -45,7 +44,7 @@ fun NewLudusDialogue(
                     }
                     visibleCallback(false)
                 },
-                enabled = ludusName.isNotEmpty() && ludusName !in databases
+                enabled = ludusName.isNotEmpty() && ludusName !in DatabaseManagement.getAllDatabases(context)
             ) {
                 Text("Create")
             }

@@ -27,14 +27,12 @@ import com.doorxii.ludus.utils.DatabaseManagement
 
 @Composable
 fun LoadLudusDialogue(
-    databasesList: List<String>,
     viewModel: StartActivityViewModel,
     launchLudusManagement: (String, AppDatabase) -> Unit,
     visibleCallback: (Boolean) -> Unit,
 ) {
     val context = LocalContext.current
     val TAG = "LoadLudusDialogue"
-    val databases = remember { databasesList }
     val selectedDb = remember { mutableStateOf("") }
     AlertDialog(
         modifier = Modifier.fillMaxWidth(),
@@ -48,7 +46,7 @@ fun LoadLudusDialogue(
         title = { Text("Load Ludus") },
         text = {
             LazyColumn {
-                items(databases) { database ->
+                items(DatabaseManagement.getAllDatabases(context)) { database ->
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -84,11 +82,14 @@ fun LoadLudusDialogue(
                                     Button(onClick = {
                                         Log.d(TAG, "deleting: $database")
                                         DatabaseManagement.deleteDb(database, context) {
-                                            viewModel.setDatabases(
-                                                DatabaseManagement.getAllDatabases(
-                                                    context
+                                            if(it){
+                                                Log.d(TAG, "deleted: $database")
+                                                viewModel.setDatabases(
+                                                    DatabaseManagement.getAllDatabases(
+                                                        context
+                                                    )
                                                 )
-                                            )
+                                            }
                                         }
                                     }) { Text("Delete") }
                                 }

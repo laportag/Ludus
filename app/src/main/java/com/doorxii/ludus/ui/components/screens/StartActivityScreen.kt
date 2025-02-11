@@ -38,7 +38,6 @@ fun StartActivityScreen(
     }
     if (newDialogueState.value) {
         NewLudusDialogue(
-            databases = databases,
             visibleCallback = { newDialogueState.value = it },
             launchLudusManagement = { ludus, db ->
                 launchLudusManagement(ludus, db)
@@ -48,7 +47,6 @@ fun StartActivityScreen(
     if (loadDialogueState.value) {
 
         LoadLudusDialogue(
-            databasesList = databases,
             viewModel = viewModel,
             visibleCallback = { loadDialogueState.value = it },
             launchLudusManagement = { ludus, db ->
