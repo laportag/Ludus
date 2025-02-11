@@ -89,7 +89,7 @@ object DatabaseManagement {
             context,
             AppDatabase::class.java,
             dbName
-        )   .enableMultiInstanceInvalidation()
+        ).enableMultiInstanceInvalidation()
             .setJournalMode(RoomDatabase.JournalMode.TRUNCATE)
             .setQueryExecutor(Executors.newSingleThreadExecutor())
             .setTransactionExecutor(Executors.newSingleThreadExecutor())
@@ -119,12 +119,24 @@ object DatabaseManagement {
                 context,
                 AppDatabase::class.java, dbName
             ).build()
-            db.clearAllTables()
             db.close()
             val file = context.getDatabasePath(dbName)
+            if (file.exists()) {
+                file.delete()
+            }
             val jFile = File(file.parentFile, "${file.name}-journal")
-            file.delete()
-            jFile.delete()
+            if (jFile.exists()) {
+                jFile.delete()
+            }
+            val walFile = File(file.parentFile, "${file.name}-wal")
+            if (walFile.exists()) {
+                walFile.delete()
+            }
+            val shmFile = File(file.parentFile, "${file.name}-shm")
+            if (shmFile.exists()) {
+                shmFile.delete()
+            }
+
             callback(true)
         }
 
