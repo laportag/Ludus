@@ -27,7 +27,7 @@ class Combat {
         appendReport("Sim Combat started")
         while (!isComplete) {
             val playerChoices: MutableList<ChosenAction> = mutableListOf()
-            for (gladiator in enemyGladiatorList) {
+            for (gladiator in playerGladiatorList) {
                 playerChoices.add(
                     ChosenAction(
                         gladiator.gladiatorId,
@@ -41,7 +41,7 @@ class Combat {
                 enemyChoices.add(
                     ChosenAction(
                         gladiator.gladiatorId,
-                        enemyTargetSelector().gladiatorId,
+                        playerTargetSelector().gladiatorId,
                         combatActionToEnum(CombatBehaviour.basicActionPicker(gladiator))
                     )
                 )
@@ -84,13 +84,23 @@ class Combat {
         }
     }
 
-    private fun enemyTargetSelector(): Gladiator {
+    private fun playerTargetSelector(): Gladiator {
         val lowestHealthGladiator = playerGladiatorList.minByOrNull { it.health }
         val randomFactor = Dice.totalRolls(Dice.roll(1, DiceTypes.D100))
         return if (randomFactor <= 40 && lowestHealthGladiator != null) { // 40% chance to target lowest health
             lowestHealthGladiator
         } else {
             playerGladiatorList.random() // Otherwise, choose randomly
+        }
+    }
+
+    private fun enemyTargetSelector(): Gladiator {
+        val lowestHealthGladiator = enemyGladiatorList.minByOrNull { it.health }
+        val randomFactor = Dice.totalRolls(Dice.roll(1, DiceTypes.D100))
+        return if (randomFactor <= 40 && lowestHealthGladiator != null) { // 40% chance to target lowest health
+            lowestHealthGladiator
+        } else {
+            enemyGladiatorList.random() // Otherwise, choose randomly
         }
     }
 
@@ -105,7 +115,7 @@ class Combat {
                 enemyChoices.add(
                     ChosenAction(
                         gladiator.gladiatorId,
-                        enemyTargetSelector().gladiatorId,
+                        playerTargetSelector().gladiatorId,
                         combatActionToEnum(CombatBehaviour.basicActionPicker(gladiator))
                     )
                 )

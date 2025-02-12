@@ -235,9 +235,6 @@ class LudusManagementActivity : ComponentActivity() {
     private fun combatFinished(resCombat: Combat) {
         Log.d(TAG, "Combat complete?: ${resCombat.isComplete}")
 
-//        viewModel.resetCombatStarted()
-//        viewModel.resetCombatSimmed()
-
         var winners = emptyList<Gladiator>()
         if (resCombat.playerGladiatorList.isEmpty() && resCombat.enemyGladiatorList.isEmpty()) {
             Log.d(TAG, "No winner")
