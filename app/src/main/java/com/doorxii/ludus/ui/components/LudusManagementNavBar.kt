@@ -7,31 +7,33 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
+import com.doorxii.ludus.ui.components.screens.LudusManagementRoutes
 
 @Composable
-fun LudusManagementNavBar() {
+fun LudusManagementNavBar(navController: NavHostController) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceAround
     ) {
         Button(onClick = {
-//            ludusManagementView.value = LudusManagementViews.HOME
+            navController.navigate(LudusManagementRoutes.Home.route)
         }) {
             Text("Home")
         }
         Button(onClick = {
-//            ludusManagementView.value = LudusManagementViews.BARRACKS_MANAGEMENT
+            navController.navigate(LudusManagementRoutes.Barracks.route)
         }) {
             Text("Barracks")
         }
         Button(onClick = {
-//            ludusManagementView.value = LudusManagementViews.GLADIATOR_MARKET
+            navController.navigate(LudusManagementRoutes.Market.route)
         }) {
             Text("Market")
         }
         Row {
             Button(onClick = {
-//                ludusManagementView.value = LudusManagementViews.COMBAT_SELECT
+                navController.navigate(LudusManagementRoutes.CombatSelect.route)
             }) {
                 Text("Combat")
             }

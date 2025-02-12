@@ -9,12 +9,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.doorxii.ludus.data.models.ludus.Ludus
+import androidx.navigation.NavHostController
+import com.doorxii.ludus.ui.activities.LudusManagementActivityViewModel
 
 @Composable
-fun LudusManagementHomeScreen(parentPadding: PaddingValues, playerLudus: Ludus) {
+fun LudusManagementHomeScreen(
+    parentPadding: PaddingValues,
+    viewModel: LudusManagementActivityViewModel,
+    navController: NavHostController
+) {
+    val playerLudus = viewModel.playerLudus.collectAsState().value
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -22,20 +29,20 @@ fun LudusManagementHomeScreen(parentPadding: PaddingValues, playerLudus: Ludus) 
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text("Ludus: ${playerLudus.name}")
+        Text(text = playerLudus?.name ?: "No player name")
         Button(onClick = {
-//            ludusManagementView.value = LudusManagementViews.BARRACKS_MANAGEMENT
+            navController.navigate(LudusManagementRoutes.Barracks.route)
         }) {
             Text("Manage Barracks")
         }
         Button(onClick = {
-//            ludusManagementView.value = LudusManagementViews.GLADIATOR_MARKET
+            navController.navigate(LudusManagementRoutes.Market.route)
         }) {
             Text("Purchase Gladiators")
         }
         Row {
             Button(onClick = {
-//                ludusManagementView.value = LudusManagementViews.COMBAT_SELECT
+                navController.navigate(LudusManagementRoutes.CombatSelect.route)
             }) {
                 Text("Choose Enemy Ludus")
             }

@@ -67,6 +67,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.navigation.compose)
     kapt(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
 
