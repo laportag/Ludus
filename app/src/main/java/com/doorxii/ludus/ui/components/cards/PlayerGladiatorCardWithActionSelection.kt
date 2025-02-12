@@ -9,7 +9,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import com.doorxii.ludus.data.models.animal.Gladiator
 import com.doorxii.ludus.ui.activities.CombatActivityViewModel
-import com.doorxii.ludus.ui.components.cards.GladiatorCards
 
 @Composable
 fun PlayerGladiatorCardWithActionSelection(
@@ -33,6 +32,6 @@ fun PlayerGladiatorCardWithActionSelection(
             onGladiatorClicked(playerGladiator)
         }
     ) {
-        GladiatorCards.CombatGladiatorCard(playerGladiator)
+        CombatGladiatorCard(playerGladiator)
     }
 }

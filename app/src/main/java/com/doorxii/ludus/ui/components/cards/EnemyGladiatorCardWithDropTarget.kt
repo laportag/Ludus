@@ -25,7 +25,7 @@ fun EnemyGladiatorCardWithDropTarget(
             onActionDropped(combatAction, enemyGladiator)
         }
         Box(modifier = Modifier.background(gladiatorBgColor)) {
-            GladiatorCards.CombatGladiatorCard(enemyGladiator)
+            CombatGladiatorCard(enemyGladiator)
         }
 
     }

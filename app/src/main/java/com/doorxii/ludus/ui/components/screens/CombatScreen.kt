@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import com.doorxii.ludus.data.models.animal.Gladiator
 import com.doorxii.ludus.ui.activities.CombatActivityViewModel
 import com.doorxii.ludus.ui.components.bars.CombatButtonBar
-import com.doorxii.ludus.ui.components.cards.ActionCards
+import com.doorxii.ludus.ui.components.cards.CardRow
 import com.doorxii.ludus.ui.components.lists.EnemyGladiatorGrid
 import com.doorxii.ludus.ui.components.lists.PlayerGladiatorGrid
 import com.doorxii.ludus.ui.components.popups.CombatDialogue
@@ -71,7 +71,7 @@ fun CombatScreen(
             Spacer(modifier = Modifier.weight(1f))
 
             // Action Cards
-            ActionCards.CardRow(
+            CardRow(
                 EnumToAction.combatEnumListToActionList(
                     listOf(
                         CombatActions.BASIC_ATTACK,
