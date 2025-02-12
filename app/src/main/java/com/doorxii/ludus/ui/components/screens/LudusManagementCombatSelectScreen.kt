@@ -14,9 +14,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.doorxii.ludus.ui.activities.LudusManagementActivityViewModel
-import com.doorxii.ludus.ui.components.lists.GladiatorDisplay
 import com.doorxii.ludus.ui.components.bars.InitiateCombatBar
 import com.doorxii.ludus.ui.components.bars.LudusSelectionBar
+import com.doorxii.ludus.ui.components.lists.GladiatorDisplay
 import com.doorxii.ludus.ui.components.popups.CombatResultAlertDialogue
 
 @Composable
@@ -34,19 +34,23 @@ fun LudusManagementCombatSelectScreen(
         Modifier
             .fillMaxSize()
             .padding(parentPadding)
+
     ) {
-        LudusSelectionBar(
-            selectedEnemyLudus = viewModel.selectedEnemyLudus.collectAsState().value,
-            ludiExcludingPlayer = viewModel.ludiExcludingPlayer.collectAsState().value
-        ) { ludus ->
-            viewModel.setSelectedEnemyLudus(ludus)
-            viewModel.getGladiatorsByLudusId(ludus.ludusId)
+        Column(modifier = Modifier.weight(0.1f)) {
+            LudusSelectionBar(
+                selectedEnemyLudus = viewModel.selectedEnemyLudus.collectAsState().value,
+                ludiExcludingPlayer = viewModel.ludiExcludingPlayer.collectAsState().value
+            ) { ludus ->
+                viewModel.setSelectedEnemyLudus(ludus)
+                viewModel.getGladiatorsByLudusId(ludus.ludusId)
+            }
         }
 
         Column(
             Modifier
                 .fillMaxWidth()
-                .weight(1f),
+                .weight(0.9f),
+//                .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -54,38 +58,42 @@ fun LudusManagementCombatSelectScreen(
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .weight(0.8f)
             ) {
-                GladiatorDisplay(
-                    title = viewModel.playerLudus.collectAsState().value?.name ?: "Player",
-                    gladiators = viewModel.playerGladiators.collectAsState().value,
-                    selectedGladiators = viewModel.selectedPlayerGladiators.value
-                ) { gladiator ->
-                    val currentSelection = viewModel.selectedPlayerGladiators.value
-                    viewModel.setSelectedPlayerGladiators(
-                        if (currentSelection.contains(gladiator)) {
-                            currentSelection - gladiator
-                        } else if (!currentSelection.any { it?.gladiatorId == gladiator.gladiatorId }) { // Check for duplicates
-                            currentSelection + gladiator
-                        } else {
-                            currentSelection // If duplicate, do nothing
-                        }
-                    )}
-                GladiatorDisplay(
-                    title = viewModel.selectedEnemyLudus.collectAsState().value?.name ?: "Select Enemy",
-                    gladiators = viewModel.gladiatorsByLudus.collectAsState().value,
-                    selectedGladiators = viewModel.selectedEnemyGladiators.value
-                ) { gladiator ->
-                    val currentSelection = viewModel.selectedEnemyGladiators.value
-                    viewModel.setSelectedEnemyGladiators(
-                        if (currentSelection.contains(gladiator)) {
-                            currentSelection - gladiator
-                        } else if (!currentSelection.any { it?.gladiatorId == gladiator.gladiatorId }) { // Check for duplicates
-                            currentSelection + gladiator
-                        } else {
-                            currentSelection // If duplicate, do nothing
-                        }
-                    )
+                Column(modifier = Modifier.weight(0.5f)) {
+                    GladiatorDisplay(
+                        title = viewModel.playerLudus.collectAsState().value?.name ?: "Player",
+                        gladiators = viewModel.playerGladiators.collectAsState().value,
+                        selectedGladiators = viewModel.selectedPlayerGladiators.value
+                    ) { gladiator ->
+                        val currentSelection = viewModel.selectedPlayerGladiators.value
+                        viewModel.setSelectedPlayerGladiators(
+                            if (currentSelection.contains(gladiator)) {
+                                currentSelection - gladiator
+                            } else if (!currentSelection.any { it?.gladiatorId == gladiator.gladiatorId }) { // Check for duplicates
+                                currentSelection + gladiator
+                            } else {
+                                currentSelection // If duplicate, do nothing
+                            }
+                        )
+                    }
+                }
+                Column(modifier = Modifier.weight(0.5f)) {
+                    GladiatorDisplay(
+                        title = viewModel.selectedEnemyLudus.collectAsState().value?.name ?: "Select Enemy",
+                        gladiators = viewModel.gladiatorsByLudus.collectAsState().value,
+                        selectedGladiators = viewModel.selectedEnemyGladiators.value
+                    ) { gladiator ->
+                        val currentSelection = viewModel.selectedEnemyGladiators.value
+                        viewModel.setSelectedEnemyGladiators(
+                            if (currentSelection.contains(gladiator)) {
+                                currentSelection - gladiator
+                            } else if (!currentSelection.any { it?.gladiatorId == gladiator.gladiatorId }) { // Check for duplicates
+                                currentSelection + gladiator
+                            } else {
+                                currentSelection // If duplicate, do nothing
+                            }
+                        )
+                    }
                 }
             }
             InitiateCombatBar(
@@ -102,4 +110,3 @@ fun LudusManagementCombatSelectScreen(
         }
     }
 }
-

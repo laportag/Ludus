@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -31,7 +30,6 @@ object GladiatorCards {
             modifier = Modifier
                 .aspectRatio(16f / 7f)
                 .background(color = Color(0xFFD3D3D3), RoundedCornerShape(8.dp))
-                .height(screenHeight * 1/6)
                 .wrapContentSize()
                 .padding(2.dp),
             shape = RoundedCornerShape(8.dp)

@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -77,10 +76,10 @@ object ActionCards {
         playerStamina: Double
     ) {
         val configuration = LocalConfiguration.current
-        val screenHeight = configuration.screenHeightDp.dp
+//        val screenHeight = configuration.screenHeightDp.dp
         LazyRow(
             modifier = modifier
-                .heightIn(max = screenHeight * 0.30f)
+//                .heightIn(max = screenHeight * 0.30f)
 //                .fillMaxSize()
         ) {
             items(cardList) { card ->
