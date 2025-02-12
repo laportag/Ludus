@@ -35,9 +35,6 @@ class LudusManagementActivity : ComponentActivity() {
 
     val ludus = mutableStateOf<Ludus?>(null)
 
-    private val ludusManagementView = mutableStateOf(LudusManagementViews.HOME)
-
-
     private val allLudi = mutableStateOf<List<Ludus>>(emptyList())
     private val ludiExcludingPlayer = mutableStateOf<List<Ludus>>(emptyList())
     private val selectedEnemyLudus = mutableStateOf<Ludus?>(null)
@@ -49,8 +46,8 @@ class LudusManagementActivity : ComponentActivity() {
     private lateinit var combatFile: File
     private var combat: Combat? = null
 
-    private val combatResultAlertEnabled = mutableStateOf(false)
-    private val combatResultText = mutableStateOf("")
+//    private val combatResultAlertEnabled = mutableStateOf(false)
+//    private val combatResultText = mutableStateOf("")
 
     private val combatResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -194,7 +191,7 @@ class LudusManagementActivity : ComponentActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.isCombatResultShown.collect {
                     Log.d(TAG, "observeStates isCombatResultShown: ${it}")
-                    combatResultAlertEnabled.value = it
+//                    viewModel.setCombatResultShown(it)
                 }
             }
         }
@@ -268,7 +265,7 @@ class LudusManagementActivity : ComponentActivity() {
         viewModel.getGladiatorsByLudusId(selectedEnemyLudus.value!!.ludusId)
         viewModel.getPlayerGladiators(ludus.value!!.ludusId)
         viewModel.setCombatResultText(resCombat.combatReport)
-        combatResultAlertEnabled.value = true
+        viewModel.setCombatResultShown(true)
         Log.d(TAG, "combatResultText: ${viewModel.combatResultText.value}")
     }
 
