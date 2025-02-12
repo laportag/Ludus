@@ -7,17 +7,14 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.unit.dp
-import com.doorxii.ludus.ui.activities.LudusManagementActivity
 import com.doorxii.ludus.ui.activities.LudusManagementActivityViewModel
+import com.doorxii.ludus.ui.components.CombatResultAlertDialogue
 import com.doorxii.ludus.ui.components.EnemyGladiatorsDisplay
 import com.doorxii.ludus.ui.components.InitiateCombatBar
 import com.doorxii.ludus.ui.components.LudusSelectionBar
@@ -28,9 +25,11 @@ fun LudusManagementCombatSelectScreen(
     viewModel: LudusManagementActivityViewModel,
     parentPadding: PaddingValues
 ) {
-//    val selectedPlayerGladiators = mutableStateOf<List<Gladiator?>>(emptyList())
-//    val selectedEnemyGladiators = mutableStateOf<List<Gladiator?>>(emptyList())
-//    val gladiatorsInSelectedEnemyLudus = mutableStateOf<List<Gladiator>>(emptyList())
+    val TAG = "LudusManagementCombatSelectScreen"
+
+    CombatResultAlertDialogue(showPopup = viewModel.isCombatResultShown.collectAsState().value, combatReport = viewModel.combatResultText.collectAsState().value) {
+        viewModel.setCombatResultShown(false)
+    }
 
     Column(
         Modifier
@@ -47,8 +46,9 @@ fun LudusManagementCombatSelectScreen(
 
         Column(
             Modifier
-                .height(LocalConfiguration.current.screenHeightDp.dp * 14 / 15)
-                .fillMaxWidth(),
+//                .height(LocalConfiguration.current.screenHeightDp.dp * 14 / 15)
+                .fillMaxWidth()
+                .weight(1f),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -56,7 +56,8 @@ fun LudusManagementCombatSelectScreen(
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .height(LocalConfiguration.current.screenHeightDp.dp * 12 / 15)
+//                    .height(LocalConfiguration.current.screenHeightDp.dp * 12 / 15)
+                    .weight(0.8f)
             ) {
                 PlayerGladiatorsDisplay(
                     playerLudus = viewModel.playerLudus.collectAsState().value,
@@ -93,10 +94,8 @@ fun LudusManagementCombatSelectScreen(
             }
             InitiateCombatBar(
                 onStartCombat = {
-                    Log.d(
-                        LudusManagementActivity.TAG,
-                        "Combatants: ${viewModel.selectedPlayerGladiators.value.joinToString(", ") { it!!.name }} "
-                    )
+                    Log.d(TAG, "selected player gladiators: ${viewModel.selectedPlayerGladiators.value.joinToString(", ") { it!!.name }}")
+                    Log.d(TAG, "selected enemy gladiators: ${viewModel.selectedEnemyGladiators.value.joinToString(", ") { it!!.name }}")
                     viewModel.startCombat()
                 },
                 onSimCombat = {

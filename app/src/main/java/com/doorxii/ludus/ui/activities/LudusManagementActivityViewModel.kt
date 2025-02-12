@@ -45,15 +45,19 @@ open class LudusManagementActivityViewModel : ViewModel() {
         mutableStateOf(emptyList())
     private val _selectedEnemyGladiators: MutableState<List<Gladiator?>> =
         mutableStateOf(emptyList())
-    private val _isCombatReady: MutableState<Boolean> = mutableStateOf(false)
-    private val _isCombatStarted: MutableState<Boolean> = mutableStateOf(false)
-    private val _isCombatSimmed: MutableState<Boolean> = mutableStateOf(false)
+    private val _isCombatReady: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    private val _isCombatStarted: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    private val _isCombatSimmed: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    private val _isCombatResultShown: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    private val _combatResultText: MutableStateFlow<String> = MutableStateFlow("")
 
     val selectedPlayerGladiators: State<List<Gladiator?>> = _selectedPlayerGladiators
     val selectedEnemyGladiators: State<List<Gladiator?>> = _selectedEnemyGladiators
-    val isCombatReady: State<Boolean> = _isCombatReady
-    val isCombatStarted: State<Boolean> = _isCombatStarted
-    val isCombatSimmed: State<Boolean> = _isCombatSimmed
+    val isCombatReady: StateFlow<Boolean> = _isCombatReady
+    val isCombatStarted: StateFlow<Boolean> = _isCombatStarted
+    val isCombatSimmed: StateFlow<Boolean> = _isCombatSimmed
+    val isCombatResultShown: StateFlow<Boolean> = _isCombatResultShown
+    val combatResultText: StateFlow<String> = _combatResultText
 
     init {
         Log.d(TAG, "init vm")
@@ -209,14 +213,12 @@ open class LudusManagementActivityViewModel : ViewModel() {
     }
 
     fun startCombat() {
+        Log.d(TAG, "startCombat: vm")
         viewModelScope.launch {
-            val playerGladiators = selectedPlayerGladiators.value.filterNotNull()
-            val enemyGladiators = selectedEnemyGladiators.value.filterNotNull()
-
-//            combatData.value = CombatData(playerGladiators, enemyGladiators)
+            Log.d(TAG, "startCombat: vm scope")
+//            val playerGladiators = selectedPlayerGladiators.value.filterNotNull()
+//            val enemyGladiators = selectedEnemyGladiators.value.filterNotNull()
             _isCombatStarted.value = true
-//            selectedPlayerGladiators.value = emptyList()
-//            selectedEnemyGladiators.value = emptyList()
         }
     }
 
@@ -235,6 +237,18 @@ open class LudusManagementActivityViewModel : ViewModel() {
     fun resetCombatStarted() {
         viewModelScope.launch {
             _isCombatStarted.value = false
+        }
+    }
+
+    fun setCombatResultShown(shown: Boolean) {
+        viewModelScope.launch {
+            _isCombatResultShown.value = shown
+        }
+    }
+
+    fun setCombatResultText(text: String) {
+        viewModelScope.launch {
+            _combatResultText.value = text
         }
     }
 

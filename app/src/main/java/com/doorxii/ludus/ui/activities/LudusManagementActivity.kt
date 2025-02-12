@@ -74,7 +74,7 @@ class LudusManagementActivity : ComponentActivity() {
 
         viewModel = ViewModelProvider(this)[LudusManagementActivityViewModel::class.java]
         observeFlows()
-        observeStates()
+//        observeStates()
         viewModel.start(repository)
         Log.d(TAG, "player ludus on create: ${viewModel.playerLudus.value}")
 
@@ -166,15 +166,13 @@ class LudusManagementActivity : ComponentActivity() {
                 }
             }
         }
-    }
 
-    private fun observeStates() {
         // launch combat
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-
-                viewModel.isCombatStarted.let { combatStarted ->
-                    if (combatStarted.value) {
+                viewModel.isCombatStarted.collect { combatStarted ->
+                    Log.d(TAG, "observeStates combatStarted: ${combatStarted}")
+                    if (combatStarted) {
                         startCombat()
                     }
                 }
@@ -183,17 +181,28 @@ class LudusManagementActivity : ComponentActivity() {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-
-                viewModel.isCombatSimmed.let {
-                    if (it.value) {
+                viewModel.isCombatSimmed.collect {
+                    Log.d(TAG, "observeStates combatSimmed: ${it}")
+                    if (it) {
                         simCombat()
                     }
+                }
+            }
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.isCombatResultShown.collect {
+                    Log.d(TAG, "observeStates isCombatResultShown: ${it}")
+                    combatResultAlertEnabled.value = it
                 }
             }
         }
     }
 
     private fun startCombat() {
+        Log.d(TAG, "startCombat")
+        viewModel.resetCombatStarted()
         combatFile = CombatSerialization.returnCombatFile(applicationContext)
         combat =
             Combat.init(
@@ -212,6 +221,8 @@ class LudusManagementActivity : ComponentActivity() {
     }
 
     private fun simCombat() {
+        viewModel.resetCombatSimmed()
+        Log.d(TAG, "simCombat")
         combat =
             Combat.init(
                 viewModel.selectedPlayerGladiators.value,
@@ -227,8 +238,8 @@ class LudusManagementActivity : ComponentActivity() {
     private fun combatFinished(resCombat: Combat) {
         Log.d(TAG, "Combat complete?: ${resCombat.isComplete}")
 
-        viewModel.resetCombatStarted()
-        viewModel.resetCombatSimmed()
+//        viewModel.resetCombatStarted()
+//        viewModel.resetCombatSimmed()
 
         var winners = emptyList<Gladiator>()
         if (resCombat.playerGladiatorList.isEmpty() && resCombat.enemyGladiatorList.isEmpty()) {
@@ -256,9 +267,9 @@ class LudusManagementActivity : ComponentActivity() {
         }
         viewModel.getGladiatorsByLudusId(selectedEnemyLudus.value!!.ludusId)
         viewModel.getPlayerGladiators(ludus.value!!.ludusId)
-        combatResultText.value = resCombat.combatReport
+        viewModel.setCombatResultText(resCombat.combatReport)
         combatResultAlertEnabled.value = true
-        Log.d(TAG, "combatResultText: $combatResultText")
+        Log.d(TAG, "combatResultText: ${viewModel.combatResultText.value}")
     }
 
 
