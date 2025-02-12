@@ -171,9 +171,13 @@ open class LudusManagementActivityViewModel : ViewModel() {
 
     fun updateGladiator(gladiator: Gladiator) {
         viewModelScope.launch {
+            Log.d(TAG, "updating ${gladiator.name}")
             ludusRepository.updateGladiator(gladiator)
+            getPlayerGladiators(playerLudus.value?.ludusId ?: 0)
+            getGladiatorsByLudusId(selectedEnemyLudus.value?.ludusId ?: 0)
         }
     }
+
 
     fun generateMarketGladiatorList() {
         viewModelScope.launch {

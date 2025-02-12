@@ -210,6 +210,8 @@ class Combat {
             val combat = Combat()
             combat.playerGladiatorList.addAll(playerGladiatorList.filterNotNull())
             combat.enemyGladiatorList.addAll(enemyGladiatorList.filterNotNull())
+            combat.originalPlayerGladiatorList = combat.playerGladiatorList
+            combat.originalEnemyGladiatorList = combat.enemyGladiatorList
             combat.combatName =
                 combat.playerGladiatorList.joinToString { it.name } + " vs " + combat.enemyGladiatorList.joinToString { it.name }
             combat.combatReport = "${combat.combatName}\n\n"
