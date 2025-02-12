@@ -19,13 +19,14 @@ fun PlayerGladiatorGrid(
     combat: MutableState<Combat?>,
     actingGladiator: Gladiator?,
     viewModel: CombatActivityViewModel,
-    onActingGladiatorChange: (Gladiator?) -> Unit
+    onActingGladiatorChange: (Gladiator?) -> Unit,
+    modifier: Modifier
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2), // Two columns
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier.fillMaxWidth() // Fill available width
+        modifier = modifier.fillMaxWidth() // Fill available width
     ) {
         items(combat.value!!.playerGladiatorList) { gladiator ->
             PlayerGladiatorCardWithActionSelection(

@@ -25,7 +25,8 @@ fun EnemyGladiatorGrid (
     makePlayerTurn: (List<ChosenAction>) -> Unit,
     resetActions: () -> Unit,
     findNextAvailableGladiator: () -> Gladiator?,
-    onActingGladiatorChange: (Gladiator?) -> Unit
+    onActingGladiatorChange: (Gladiator?) -> Unit,
+    modifier: Modifier
 ) {
     val TAG = "EnemyGladiatorGrid"
 
@@ -33,7 +34,7 @@ fun EnemyGladiatorGrid (
         columns = GridCells.Fixed(2), // Two columns
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth() // Fill available width
             .wrapContentHeight()
     ) {

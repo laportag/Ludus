@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -52,12 +53,9 @@ fun CombatScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Bottom
         ) {
-            val actionCardModifier = Modifier
-//                .height(LocalConfiguration.current.screenHeightDp.dp * 0.3f)
-                .weight(0.3f)
-
             // Enemy Gladiator Grid
             EnemyGladiatorGrid(
+                modifier = Modifier.weight(0.3f),
                 combat = combat,
                 actingGladiator = actingGladiator,
                 viewModel = viewModel,
@@ -68,7 +66,7 @@ fun CombatScreen(
             )
 
             // row for spacer
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.weight(0.1f))
 
             // Action Cards
             CardRow(
@@ -80,7 +78,7 @@ fun CombatScreen(
                         CombatActions.MISSIO
                     )
                 ),
-                actionCardModifier,
+                modifier = Modifier.weight(0.4f),
                 actingGladiator?.stamina ?: 0.0
             )
 
@@ -88,12 +86,13 @@ fun CombatScreen(
             CombatButtonBar(showDialog = { showDialog.value = true })
 
             // Gladiator Turn Bar
-            Row() {
+            Row(modifier = Modifier.fillMaxWidth()) {
                 androidx.compose.material3.Text(text = "Name for turn")
             }
 
             // Player Gladiator Grid
             PlayerGladiatorGrid(
+                modifier = Modifier.weight(0.3f),
                 combat = combat,
                 actingGladiator = actingGladiator,
                 viewModel = viewModel,
