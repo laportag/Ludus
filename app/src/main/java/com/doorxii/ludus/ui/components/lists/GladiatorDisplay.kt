@@ -1,6 +1,7 @@
-package com.doorxii.ludus.ui.components
+package com.doorxii.ludus.ui.components.lists
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,12 +21,18 @@ fun GladiatorDisplay(
         Modifier
             .width(LocalConfiguration.current.screenWidthDp.dp / 2)
     ) {
-        Text(text = title)
-        // Use LazyVerticalGrid here
-        BarracksListShort(
+        Text(text = title, Modifier.padding(16.dp))
+        GladiatorList(
             list = gladiators,
-            selectedGladiators = selectedGladiators, // Pass the Set here
-            onItemSelected = onGladiatorSelected
+            onItemSelected = onGladiatorSelected,
+            itemContent = { gladiator, onItemSelected ->
+                GladiatorListItem(
+                    gladiator = gladiator,
+                    onItemSelected = onItemSelected,
+                    isSelected = selectedGladiators.contains(gladiator),
+                    content = { GladiatorItemContentShort(it) }
+                )
+            },
         )
     }
 }

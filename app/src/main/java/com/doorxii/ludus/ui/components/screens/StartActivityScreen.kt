@@ -11,8 +11,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.doorxii.ludus.data.db.AppDatabase
 import com.doorxii.ludus.ui.activities.StartActivityViewModel
-import com.doorxii.ludus.ui.components.LoadLudusDialogue
-import com.doorxii.ludus.ui.components.NewLudusDialogue
+import com.doorxii.ludus.ui.components.popups.LoadLudusDialogue
+import com.doorxii.ludus.ui.components.popups.NewLudusDialogue
 
 @Composable
 fun StartActivityScreen(

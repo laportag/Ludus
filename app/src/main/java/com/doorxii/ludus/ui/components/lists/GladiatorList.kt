@@ -1,6 +1,7 @@
-package com.doorxii.ludus.ui.components
+package com.doorxii.ludus.ui.components.lists
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -9,23 +10,20 @@ import androidx.compose.ui.unit.dp
 import com.doorxii.ludus.data.models.animal.Gladiator
 
 @Composable
-fun BarracksListShort(
+fun GladiatorList (
     list: List<Gladiator>,
-    selectedGladiators: List<Gladiator?>, // Add selectedGladiators parameter
-    onItemSelected: (Gladiator) -> Unit
+    onItemSelected: (Gladiator) -> Unit,
+    itemContent: @Composable (Gladiator, (Gladiator) -> Unit) -> Unit,
+    contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(1),
         verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        contentPadding = contentPadding
     ) {
         items(list) { gladiator ->
-            val isSelected = selectedGladiators.contains(gladiator) // Check if selected
-            SelectableItemShort(
-                gladiator,
-                isSelected, // Pass isSelected state
-                onItemSelected
-            )
+            itemContent(gladiator, onItemSelected)
         }
     }
 }

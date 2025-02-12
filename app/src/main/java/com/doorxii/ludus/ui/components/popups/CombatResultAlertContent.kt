@@ -1,4 +1,4 @@
-package com.doorxii.ludus.ui.components
+package com.doorxii.ludus.ui.components.popups
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth

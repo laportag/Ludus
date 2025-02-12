@@ -1,4 +1,4 @@
-package com.doorxii.ludus.ui.components
+package com.doorxii.ludus.ui.components.popups
 
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button

@@ -1,4 +1,4 @@
-package com.doorxii.ludus.ui.components
+package com.doorxii.ludus.ui.components.popups
 
 import android.util.Log
 import androidx.compose.foundation.clickable

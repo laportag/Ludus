@@ -1,4 +1,4 @@
-package com.doorxii.ludus.ui.components
+package com.doorxii.ludus.ui.components.bars
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.Button

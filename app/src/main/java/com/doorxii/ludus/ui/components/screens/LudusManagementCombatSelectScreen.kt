@@ -14,10 +14,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.doorxii.ludus.ui.activities.LudusManagementActivityViewModel
-import com.doorxii.ludus.ui.components.CombatResultAlertDialogue
-import com.doorxii.ludus.ui.components.GladiatorDisplay
-import com.doorxii.ludus.ui.components.InitiateCombatBar
-import com.doorxii.ludus.ui.components.LudusSelectionBar
+import com.doorxii.ludus.ui.components.lists.GladiatorDisplay
+import com.doorxii.ludus.ui.components.bars.InitiateCombatBar
+import com.doorxii.ludus.ui.components.bars.LudusSelectionBar
+import com.doorxii.ludus.ui.components.popups.CombatResultAlertDialogue
 
 @Composable
 fun LudusManagementCombatSelectScreen(
@@ -45,7 +45,6 @@ fun LudusManagementCombatSelectScreen(
 
         Column(
             Modifier
-//                .height(LocalConfiguration.current.screenHeightDp.dp * 14 / 15)
                 .fillMaxWidth()
                 .weight(1f),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -55,7 +54,6 @@ fun LudusManagementCombatSelectScreen(
             Row(
                 Modifier
                     .fillMaxWidth()
-//                    .height(LocalConfiguration.current.screenHeightDp.dp * 12 / 15)
                     .weight(0.8f)
             ) {
                 GladiatorDisplay(
