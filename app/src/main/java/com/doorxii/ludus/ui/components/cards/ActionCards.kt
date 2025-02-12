@@ -48,12 +48,12 @@ object ActionCards {
                     Text(
                         combatAction.name,
                         modifier = Modifier.padding(2.dp),
-                        color = Color.LightGray
+                        color = Color.Black
                     )
                     Text(
                         combatAction.description,
                         modifier = Modifier.padding(2.dp),
-                        color = Color.LightGray
+                        color = Color.Black
                     )
                     Text(
                         combatAction.staminaCost.toString(),
@@ -61,7 +61,7 @@ object ActionCards {
                         color = if (!enabled) {
                             Color.Red
                         } else {
-                            Color.LightGray
+                            Color.Black
                         }
                     )
                 }
