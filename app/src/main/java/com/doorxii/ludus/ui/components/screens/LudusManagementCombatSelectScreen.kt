@@ -15,10 +15,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.doorxii.ludus.ui.activities.LudusManagementActivityViewModel
 import com.doorxii.ludus.ui.components.CombatResultAlertDialogue
-import com.doorxii.ludus.ui.components.EnemyGladiatorsDisplay
+import com.doorxii.ludus.ui.components.GladiatorDisplay
 import com.doorxii.ludus.ui.components.InitiateCombatBar
 import com.doorxii.ludus.ui.components.LudusSelectionBar
-import com.doorxii.ludus.ui.components.PlayerGladiatorsDisplay
 
 @Composable
 fun LudusManagementCombatSelectScreen(
@@ -59,10 +58,10 @@ fun LudusManagementCombatSelectScreen(
 //                    .height(LocalConfiguration.current.screenHeightDp.dp * 12 / 15)
                     .weight(0.8f)
             ) {
-                PlayerGladiatorsDisplay(
-                    playerLudus = viewModel.playerLudus.collectAsState().value,
-                    playerGladiators = viewModel.playerGladiators.collectAsState().value,
-                    selectedPlayerGladiators = viewModel.selectedPlayerGladiators.value
+                GladiatorDisplay(
+                    title = viewModel.playerLudus.collectAsState().value?.name ?: "Player",
+                    gladiators = viewModel.playerGladiators.collectAsState().value,
+                    selectedGladiators = viewModel.selectedPlayerGladiators.value
                 ) { gladiator ->
                     val currentSelection = viewModel.selectedPlayerGladiators.value
                     viewModel.setSelectedPlayerGladiators(
@@ -73,12 +72,11 @@ fun LudusManagementCombatSelectScreen(
                         } else {
                             currentSelection // If duplicate, do nothing
                         }
-                    )
-                }
-                EnemyGladiatorsDisplay(
-                    selectedEnemyLudus = viewModel.selectedEnemyLudus.collectAsState().value,
-                    enemyGladiators = viewModel.gladiatorsByLudus.collectAsState().value,
-                    selectedEnemyGladiators = viewModel.selectedEnemyGladiators.value
+                    )}
+                GladiatorDisplay(
+                    title = viewModel.selectedEnemyLudus.collectAsState().value?.name ?: "Select Enemy",
+                    gladiators = viewModel.gladiatorsByLudus.collectAsState().value,
+                    selectedGladiators = viewModel.selectedEnemyGladiators.value
                 ) { gladiator ->
                     val currentSelection = viewModel.selectedEnemyGladiators.value
                     viewModel.setSelectedEnemyGladiators(
