@@ -1,8 +1,8 @@
 package com.doorxii.ludus.ui.activities
 
 import androidx.lifecycle.ViewModel
-import com.doorxii.ludus.utils.actions.combatactions.ChosenAction
 import com.doorxii.ludus.data.models.animal.Gladiator
+import com.doorxii.ludus.utils.actions.combatactions.ChosenAction
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,7 +24,6 @@ class CombatActivityViewModel: ViewModel() {
     }
 
     fun resetGladiatorActions() {
-//        _gladiatorActions.value = _gladiatorActions.value.mapValues { null }
         _gladiatorActions.value = mapOf()
     }
 
