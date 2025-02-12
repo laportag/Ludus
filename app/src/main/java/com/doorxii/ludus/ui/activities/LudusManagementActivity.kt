@@ -19,17 +19,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -39,7 +32,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -48,15 +40,19 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.doorxii.ludus.utils.combat.Combat
 import com.doorxii.ludus.data.db.AppDatabase
 import com.doorxii.ludus.data.db.LudusRepository
 import com.doorxii.ludus.data.models.animal.Gladiator
 import com.doorxii.ludus.data.models.ludus.Ludus
+import com.doorxii.ludus.ui.components.BarracksListShort
 import com.doorxii.ludus.ui.components.CombatResultAlert
+import com.doorxii.ludus.ui.components.screens.LudusManagementBarracksScreen
+import com.doorxii.ludus.ui.components.screens.LudusManagementHomeScreen
+import com.doorxii.ludus.ui.components.screens.LudusManagementMarketScreen
 import com.doorxii.ludus.ui.theme.LudusTheme
 import com.doorxii.ludus.utils.CombatSerialization
 import com.doorxii.ludus.utils.DatabaseManagement.returnDb
+import com.doorxii.ludus.utils.combat.Combat
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import java.io.File
@@ -79,7 +75,7 @@ class LudusManagementActivity : ComponentActivity() {
     private val gladiatorsInSelectedEnemyLudus = mutableStateOf<List<Gladiator>>(emptyList())
     private val selectedPlayerGladiators = mutableStateOf<List<Gladiator?>>(emptyList())
     private val selectedEnemyGladiators = mutableStateOf<List<Gladiator?>>(emptyList())
-    private var marketGladiatorList = mutableStateOf<List<Gladiator>>(emptyList())
+//    private var marketGladiatorList = mutableStateOf<List<Gladiator>>(emptyList())
 
     private lateinit var combatFile: File
     private var combat: Combat? = null
@@ -191,7 +187,7 @@ class LudusManagementActivity : ComponentActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.marketGladiatorList.collect {
                     Log.d(TAG, "observeFlow marketList: $it")
-                    marketGladiatorList.value = it
+//                    marketGladiatorList.value = it
                 }
             }
         }
@@ -322,19 +318,19 @@ class LudusManagementActivity : ComponentActivity() {
 
             when (ludusManagementView.value) {
                 LudusManagementViews.HOME -> {
-                    playerLudus?.let { LudusManagementHome(innerPadding, it) }
+                    playerLudus?.let { LudusManagementHomeScreen(innerPadding, it) }
                 }
 
                 LudusManagementViews.BARRACKS_MANAGEMENT -> {
-                    BarracksManagement(innerPadding)
+                    LudusManagementBarracksScreen(viewModel, innerPadding)
                 }
 
                 LudusManagementViews.GLADIATOR_MARKET -> {
-                    GladiatorMarket(innerPadding)
+                    LudusManagementMarketScreen(viewModel, innerPadding)
                 }
 
                 LudusManagementViews.COMBAT_SELECT -> {
-                    CombatSelect(innerPadding)
+//                    LudusManagementCombatSelectScreen(innerPadding)
                 }
 
             }
@@ -352,68 +348,68 @@ class LudusManagementActivity : ComponentActivity() {
         }
     }
 
-    @Composable
-    fun LudusManagementHome(parentPadding: PaddingValues, playerLudus: Ludus) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(parentPadding),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text("Ludus: ${ludus.value?.name}")
-            Button(onClick = {
-                ludusManagementView.value = LudusManagementViews.BARRACKS_MANAGEMENT
-            }) {
-                Text("Manage Barracks")
-            }
-            Button(onClick = {
-                ludusManagementView.value = LudusManagementViews.GLADIATOR_MARKET
-            }) {
-                Text("Purchase Gladiators")
-            }
-            Row {
-                Button(onClick = {
-                    ludusManagementView.value = LudusManagementViews.COMBAT_SELECT
-                }) {
-                    Text("Choose Enemy Ludus")
-                }
-            }
-        }
-    }
+//    @Composable
+//    fun LudusManagementHome(parentPadding: PaddingValues, playerLudus: Ludus) {
+//        Column(
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .padding(parentPadding),
+//            horizontalAlignment = Alignment.CenterHorizontally,
+//            verticalArrangement = Arrangement.Center
+//        ) {
+//            Text("Ludus: ${ludus.value?.name}")
+//            Button(onClick = {
+//                ludusManagementView.value = LudusManagementViews.BARRACKS_MANAGEMENT
+//            }) {
+//                Text("Manage Barracks")
+//            }
+//            Button(onClick = {
+//                ludusManagementView.value = LudusManagementViews.GLADIATOR_MARKET
+//            }) {
+//                Text("Purchase Gladiators")
+//            }
+//            Row {
+//                Button(onClick = {
+//                    ludusManagementView.value = LudusManagementViews.COMBAT_SELECT
+//                }) {
+//                    Text("Choose Enemy Ludus")
+//                }
+//            }
+//        }
+//    }
 
 
-    @Composable
-    fun BarracksManagement(parentPadding: PaddingValues) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(parentPadding),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            BarracksList(list = playerGladiators.value) {
-                Log.d(TAG, "Gladiator: $it")
-            }
-        }
-    }
+//    @Composable
+//    fun BarracksManagement(parentPadding: PaddingValues) {
+//        Column(
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .padding(parentPadding),
+//            horizontalAlignment = Alignment.CenterHorizontally,
+//            verticalArrangement = Arrangement.Center
+//        ) {
+//            BarracksList(list = playerGladiators.value) {
+//                Log.d(TAG, "Gladiator: $it")
+//            }
+//        }
+//    }
 
-    @Composable
-    fun GladiatorMarket(parentPadding: PaddingValues) {
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(parentPadding),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text("Gladiator Market")
-            MarketList(list = marketGladiatorList.value) {
-
-            }
-        }
-    }
+//    @Composable
+//    fun GladiatorMarket(parentPadding: PaddingValues) {
+//
+//        Column(
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .padding(parentPadding),
+//            horizontalAlignment = Alignment.CenterHorizontally,
+//            verticalArrangement = Arrangement.Center
+//        ) {
+//            Text("Gladiator Market")
+//            MarketList(list = marketGladiatorList.value) {
+//
+//            }
+//        }
+//    }
 
     @Composable
     fun CombatSelect(parentPadding: PaddingValues) {
@@ -577,149 +573,149 @@ class LudusManagementActivity : ComponentActivity() {
         }
     }
 
-    @Composable
-    fun BarracksList(
-        list: List<Gladiator>,
-        onItemSelected: (Gladiator) -> Unit
-    ) {
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(list) { gladiator ->
-                SelectableItemBarracksGladiator(
-                    gladiator,
-                    onItemSelected
-                )
-            }
-        }
-    }
+//    @Composable
+//    fun BarracksList(
+//        list: List<Gladiator>,
+//        onItemSelected: (Gladiator) -> Unit
+//    ) {
+//        LazyColumn(
+//            verticalArrangement = Arrangement.spacedBy(8.dp)
+//        ) {
+//            items(list) { gladiator ->
+//                SelectableItemBarracksGladiator(
+//                    gladiator,
+//                    onItemSelected
+//                )
+//            }
+//        }
+//    }
 
-    @Composable
-    fun MarketList(
-        list: List<Gladiator>,
-        onItemSelected: (Gladiator) -> Unit
-    ) {
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(list) { gladiator ->
-                SelectableItemMarketGladiator(
-                    gladiator,
-                    onItemSelected
-                )
-            }
-        }
-    }
+//    @Composable
+//    fun MarketList(
+//        list: List<Gladiator>,
+//        onItemSelected: (Gladiator) -> Unit
+//    ) {
+//        LazyColumn(
+//            verticalArrangement = Arrangement.spacedBy(8.dp)
+//        ) {
+//            items(list) { gladiator ->
+//                SelectableItemMarketGladiator(
+//                    gladiator,
+//                    onItemSelected
+//                )
+//            }
+//        }
+//    }
 
-    @Composable
-    fun BarracksListShort(
-        list: List<Gladiator>,
-        selectedGladiators: List<Gladiator?>, // Add selectedGladiators parameter
-        onItemSelected: (Gladiator) -> Unit
-    ) {
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(1),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(list) { gladiator ->
-                val isSelected = selectedGladiators.contains(gladiator) // Check if selected
-                SelectableItemShort(
-                    gladiator,
-                    isSelected, // Pass isSelected state
-                    onItemSelected
-                )
-            }
-        }
-    }
+//    @Composable
+//    fun BarracksListShort(
+//        list: List<Gladiator>,
+//        selectedGladiators: List<Gladiator?>, // Add selectedGladiators parameter
+//        onItemSelected: (Gladiator) -> Unit
+//    ) {
+//        LazyVerticalGrid(
+//            columns = GridCells.Fixed(1),
+//            verticalArrangement = Arrangement.spacedBy(8.dp),
+//            horizontalArrangement = Arrangement.spacedBy(8.dp)
+//        ) {
+//            items(list) { gladiator ->
+//                val isSelected = selectedGladiators.contains(gladiator) // Check if selected
+//                SelectableItemShort(
+//                    gladiator,
+//                    isSelected, // Pass isSelected state
+//                    onItemSelected
+//                )
+//            }
+//        }
+//    }
 
 
-    @Composable
-    fun SelectableItemShort(
-        item: Gladiator,
-        isSelected: Boolean,
-        onSelected: (Gladiator) -> Unit
-    ) {
-        val backgroundColour = if (isSelected) Color.LightGray else Color.Transparent
+//    @Composable
+//    fun SelectableItemShort(
+//        item: Gladiator,
+//        isSelected: Boolean,
+//        onSelected: (Gladiator) -> Unit
+//    ) {
+//        val backgroundColour = if (isSelected) Color.LightGray else Color.Transparent
+//
+//        Surface(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .clickable { onSelected(item) },
+//            shape = MaterialTheme.shapes.small,
+//            tonalElevation = 4.dp,
+//            color = backgroundColour
+//        ) {
+//            Text(
+//                text = item.name,
+//                modifier = Modifier.padding(16.dp)
+//            )
+//        }
+//    }
 
-        Surface(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { onSelected(item) },
-            shape = MaterialTheme.shapes.small,
-            tonalElevation = 4.dp,
-            color = backgroundColour
-        ) {
-            Text(
-                text = item.name,
-                modifier = Modifier.padding(16.dp)
-            )
-        }
-    }
+//    @Composable
+//    fun SelectableItemBarracksGladiator(
+//        item: Gladiator,
+//        onSelected: (Gladiator) -> Unit
+//    ) {
+//        Surface(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .clickable { onSelected(item) },
+//            shape = MaterialTheme.shapes.small,
+//            tonalElevation = 4.dp
+//        ) {
+//            Row(modifier = Modifier.padding(16.dp)) {
+//                Column(modifier = Modifier.weight(1f)) {
+//                    Text(text = item.name)
+//                    Text(text = "H: ${item.health}")
+//                    Text(text = "S: ${item.stamina}")
+//                    Text(text = "M: ${item.morale}")
+//                }
+//                Column {
+//                    Button(onClick = { /*TODO*/ }) {
+//                        Text("Check Stats")
+//                    }
+//                    Button(onClick = { /* healAliveGladiators(listOf(item)) */ }) {
+//                        Text("Heal")
+//                    }
+//                    Button(onClick = { /*TODO*/ }) {
+//                        Text("Sell")
+//                    }
+//                }
+//            }
+//        }
+//    }
 
-    @Composable
-    fun SelectableItemBarracksGladiator(
-        item: Gladiator,
-        onSelected: (Gladiator) -> Unit
-    ) {
-        Surface(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { onSelected(item) },
-            shape = MaterialTheme.shapes.small,
-            tonalElevation = 4.dp
-        ) {
-            Row(modifier = Modifier.padding(16.dp)) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(text = item.name)
-                    Text(text = "H: ${item.health}")
-                    Text(text = "S: ${item.stamina}")
-                    Text(text = "M: ${item.morale}")
-                }
-                Column {
-                    Button(onClick = { /*TODO*/ }) {
-                        Text("Check Stats")
-                    }
-                    Button(onClick = { /* healAliveGladiators(listOf(item)) */ }) {
-                        Text("Heal")
-                    }
-                    Button(onClick = { /*TODO*/ }) {
-                        Text("Sell")
-                    }
-                }
-            }
-        }
-    }
-
-    @Composable
-    fun SelectableItemMarketGladiator(
-        item: Gladiator,
-        onSelected: (Gladiator) -> Unit
-    ) {
-        Surface(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { onSelected(item) },
-            shape = MaterialTheme.shapes.small,
-            tonalElevation = 4.dp
-        ) {
-            Row(modifier = Modifier.padding(16.dp)) { // Apply padding to the Row
-                Column(modifier = Modifier.weight(1f)) { // Make the first Column take available space
-                    Text(text = item.name)
-                    Text(text = "Height: ${item.height}")
-                    Text(text = "Age: ${item.age}")
-                }
-                Column(modifier = Modifier.weight(1f)) { // Make the second Column take available space
-                    Text(text = "Strength: ${item.strength}")
-                    Text(text = "Speed: ${item.speed}")
-                    Text(text = "Technique: ${item.technique}")
-                }
-                Button(onClick = { /* buyGladiator(item) */ }) { // Assuming buyGladiator is defined elsewhere
-                    Text("Buy")
-                }
-            }
-        }
-    }
+//    @Composable
+//    fun SelectableItemMarketGladiator(
+//        item: Gladiator,
+//        onSelected: (Gladiator) -> Unit
+//    ) {
+//        Surface(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .clickable { onSelected(item) },
+//            shape = MaterialTheme.shapes.small,
+//            tonalElevation = 4.dp
+//        ) {
+//            Row(modifier = Modifier.padding(16.dp)) { // Apply padding to the Row
+//                Column(modifier = Modifier.weight(1f)) { // Make the first Column take available space
+//                    Text(text = item.name)
+//                    Text(text = "Height: ${item.height}")
+//                    Text(text = "Age: ${item.age}")
+//                }
+//                Column(modifier = Modifier.weight(1f)) { // Make the second Column take available space
+//                    Text(text = "Strength: ${item.strength}")
+//                    Text(text = "Speed: ${item.speed}")
+//                    Text(text = "Technique: ${item.technique}")
+//                }
+//                Button(onClick = { /* buyGladiator(item) */ }) { // Assuming buyGladiator is defined elsewhere
+//                    Text("Buy")
+//                }
+//            }
+//        }
+//    }
     companion object {
         const val TAG = "LudusManagementActivity"
     }
