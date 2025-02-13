@@ -1,6 +1,9 @@
 package com.doorxii.ludus.ui.activities
 
 import android.util.Log
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.doorxii.ludus.data.db.LudusRepository
@@ -38,6 +41,23 @@ open class LudusManagementActivityViewModel : ViewModel() {
     private val _marketGladiatorList = MutableStateFlow<List<Gladiator>>(emptyList())
     val marketGladiatorList: StateFlow<List<Gladiator>> = _marketGladiatorList.asStateFlow()
 
+    private val _selectedPlayerGladiators: MutableState<List<Gladiator?>> =
+        mutableStateOf(emptyList())
+    private val _selectedEnemyGladiators: MutableState<List<Gladiator?>> =
+        mutableStateOf(emptyList())
+    private val _isCombatReady: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    private val _isCombatStarted: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    private val _isCombatSimmed: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    private val _isCombatResultShown: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    private val _combatResultText: MutableStateFlow<String> = MutableStateFlow("")
+
+    val selectedPlayerGladiators: State<List<Gladiator?>> = _selectedPlayerGladiators
+    val selectedEnemyGladiators: State<List<Gladiator?>> = _selectedEnemyGladiators
+    val isCombatReady: StateFlow<Boolean> = _isCombatReady
+    val isCombatStarted: StateFlow<Boolean> = _isCombatStarted
+    val isCombatSimmed: StateFlow<Boolean> = _isCombatSimmed
+    val isCombatResultShown: StateFlow<Boolean> = _isCombatResultShown
+    val combatResultText: StateFlow<String> = _combatResultText
 
     init {
         Log.d(TAG, "init vm")
@@ -81,6 +101,18 @@ open class LudusManagementActivityViewModel : ViewModel() {
             ludusRepository.updateLudus(newLudus)
             _playerLudus.value = newLudus // Update the local state
         }
+    }
+
+    fun setSelectedPlayerGladiators(gladiators: List<Gladiator?>) {
+        _selectedPlayerGladiators.value = gladiators
+    }
+
+    fun setSelectedEnemyGladiators(gladiators: List<Gladiator?>) {
+        _selectedEnemyGladiators.value = gladiators
+    }
+
+    fun setGladiatorsByLudus(gladiators: List<Gladiator>) {
+        _gladiatorsByLudus.value = gladiators
     }
 
     fun getAllLudi(): List<Ludus> {
@@ -139,9 +171,13 @@ open class LudusManagementActivityViewModel : ViewModel() {
 
     fun updateGladiator(gladiator: Gladiator) {
         viewModelScope.launch {
+            Log.d(TAG, "updating ${gladiator.name}")
             ludusRepository.updateGladiator(gladiator)
+            getPlayerGladiators(playerLudus.value?.ludusId ?: 0)
+            getGladiatorsByLudusId(selectedEnemyLudus.value?.ludusId ?: 0)
         }
     }
+
 
     fun generateMarketGladiatorList() {
         viewModelScope.launch {
@@ -150,7 +186,7 @@ open class LudusManagementActivityViewModel : ViewModel() {
         }
     }
 
-    fun addGladiatorToPlayer(gladiator: Gladiator){
+    fun addGladiatorToPlayer(gladiator: Gladiator) {
         Log.d(TAG, "addGladiatorToPlayer: $gladiator")
         viewModelScope.launch {
             Log.d(TAG, "addGladiatorToPlayer id: $gladiator.ludusId")
@@ -161,7 +197,7 @@ open class LudusManagementActivityViewModel : ViewModel() {
         removeGladiatorFromMarketList(gladiator)
     }
 
-    fun removeGladiatorFromMarketList(gladiator: Gladiator){
+    fun removeGladiatorFromMarketList(gladiator: Gladiator) {
         viewModelScope.launch {
             val list = marketGladiatorList.value.toMutableList()
             for (marketGladiator in marketGladiatorList.value) {
@@ -170,6 +206,53 @@ open class LudusManagementActivityViewModel : ViewModel() {
                 }
             }
             _marketGladiatorList.value = list
+        }
+    }
+
+    fun updateCombatReadiness() {
+        viewModelScope.launch {
+            _isCombatReady.value =
+                selectedEnemyLudus.value != null && selectedPlayerGladiators.value.isNotEmpty()
+        }
+    }
+
+    fun startCombat() {
+        Log.d(TAG, "startCombat: vm")
+        viewModelScope.launch {
+            Log.d(TAG, "startCombat: vm scope")
+//            val playerGladiators = selectedPlayerGladiators.value.filterNotNull()
+//            val enemyGladiators = selectedEnemyGladiators.value.filterNotNull()
+            _isCombatStarted.value = true
+        }
+    }
+
+    fun simCombat() {
+        viewModelScope.launch {
+            _isCombatSimmed.value = true
+        }
+    }
+
+    fun resetCombatSimmed() {
+        viewModelScope.launch {
+            _isCombatStarted.value = false
+        }
+    }
+
+    fun resetCombatStarted() {
+        viewModelScope.launch {
+            _isCombatStarted.value = false
+        }
+    }
+
+    fun setCombatResultShown(shown: Boolean) {
+        viewModelScope.launch {
+            _isCombatResultShown.value = shown
+        }
+    }
+
+    fun setCombatResultText(text: String) {
+        viewModelScope.launch {
+            _combatResultText.value = text
         }
     }
 

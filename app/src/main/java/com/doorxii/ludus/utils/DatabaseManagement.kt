@@ -20,10 +20,7 @@ object DatabaseManagement {
 
         val databases = mutableListOf<String>()
         context.databaseList().forEach { databaseName ->
-            if (!databaseName.endsWith("-journal") && !databaseName.endsWith("-wal") && !databaseName.endsWith(
-                    "-shm"
-                )
-            ) {
+            if (isValidDatabaseName(databaseName)) {
                 databases.add(databaseName)
             }
         }
@@ -31,29 +28,38 @@ object DatabaseManagement {
         return databases
     }
 
+    private fun isValidDatabaseName(name: String): Boolean {
+        // Filter out Room's temporary files and anything that doesn't look like a valid db name
+        return !name.endsWith("-journal") &&
+                !name.endsWith("-wal") &&
+                !name.endsWith("-shm") &&
+                name.isNotBlank() &&
+                name.matches(Regex("^[a-zA-Z0-9_]+$")) //only contains letters, numbers and underscores
+    }
+
     suspend fun createDb(ludusName: String, context: Context): AppDatabase {
         Log.d(TAG, "createDb: $ludusName")
 
-        val ludusName = ludusName.replace(" ", "_")
+        val name = ludusName.replace(" ", "_")
 
         // Validate the ludusName parameter
-        if (ludusName.isEmpty() || ludusName.contains(Regex("[\\s\\W]"))) {
-            Log.e(TAG, "Invalid database name: $ludusName")
-            throw IllegalArgumentException("Invalid database name: $ludusName")
+        if (!isValidDatabaseName(name)) {
+            Log.e(TAG, "Invalid database name: $name")
+            throw IllegalArgumentException("Invalid database name: $name")
         }
 
         // Check if the database file already exists
-        val dbFile = context.getDatabasePath(ludusName)
+        val dbFile = context.getDatabasePath(name)
         if (dbFile.exists()) {
-            Log.d(TAG, "Database file already exists: $ludusName")
-            throw IllegalArgumentException("Database file already exists: $ludusName")
+            Log.d(TAG, "Database file already exists: $name")
+            throw IllegalArgumentException("Database file already exists: $name")
         }
 
         // Create the database file
         val db = Room.databaseBuilder(
             context,
             AppDatabase::class.java,
-            ludusName
+            name
         )
             .enableMultiInstanceInvalidation()
             .setJournalMode(RoomDatabase.JournalMode.TRUNCATE)
@@ -61,8 +67,8 @@ object DatabaseManagement {
             .setTransactionExecutor(Executors.newSingleThreadExecutor())
             .build()
 
-        Log.d(TAG, "Database file created: $ludusName")
-        val ludus = Ludus(ludusName)
+        Log.d(TAG, "Database file created: $name")
+        val ludus = Ludus(name)
         ludus.playerLudus = true
         db.ludusDao().insertLudus(ludus)
 
@@ -83,7 +89,7 @@ object DatabaseManagement {
             context,
             AppDatabase::class.java,
             dbName
-        )   .enableMultiInstanceInvalidation()
+        ).enableMultiInstanceInvalidation()
             .setJournalMode(RoomDatabase.JournalMode.TRUNCATE)
             .setQueryExecutor(Executors.newSingleThreadExecutor())
             .setTransactionExecutor(Executors.newSingleThreadExecutor())
@@ -113,12 +119,24 @@ object DatabaseManagement {
                 context,
                 AppDatabase::class.java, dbName
             ).build()
-            db.clearAllTables()
             db.close()
             val file = context.getDatabasePath(dbName)
+            if (file.exists()) {
+                file.delete()
+            }
             val jFile = File(file.parentFile, "${file.name}-journal")
-            file.delete()
-            jFile.delete()
+            if (jFile.exists()) {
+                jFile.delete()
+            }
+            val walFile = File(file.parentFile, "${file.name}-wal")
+            if (walFile.exists()) {
+                walFile.delete()
+            }
+            val shmFile = File(file.parentFile, "${file.name}-shm")
+            if (shmFile.exists()) {
+                shmFile.delete()
+            }
+
             callback(true)
         }
 
