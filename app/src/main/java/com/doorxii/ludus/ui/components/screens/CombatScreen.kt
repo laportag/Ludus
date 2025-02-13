@@ -92,7 +92,7 @@ fun CombatScreen(
 
                 // Gladiator Turn Bar
                 Row(modifier = Modifier.fillMaxWidth()) {
-                    androidx.compose.material3.Text(text = "Name for turn")
+                    androidx.compose.material3.Text(text = "${actingGladiator?.name}'s turn" ?: "Choose an action")
                 }
 
                 // Player Gladiator Grid
