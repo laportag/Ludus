@@ -18,6 +18,7 @@ import com.doorxii.ludus.data.models.animal.Gladiator
 import com.doorxii.ludus.ui.activities.CombatActivityViewModel
 import com.doorxii.ludus.ui.components.bars.CombatButtonBar
 import com.doorxii.ludus.ui.components.cards.CardRow
+import com.doorxii.ludus.ui.components.cards.LongPressDraggable
 import com.doorxii.ludus.ui.components.lists.EnemyGladiatorGrid
 import com.doorxii.ludus.ui.components.lists.PlayerGladiatorGrid
 import com.doorxii.ludus.ui.components.popups.CombatDialogue
@@ -34,6 +35,7 @@ fun CombatScreen(
     resetActions: () -> Unit,
     makePlayerTurn: (List<ChosenAction>) -> Unit,
     findNextAvailableGladiator: () -> Gladiator?,
+    modifier: Modifier,
     handleSubmissions: () -> Unit,
     combatCompleted: () -> Unit
 ) {
@@ -48,56 +50,62 @@ fun CombatScreen(
     val showDialog = remember { mutableStateOf(false) }
 
     if (combat.value != null) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Bottom
-        ) {
-            // Enemy Gladiator Grid
-            EnemyGladiatorGrid(
-                modifier = Modifier.weight(0.3f),
-                combat = combat,
-                actingGladiator = actingGladiator,
-                viewModel = viewModel,
-                makePlayerTurn = makePlayerTurn,
-                resetActions = resetActions,
-                findNextAvailableGladiator = findNextAvailableGladiator,
-                onActingGladiatorChange = { actingGladiator = it }
-            )
-
-            // row for spacer
-            Spacer(modifier = Modifier.weight(0.1f))
-
-            // Action Cards
-            CardRow(
-                EnumToAction.combatEnumListToActionList(
-                    listOf(
-                        CombatActions.BASIC_ATTACK,
-                        CombatActions.TIRED_ATTACK,
-                        CombatActions.WAIT,
-                        CombatActions.MISSIO
+        LongPressDraggable(modifier = Modifier) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Bottom
+            ) {
+                // Enemy Gladiator Grid
+                Column(modifier = Modifier.weight(0.3f)) {
+                    EnemyGladiatorGrid(
+                        modifier = Modifier.fillMaxSize(),
+                        combat = combat,
+                        actingGladiator = actingGladiator,
+                        viewModel = viewModel,
+                        makePlayerTurn = makePlayerTurn,
+                        resetActions = resetActions,
+                        findNextAvailableGladiator = findNextAvailableGladiator,
+                        onActingGladiatorChange = { actingGladiator = it }
                     )
-                ),
-                modifier = Modifier.weight(0.4f),
-                actingGladiator?.stamina ?: 0.0
-            )
+                }
 
-            // Buttons Bar
-            CombatButtonBar(showDialog = { showDialog.value = true })
+                // row for spacer
+                Spacer(modifier = Modifier.weight(0.1f))
 
-            // Gladiator Turn Bar
-            Row(modifier = Modifier.fillMaxWidth()) {
-                androidx.compose.material3.Text(text = "Name for turn")
+                // Action Cards
+                CardRow(
+                    EnumToAction.combatEnumListToActionList(
+                        listOf(
+                            CombatActions.BASIC_ATTACK,
+                            CombatActions.TIRED_ATTACK,
+                            CombatActions.WAIT,
+                            CombatActions.MISSIO
+                        )
+                    ),
+                    modifier = Modifier.weight(0.3f),
+                    actingGladiator?.stamina ?: 0.0
+                )
+
+                // Buttons Bar
+                CombatButtonBar(showDialog = { showDialog.value = true })
+
+                // Gladiator Turn Bar
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    androidx.compose.material3.Text(text = "Name for turn")
+                }
+
+                // Player Gladiator Grid
+                Column(modifier = Modifier.weight(0.3f)) {
+                    PlayerGladiatorGrid(
+                        modifier = Modifier.fillMaxSize(),
+                        combat = combat,
+                        actingGladiator = actingGladiator,
+                        viewModel = viewModel,
+                        onActingGladiatorChange = { actingGladiator = it }
+                    )
+                }
             }
-
-            // Player Gladiator Grid
-            PlayerGladiatorGrid(
-                modifier = Modifier.weight(0.3f),
-                combat = combat,
-                actingGladiator = actingGladiator,
-                viewModel = viewModel,
-                onActingGladiatorChange = { actingGladiator = it }
-            )
         }
     } else {
         androidx.compose.material3.Text("Loading combat data...")

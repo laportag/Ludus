@@ -3,7 +3,6 @@ package com.doorxii.ludus.ui.components.cards
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -21,7 +20,7 @@ fun CombatActionCard(
     enabled: Boolean = true
 ) {
     DragTarget(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier,
         dataToDrop = combatAction.actionEnum,
         enabled = enabled
     ) {

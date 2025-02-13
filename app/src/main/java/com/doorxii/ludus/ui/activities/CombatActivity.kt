@@ -7,7 +7,8 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -16,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModelProvider
 import com.doorxii.ludus.data.models.animal.Gladiator
-import com.doorxii.ludus.ui.components.cards.LongPressDraggable
 import com.doorxii.ludus.ui.components.screens.CombatScreen
 import com.doorxii.ludus.ui.theme.LudusTheme
 import com.doorxii.ludus.utils.CombatSerialization.readCombatFromFile
@@ -51,7 +51,7 @@ class CombatActivity : ComponentActivity() {
         setContent {
 
             LudusTheme {
-                LongPressDraggable(modifier = Modifier.fillMaxSize()) {
+                Scaffold { innerPadding ->
                     if (!isFinished){
                         CombatScreen(
                             viewModel,
@@ -60,6 +60,7 @@ class CombatActivity : ComponentActivity() {
                             ::resetActions,
                             ::makePlayerTurn,
                             ::findNextAvailableGladiator,
+                            Modifier.padding(innerPadding),
                             ::handleSubmissions,
                             ::combatCompleted
                         )
