@@ -1,24 +1,20 @@
 package com.doorxii.ludus.ui.components.lists
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.doorxii.ludus.data.models.animal.Gladiator
 import com.doorxii.ludus.ui.components.items.GladiatorItemContentShort
 import com.doorxii.ludus.ui.components.items.GladiatorListItem
 
 @Composable
 fun GladiatorDisplay(
-    title: String,
+    title: @Composable () -> Unit,
     gladiators: List<Gladiator>,
     selectedGladiators: List<Gladiator?> = emptyList(),
     onGladiatorSelected: (Gladiator) -> Unit,
 ) {
     Column() {
-        Text(text = title, Modifier.padding(16.dp))
+        title()
         GladiatorList(
             list = gladiators,
             onItemSelected = onGladiatorSelected,

@@ -32,15 +32,15 @@ fun LudusManagementCombatSelectScreen(
             .fillMaxSize()
 
     ) {
-        Column(modifier = Modifier.weight(0.1f)) {
-            LudusSelectionBar(
-                selectedEnemyLudus = viewModel.selectedEnemyLudus.collectAsState().value,
-                ludiExcludingPlayer = viewModel.ludiExcludingPlayer.collectAsState().value
-            ) { ludus ->
-                viewModel.setSelectedEnemyLudus(ludus)
-                viewModel.getGladiatorsByLudusId(ludus.ludusId)
-            }
-        }
+//        Column(modifier = Modifier.weight(0.1f)) {
+//            LudusSelectionBar(
+//                selectedEnemyLudus = viewModel.selectedEnemyLudus.collectAsState().value,
+//                ludiExcludingPlayer = viewModel.ludiExcludingPlayer.collectAsState().value
+//            ) { ludus ->
+//                viewModel.setSelectedEnemyLudus(ludus)
+//                viewModel.getGladiatorsByLudusId(ludus.ludusId)
+//            }
+//        }
 
         Column(
             Modifier
@@ -57,7 +57,7 @@ fun LudusManagementCombatSelectScreen(
             ) {
                 Column(modifier = Modifier.weight(0.5f)) {
                     GladiatorDisplay(
-                        title = viewModel.playerLudus.collectAsState().value?.name ?: "Player",
+                        title = { Text(viewModel.playerLudus.collectAsState().value?.name ?: "Player") },
                         gladiators = viewModel.playerGladiators.collectAsState().value,
                         selectedGladiators = viewModel.selectedPlayerGladiators.value
                     ) { gladiator ->
@@ -75,7 +75,15 @@ fun LudusManagementCombatSelectScreen(
                 }
                 Column(modifier = Modifier.weight(0.5f)) {
                     GladiatorDisplay(
-                        title = viewModel.selectedEnemyLudus.collectAsState().value?.name ?: "Select Enemy",
+                        title = {
+                            LudusSelectionBar(
+                                selectedEnemyLudus = viewModel.selectedEnemyLudus.collectAsState().value,
+                                ludiExcludingPlayer = viewModel.ludiExcludingPlayer.collectAsState().value
+                            ) { ludus ->
+                                viewModel.setSelectedEnemyLudus(ludus)
+                                viewModel.getGladiatorsByLudusId(ludus.ludusId)
+                            }
+                        },
                         gladiators = viewModel.gladiatorsByLudus.collectAsState().value,
                         selectedGladiators = viewModel.selectedEnemyGladiators.value
                     ) { gladiator ->

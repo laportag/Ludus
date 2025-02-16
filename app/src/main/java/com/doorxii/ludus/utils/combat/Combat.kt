@@ -17,7 +17,7 @@ class Combat {
     var submittedPlayerGladiatorList: MutableList<Gladiator> = mutableListOf()
     var submittedEnemyGladiatorList: MutableList<Gladiator> = mutableListOf()
     private var round: CombatRound? = null
-    private var roundNumber: Int = 0
+    var roundNumber: Int = 0
     var isComplete = false
     lateinit var combatName: String
     lateinit var combatReport: String
