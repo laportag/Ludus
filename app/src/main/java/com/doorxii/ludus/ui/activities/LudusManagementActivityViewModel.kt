@@ -45,7 +45,6 @@ open class LudusManagementActivityViewModel : ViewModel() {
         mutableStateOf(emptyList())
     private val _selectedEnemyGladiators: MutableState<List<Gladiator?>> =
         mutableStateOf(emptyList())
-    private val _isCombatReady: MutableStateFlow<Boolean> = MutableStateFlow(false)
     private val _isCombatStarted: MutableStateFlow<Boolean> = MutableStateFlow(false)
     private val _isCombatSimmed: MutableStateFlow<Boolean> = MutableStateFlow(false)
     private val _isCombatResultShown: MutableStateFlow<Boolean> = MutableStateFlow(false)
@@ -53,7 +52,6 @@ open class LudusManagementActivityViewModel : ViewModel() {
 
     val selectedPlayerGladiators: State<List<Gladiator?>> = _selectedPlayerGladiators
     val selectedEnemyGladiators: State<List<Gladiator?>> = _selectedEnemyGladiators
-    val isCombatReady: StateFlow<Boolean> = _isCombatReady
     val isCombatStarted: StateFlow<Boolean> = _isCombatStarted
     val isCombatSimmed: StateFlow<Boolean> = _isCombatSimmed
     val isCombatResultShown: StateFlow<Boolean> = _isCombatResultShown
@@ -197,22 +195,15 @@ open class LudusManagementActivityViewModel : ViewModel() {
         removeGladiatorFromMarketList(gladiator)
     }
 
-    fun removeGladiatorFromMarketList(gladiator: Gladiator) {
+    private fun removeGladiatorFromMarketList(gladiator: Gladiator) {
         viewModelScope.launch {
             val list = marketGladiatorList.value.toMutableList()
             for (marketGladiator in marketGladiatorList.value) {
-                if (marketGladiator.ludusId != -1) {
+                if (marketGladiator.ludusId != gladiator.gladiatorId) {
                     list.remove(marketGladiator)
                 }
             }
             _marketGladiatorList.value = list
-        }
-    }
-
-    fun updateCombatReadiness() {
-        viewModelScope.launch {
-            _isCombatReady.value =
-                selectedEnemyLudus.value != null && selectedPlayerGladiators.value.isNotEmpty()
         }
     }
 

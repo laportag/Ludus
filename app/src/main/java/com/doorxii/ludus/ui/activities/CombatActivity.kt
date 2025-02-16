@@ -61,8 +61,6 @@ class CombatActivity : ComponentActivity() {
                             ::makePlayerTurn,
                             ::findNextAvailableGladiator,
                             Modifier.padding(innerPadding),
-                            ::handleSubmissions,
-                            ::combatCompleted
                         )
                     }
                 }

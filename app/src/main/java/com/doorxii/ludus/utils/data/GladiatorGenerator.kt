@@ -45,7 +45,6 @@ object GladiatorGenerator {
     }
 
     fun newGladiatorList(size: Int): MutableList<Gladiator> {
-        var count = 1
         val gladList = mutableListOf<Gladiator>()
         for (i in 1..size){
             gladList.add(newGladiator())

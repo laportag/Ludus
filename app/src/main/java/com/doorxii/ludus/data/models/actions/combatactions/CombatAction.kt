@@ -10,12 +10,4 @@ interface CombatAction: Action {
     val actionEnum: CombatActions
     val cardType: CombatActionType
     fun act(actor: Gladiator, target: Gladiator?): CombatActionResult
-
-    fun reduceStamina(aggressor: Gladiator){
-        aggressor.stamina -= staminaCost
-    }
-
-    companion object {
-        private const val TAG = "CombatActions"
-    }
 }

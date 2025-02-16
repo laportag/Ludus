@@ -38,8 +38,6 @@ fun CombatScreen(
     makePlayerTurn: (List<ChosenAction>) -> Unit,
     findNextAvailableGladiator: () -> Gladiator?,
     modifier: Modifier,
-    handleSubmissions: () -> Unit,
-    combatCompleted: () -> Unit
 ) {
     val TAG = "CombatScreen"
     val battleText: String by remember { text }
@@ -118,7 +116,7 @@ fun CombatScreen(
 
                 // Gladiator Turn Bar
                 Row(modifier = Modifier.fillMaxWidth()) {
-                    androidx.compose.material3.Text(text = "Round ${((combat.value?.roundNumber ?: 0) + 1)} ${actingGladiator?.name}'s turn" ?: "Choose an action")
+                    androidx.compose.material3.Text(text = "Round ${((combat.value?.roundNumber ?: 0) + 1)} ${actingGladiator?.name}'s turn")
                 }
 
                 // Player Gladiator Grid
