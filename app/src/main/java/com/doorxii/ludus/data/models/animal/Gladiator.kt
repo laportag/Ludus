@@ -7,7 +7,7 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
-import com.doorxii.ludus.utils.actions.combatactions.ChosenAction
+import com.doorxii.ludus.data.models.actions.combatactions.ChosenAction
 import com.doorxii.ludus.data.db.ChosenActionTypeConverter
 import com.doorxii.ludus.data.models.equipment.Equipment
 import com.doorxii.ludus.data.models.ludus.Ludus

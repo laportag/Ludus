@@ -6,8 +6,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import com.doorxii.ludus.data.models.actions.combatactions.CombatActions
 import com.doorxii.ludus.data.models.animal.Gladiator
-import com.doorxii.ludus.utils.actions.combatactions.CombatActions
 
 @Composable
 fun EnemyGladiatorCardWithDropTarget(

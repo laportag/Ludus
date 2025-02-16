@@ -14,6 +14,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 @Composable
 fun <T> DropTarget(
     modifier: Modifier,
+    isTargetlessDropTarget: Boolean = false,
     content: @Composable (BoxScope.(isInBound: Boolean, data: T?) -> Unit)
 ) {
 
@@ -26,7 +27,13 @@ fun <T> DropTarget(
 
     Box(modifier = modifier.onGloballyPositioned {
         it.boundsInWindow().let { rect ->
-            isCurrentDropTarget = rect.contains(dragPosition + dragOffset)
+            val isTargetedCard = dragInfo.combatActionType is CombatActionType.Targeted
+            val isTargetlessCard = dragInfo.combatActionType is CombatActionType.Targetless
+            isCurrentDropTarget = when {
+                isTargetedCard && !isTargetlessDropTarget -> rect.contains(dragPosition + dragOffset) // Targeted card on a targeted drop target
+                isTargetlessCard && isTargetlessDropTarget -> rect.contains(dragPosition + dragOffset) // Targetless card on a targetless drop target
+                else -> false
+            }
         }
     }) {
         val data =

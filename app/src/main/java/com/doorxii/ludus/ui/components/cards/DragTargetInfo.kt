@@ -13,6 +13,7 @@ class DragTargetInfo {
     var dragOffset by mutableStateOf(Offset.Zero)
     var draggableComposable by mutableStateOf<(@Composable () -> Unit)?>(null)
     var dataToDrop by mutableStateOf<Any?>(null)
+    var combatActionType by mutableStateOf<CombatActionType?>(null)
 
     companion object {
         internal val LocalDragTargetInfo = compositionLocalOf { DragTargetInfo() }

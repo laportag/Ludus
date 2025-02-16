@@ -11,17 +11,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.doorxii.ludus.utils.actions.combatactions.CombatAction
+import com.doorxii.ludus.data.models.actions.combatactions.CombatAction
 
 @Composable
 fun CombatActionCard(
     combatAction: CombatAction,
     modifier: Modifier = Modifier,
+    combatActionType: CombatActionType,
     enabled: Boolean = true
 ) {
     DragTarget(
         modifier = modifier,
         dataToDrop = combatAction.actionEnum,
+        combatActionType,
         enabled = enabled
     ) {
         Card(

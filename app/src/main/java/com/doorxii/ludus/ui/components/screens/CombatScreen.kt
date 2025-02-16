@@ -1,5 +1,6 @@
 package com.doorxii.ludus.ui.components.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,16 +15,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.doorxii.ludus.data.models.actions.combatactions.ChosenAction
+import com.doorxii.ludus.data.models.actions.combatactions.CombatActions
 import com.doorxii.ludus.data.models.animal.Gladiator
 import com.doorxii.ludus.ui.activities.CombatActivityViewModel
 import com.doorxii.ludus.ui.components.bars.CombatButtonBar
 import com.doorxii.ludus.ui.components.cards.CardRow
+import com.doorxii.ludus.ui.components.cards.DropTarget
 import com.doorxii.ludus.ui.components.cards.LongPressDraggable
 import com.doorxii.ludus.ui.components.lists.EnemyGladiatorGrid
 import com.doorxii.ludus.ui.components.lists.PlayerGladiatorGrid
 import com.doorxii.ludus.ui.components.popups.CombatDialogue
-import com.doorxii.ludus.utils.actions.combatactions.ChosenAction
-import com.doorxii.ludus.utils.actions.combatactions.CombatActions
 import com.doorxii.ludus.utils.combat.Combat
 import com.doorxii.ludus.utils.combat.EnumToAction
 
@@ -39,6 +41,7 @@ fun CombatScreen(
     handleSubmissions: () -> Unit,
     combatCompleted: () -> Unit
 ) {
+    val TAG = "CombatScreen"
     val battleText: String by remember { text }
     var actingGladiator by remember {
         mutableStateOf(
@@ -49,6 +52,21 @@ fun CombatScreen(
     }
     val showDialog = remember { mutableStateOf(false) }
 
+    fun handleCardDrop(chosenAct: ChosenAction, gladiator: Gladiator?, onActingGladiatorChange: (Gladiator?) -> Unit) {
+        Log.d(TAG, "handleCardDrop: ${chosenAct.actionName}")
+        if (gladiator != null) {
+            viewModel.updateGladiatorAction(gladiator, chosenAct)
+            onActingGladiatorChange(findNextAvailableGladiator())
+            if (viewModel.haveAllGladiatorsHadATurn()) {
+                makePlayerTurn(
+                    viewModel.gladiatorActions.value.values.toList().filterNotNull()
+                )
+                resetActions()
+                onActingGladiatorChange(findNextAvailableGladiator())
+            }
+        }
+    }
+
     if (combat.value != null) {
         LongPressDraggable(modifier = Modifier) {
             Column(
@@ -58,16 +76,34 @@ fun CombatScreen(
             ) {
                 // Enemy Gladiator Grid
                 Column(modifier = Modifier.weight(0.3f)) {
-                    EnemyGladiatorGrid(
-                        modifier = Modifier.fillMaxSize(),
-                        combat = combat,
-                        actingGladiator = actingGladiator,
-                        viewModel = viewModel,
-                        makePlayerTurn = makePlayerTurn,
-                        resetActions = resetActions,
-                        findNextAvailableGladiator = findNextAvailableGladiator,
-                        onActingGladiatorChange = { actingGladiator = it }
-                    )
+                    DropTarget<CombatActions>(
+                        modifier = Modifier.fillMaxWidth(),
+                        isTargetlessDropTarget = true,
+
+                    ) { isInBound, data ->
+                        EnemyGladiatorGrid(
+                            modifier = modifier.fillMaxSize(),
+                            combat = combat,
+                            actingGladiator = actingGladiator,
+                            viewModel = viewModel,
+                            makePlayerTurn = makePlayerTurn,
+                            resetActions = resetActions,
+                            findNextAvailableGladiator = findNextAvailableGladiator,
+                            onActingGladiatorChange = { actingGladiator = it },
+                            handleCardDrop = { chosenAction, gladiator, onActingGladiatorChange ->
+                                handleCardDrop(chosenAction, gladiator, { actingGladiator = it })
+                            }
+                        )
+                        if (isInBound && data != null) {
+                            Log.d(TAG, "targetless card drapped ${data}")
+                            val chosenAction = ChosenAction(
+                                action = data,
+                                actingGladiatorID = actingGladiator!!.gladiatorId,
+                                targetGladiatorID = 0
+                            )
+                            handleCardDrop(chosenAction, actingGladiator, { actingGladiator = it })
+                        }
+                    }
                 }
 
                 // row for spacer

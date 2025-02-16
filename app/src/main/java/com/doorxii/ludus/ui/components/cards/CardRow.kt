@@ -4,7 +4,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.doorxii.ludus.utils.actions.combatactions.CombatAction
+import com.doorxii.ludus.data.models.actions.combatactions.CombatAction
 
 @Composable
 fun CardRow(
@@ -19,6 +19,7 @@ fun CardRow(
             CombatActionCard(
                 combatAction = card,
                 modifier,
+                card.cardType,
                 enabled = card.staminaCost <= playerStamina
             )
         }

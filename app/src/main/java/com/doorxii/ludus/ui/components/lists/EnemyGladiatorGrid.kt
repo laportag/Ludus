@@ -11,10 +11,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.doorxii.ludus.data.models.actions.combatactions.ChosenAction
 import com.doorxii.ludus.data.models.animal.Gladiator
 import com.doorxii.ludus.ui.activities.CombatActivityViewModel
 import com.doorxii.ludus.ui.components.cards.EnemyGladiatorCardWithDropTarget
-import com.doorxii.ludus.utils.actions.combatactions.ChosenAction
 import com.doorxii.ludus.utils.combat.Combat
 
 @Composable
@@ -26,7 +26,8 @@ fun EnemyGladiatorGrid (
     resetActions: () -> Unit,
     findNextAvailableGladiator: () -> Gladiator?,
     onActingGladiatorChange: (Gladiator?) -> Unit,
-    modifier: Modifier
+    modifier: Modifier,
+    handleCardDrop: (ChosenAction, Gladiator?, (Gladiator?) -> Unit) -> Unit
 ) {
     val TAG = "EnemyGladiatorGrid"
 
@@ -47,16 +48,16 @@ fun EnemyGladiatorGrid (
                     )
                     val chosenAct =
                         ChosenAction(actingGladiator.gladiatorId, target.gladiatorId, action)
-
-                    viewModel.updateGladiatorAction(actingGladiator, chosenAct)
-                    onActingGladiatorChange(findNextAvailableGladiator())
-                    if (viewModel.haveAllGladiatorsHadATurn()) {
-                        makePlayerTurn(
-                            viewModel.gladiatorActions.value.values.toList().filterNotNull()
-                        )
-                        resetActions()
-                        onActingGladiatorChange(findNextAvailableGladiator())
-                    }
+                    handleCardDrop(chosenAct, gladiator, onActingGladiatorChange)
+//                    viewModel.updateGladiatorAction(actingGladiator, chosenAct)
+//                    onActingGladiatorChange(findNextAvailableGladiator())
+//                    if (viewModel.haveAllGladiatorsHadATurn()) {
+//                        makePlayerTurn(
+//                            viewModel.gladiatorActions.value.values.toList().filterNotNull()
+//                        )
+//                        resetActions()
+//                        onActingGladiatorChange(findNextAvailableGladiator())
+//                    }
                 }
             }
         }

@@ -101,7 +101,7 @@ fun LudusManagementCombatSelectScreen(
                 onSimCombat = {
                     viewModel.simCombat()
                 },
-                isEnabled = viewModel.selectedEnemyLudus.collectAsState().value != null && viewModel.selectedPlayerGladiators.value.isNotEmpty()
+                isEnabled = viewModel.selectedEnemyLudus.collectAsState().value != null && viewModel.selectedPlayerGladiators.value.isNotEmpty() && viewModel.selectedEnemyGladiators.value.isNotEmpty()
             )
         }
     }

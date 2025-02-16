@@ -1,6 +1,6 @@
-package com.doorxii.ludus.utils.actions.combatactions
+package com.doorxii.ludus.data.models.actions.combatactions
 
-import com.doorxii.ludus.utils.actions.ActionResult
+import com.doorxii.ludus.data.models.actions.ActionResult
 import com.doorxii.ludus.data.models.animal.Gladiator
 
 class CombatActionResult(

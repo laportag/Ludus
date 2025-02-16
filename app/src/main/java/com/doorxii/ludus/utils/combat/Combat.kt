@@ -1,12 +1,11 @@
 package com.doorxii.ludus.utils.combat
 
 import android.util.Log
+import com.doorxii.ludus.data.models.actions.combatactions.ChosenAction
 import com.doorxii.ludus.data.models.animal.Gladiator
-import com.doorxii.ludus.utils.actions.CombatBehaviour
-import com.doorxii.ludus.utils.actions.combatactions.ChosenAction
+import com.doorxii.ludus.utils.combat.EnumToAction.combatActionToEnum
 import com.doorxii.ludus.utils.dice.Dice
 import com.doorxii.ludus.utils.dice.DiceTypes
-import com.doorxii.ludus.utils.combat.EnumToAction.combatActionToEnum
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -120,6 +119,7 @@ class Combat {
                     )
                 )
             }
+            // run round
             val combatRoundResult: CombatRoundResult = runNewRound(playerChoices, enemyChoices)
             updateListsFromCombatRoundResult(combatRoundResult)
             for (gladiator in playerGladiatorList) {

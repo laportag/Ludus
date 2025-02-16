@@ -16,13 +16,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModelProvider
+import com.doorxii.ludus.data.models.actions.combatactions.ChosenAction
 import com.doorxii.ludus.data.models.animal.Gladiator
 import com.doorxii.ludus.ui.components.screens.CombatScreen
 import com.doorxii.ludus.ui.theme.LudusTheme
+import com.doorxii.ludus.utils.combat.Combat
 import com.doorxii.ludus.utils.combat.CombatSerialization.readCombatFromFile
 import com.doorxii.ludus.utils.combat.CombatSerialization.saveCombatJson
-import com.doorxii.ludus.utils.actions.combatactions.ChosenAction
-import com.doorxii.ludus.utils.combat.Combat
 import com.doorxii.ludus.utils.dice.Dice
 import com.doorxii.ludus.utils.dice.DiceTypes
 import java.io.File

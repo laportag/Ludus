@@ -16,6 +16,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 fun <T> DragTarget(
     modifier: Modifier,
     dataToDrop: T,
+    combatActionType: CombatActionType,
     enabled: Boolean = true,
     content: @Composable () -> Unit
 ) {
@@ -33,7 +34,8 @@ fun <T> DragTarget(
                     currentState.dataToDrop = dataToDrop
                     currentState.isDragging = true
                     currentState.dragPosition = currentPosition + it
-                    currentState.draggableComposable = { content() } // Wrap content in a lambda
+                    currentState.draggableComposable = { content() }
+                    currentState.combatActionType = combatActionType
                 }, onDrag = { change, dragAmount ->
                     change.consume()
                     currentState.dragOffset += Offset(dragAmount.x, dragAmount.y)

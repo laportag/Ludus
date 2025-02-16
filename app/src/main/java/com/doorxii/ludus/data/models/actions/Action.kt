@@ -1,4 +1,4 @@
-package com.doorxii.ludus.utils.actions
+package com.doorxii.ludus.data.models.actions
 
 
 interface Action {

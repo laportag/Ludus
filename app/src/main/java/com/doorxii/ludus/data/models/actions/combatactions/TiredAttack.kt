@@ -1,7 +1,8 @@
-package com.doorxii.ludus.utils.actions.combatactions
+package com.doorxii.ludus.data.models.actions.combatactions
 
 import android.util.Log
 import com.doorxii.ludus.data.models.animal.Gladiator
+import com.doorxii.ludus.ui.components.cards.CombatActionType
 import com.doorxii.ludus.utils.dice.Dice
 import com.doorxii.ludus.utils.dice.DiceTypes
 
@@ -11,6 +12,7 @@ class TiredAttack: CombatAction {
     override val description: String = "Tired Attack"
     override val staminaCost: Double = -5.0
     override val actionEnum: CombatActions = CombatActions.TIRED_ATTACK
+    override val cardType= CombatActionType.Targeted
 
     override fun act(actor: Gladiator, target: Gladiator): CombatActionResult {
         val combatDifference = actor.attack - target.defence

@@ -1,4 +1,4 @@
-package com.doorxii.ludus.utils.actions.combatactions
+package com.doorxii.ludus.data.models.actions.combatactions
 
 enum class CombatActions {
     BASIC_ATTACK,

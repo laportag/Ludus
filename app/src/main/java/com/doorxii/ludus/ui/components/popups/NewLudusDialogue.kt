@@ -42,7 +42,7 @@ fun NewLudusDialogue(
                         val db = DatabaseManagement.createDb(ludusName, context)
                         launchLudusManagement(ludusName, db)
                     }
-                    visibleCallback(false)
+//                    visibleCallback(false)
                 },
                 enabled = ludusName.isNotEmpty() && ludusName !in DatabaseManagement.getAllDatabases(context)
             ) {

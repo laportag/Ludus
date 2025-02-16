@@ -1,11 +1,11 @@
 package com.doorxii.ludus.utils.combat
 
-import com.doorxii.ludus.utils.actions.combatactions.BasicAttack
-import com.doorxii.ludus.utils.actions.combatactions.CombatAction
-import com.doorxii.ludus.utils.actions.combatactions.CombatActions
-import com.doorxii.ludus.utils.actions.combatactions.Missio
-import com.doorxii.ludus.utils.actions.combatactions.TiredAttack
-import com.doorxii.ludus.utils.actions.combatactions.Wait
+import com.doorxii.ludus.data.models.actions.combatactions.BasicAttack
+import com.doorxii.ludus.data.models.actions.combatactions.CombatAction
+import com.doorxii.ludus.data.models.actions.combatactions.CombatActions
+import com.doorxii.ludus.data.models.actions.combatactions.Missio
+import com.doorxii.ludus.data.models.actions.combatactions.TiredAttack
+import com.doorxii.ludus.data.models.actions.combatactions.Wait
 
 object EnumToAction {
     fun combatEnumToAction(choice: CombatActions): CombatAction {
