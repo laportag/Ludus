@@ -6,7 +6,7 @@ import com.doorxii.ludus.utils.actions.CombatBehaviour
 import com.doorxii.ludus.utils.actions.combatactions.ChosenAction
 import com.doorxii.ludus.utils.dice.Dice
 import com.doorxii.ludus.utils.dice.DiceTypes
-import com.doorxii.ludus.utils.enums.EnumToAction.combatActionToEnum
+import com.doorxii.ludus.utils.combat.EnumToAction.combatActionToEnum
 import kotlinx.serialization.Serializable
 
 @Serializable

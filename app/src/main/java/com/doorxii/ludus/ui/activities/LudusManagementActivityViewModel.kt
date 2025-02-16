@@ -9,7 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.doorxii.ludus.data.db.LudusRepository
 import com.doorxii.ludus.data.models.animal.Gladiator
 import com.doorxii.ludus.data.models.ludus.Ludus
-import com.doorxii.ludus.utils.GladiatorGenerator.newGladiatorList
+import com.doorxii.ludus.utils.data.GladiatorGenerator.newGladiatorList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

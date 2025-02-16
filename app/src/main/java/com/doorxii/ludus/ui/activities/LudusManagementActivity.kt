@@ -20,8 +20,8 @@ import com.doorxii.ludus.data.models.animal.Gladiator
 import com.doorxii.ludus.data.models.ludus.Ludus
 import com.doorxii.ludus.ui.components.screens.LudusManagementScreen
 import com.doorxii.ludus.ui.theme.LudusTheme
-import com.doorxii.ludus.utils.CombatSerialization
-import com.doorxii.ludus.utils.DatabaseManagement.returnDb
+import com.doorxii.ludus.utils.combat.CombatSerialization
+import com.doorxii.ludus.utils.data.DatabaseManagement.returnDb
 import com.doorxii.ludus.utils.combat.Combat
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json

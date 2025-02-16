@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import com.doorxii.ludus.ui.activities.LudusManagementActivityViewModel
+import com.doorxii.ludus.utils.ui.LudusManagementRoutes
 
 @Composable
 fun LudusManagementHomeScreen(

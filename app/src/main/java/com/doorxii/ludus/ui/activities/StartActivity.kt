@@ -15,7 +15,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.doorxii.ludus.data.db.AppDatabase
 import com.doorxii.ludus.ui.components.screens.StartActivityScreen
 import com.doorxii.ludus.ui.theme.LudusTheme
-import com.doorxii.ludus.utils.DatabaseManagement.getAllDatabases
+import com.doorxii.ludus.utils.data.DatabaseManagement.getAllDatabases
 import kotlinx.coroutines.launch
 
 class StartActivity : ComponentActivity() {

@@ -1,4 +1,4 @@
-package com.doorxii.ludus.utils.enums
+package com.doorxii.ludus.utils.data
 
 import com.doorxii.ludus.data.models.equipment.armour.Armour
 import com.doorxii.ludus.data.models.equipment.armour.Armourless

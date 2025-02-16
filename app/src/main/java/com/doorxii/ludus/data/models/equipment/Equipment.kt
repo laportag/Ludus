@@ -2,8 +2,8 @@ package com.doorxii.ludus.data.models.equipment
 
 import com.doorxii.ludus.data.models.equipment.armour.Armours
 import com.doorxii.ludus.data.models.equipment.weapon.Weapons
-import com.doorxii.ludus.utils.enums.EnumToEquipment.enumToWeapon
-import com.doorxii.ludus.utils.enums.EnumToEquipment.enumToArmour
+import com.doorxii.ludus.utils.data.EnumToEquipment.enumToWeapon
+import com.doorxii.ludus.utils.data.EnumToEquipment.enumToArmour
 import kotlinx.serialization.Serializable
 
 @Serializable

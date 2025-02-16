@@ -8,7 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
-import com.doorxii.ludus.ui.components.screens.LudusManagementRoutes
+import com.doorxii.ludus.utils.ui.LudusManagementRoutes
 
 @Composable
 fun LudusManagementNavBar(navController: NavHostController) {

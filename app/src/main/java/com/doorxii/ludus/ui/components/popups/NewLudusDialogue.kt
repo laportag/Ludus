@@ -14,7 +14,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.doorxii.ludus.data.db.AppDatabase
-import com.doorxii.ludus.utils.DatabaseManagement
+import com.doorxii.ludus.utils.data.DatabaseManagement
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope

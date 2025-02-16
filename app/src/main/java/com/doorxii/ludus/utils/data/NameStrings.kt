@@ -1,4 +1,4 @@
-package com.doorxii.ludus.utils
+package com.doorxii.ludus.utils.data
 
 object NameStrings {
 

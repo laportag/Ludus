@@ -23,7 +23,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.doorxii.ludus.data.db.AppDatabase
 import com.doorxii.ludus.ui.activities.StartActivityViewModel
-import com.doorxii.ludus.utils.DatabaseManagement
+import com.doorxii.ludus.utils.data.DatabaseManagement
 
 @Composable
 fun LoadLudusDialogue(

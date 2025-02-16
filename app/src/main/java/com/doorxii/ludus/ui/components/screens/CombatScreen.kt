@@ -25,7 +25,7 @@ import com.doorxii.ludus.ui.components.popups.CombatDialogue
 import com.doorxii.ludus.utils.actions.combatactions.ChosenAction
 import com.doorxii.ludus.utils.actions.combatactions.CombatActions
 import com.doorxii.ludus.utils.combat.Combat
-import com.doorxii.ludus.utils.enums.EnumToAction
+import com.doorxii.ludus.utils.combat.EnumToAction
 
 @Composable
 fun CombatScreen(

@@ -1,4 +1,4 @@
-package com.doorxii.ludus.utils.enums
+package com.doorxii.ludus.utils.combat
 
 import com.doorxii.ludus.utils.actions.combatactions.BasicAttack
 import com.doorxii.ludus.utils.actions.combatactions.CombatAction

@@ -5,7 +5,7 @@ import com.doorxii.ludus.utils.actions.combatactions.CombatActionResult
 import com.doorxii.ludus.data.models.animal.Gladiator
 import com.doorxii.ludus.utils.dice.Dice
 import com.doorxii.ludus.utils.dice.DiceTypes
-import com.doorxii.ludus.utils.enums.EnumToAction.combatEnumToAction
+import com.doorxii.ludus.utils.combat.EnumToAction.combatEnumToAction
 import kotlinx.serialization.Serializable
 
 @Serializable

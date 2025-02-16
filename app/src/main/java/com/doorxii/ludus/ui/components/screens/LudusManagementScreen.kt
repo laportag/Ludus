@@ -12,6 +12,7 @@ import androidx.navigation.compose.rememberNavController
 import com.doorxii.ludus.ui.activities.LudusManagementActivityViewModel
 import com.doorxii.ludus.ui.components.bars.LudusManagementNavBar
 import com.doorxii.ludus.ui.components.bars.LudusManagementTopBar
+import com.doorxii.ludus.utils.ui.LudusManagementRoutes
 
 @Composable
 fun LudusManagementScreen(

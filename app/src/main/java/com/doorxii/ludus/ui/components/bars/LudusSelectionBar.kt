@@ -2,7 +2,7 @@ package com.doorxii.ludus.ui.components.bars
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
@@ -24,10 +24,8 @@ fun LudusSelectionBar(
     var expanded by remember { mutableStateOf(false) }
     Box(
         modifier = Modifier
-//            .fillMaxWidth()
-            .fillMaxSize()
-//            .height(LocalConfiguration.current.screenHeightDp.dp / 15) // Assuming you have screenHeight available
-//            .weight(0.07f)
+            .fillMaxWidth()
+//            .fillMaxSize()
             .clickable { expanded = true }
     ) {
         Text(
@@ -51,5 +49,4 @@ fun LudusSelectionBar(
         }
 
     }
-
 }

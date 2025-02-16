@@ -1,8 +1,7 @@
-package com.doorxii.ludus.utils
+package com.doorxii.ludus.utils.combat
 
 import android.content.Context
 import android.util.Log
-import com.doorxii.ludus.utils.combat.Combat
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File

@@ -1,4 +1,4 @@
-package com.doorxii.ludus.ui.components.screens
+package com.doorxii.ludus.utils.ui
 
 sealed class LudusManagementRoutes (val route: String) {
     object Home: LudusManagementRoutes("home")
