@@ -27,7 +27,7 @@ import com.doorxii.ludus.ui.components.lists.EnemyGladiatorGrid
 import com.doorxii.ludus.ui.components.lists.PlayerGladiatorGrid
 import com.doorxii.ludus.ui.components.popups.CombatDialogue
 import com.doorxii.ludus.utils.combat.Combat
-import com.doorxii.ludus.utils.combat.EnumToAction
+import com.doorxii.ludus.utils.combat.CombatUtils
 
 @Composable
 fun CombatScreen(
@@ -52,21 +52,6 @@ fun CombatScreen(
     }
     val showDialog = remember { mutableStateOf(false) }
 
-    fun handleCardDrop(chosenAct: ChosenAction, gladiator: Gladiator?, onActingGladiatorChange: (Gladiator?) -> Unit) {
-        Log.d(TAG, "handleCardDrop: ${chosenAct.actionName}")
-        if (gladiator != null) {
-            viewModel.updateGladiatorAction(gladiator, chosenAct)
-            onActingGladiatorChange(findNextAvailableGladiator())
-            if (viewModel.haveAllGladiatorsHadATurn()) {
-                makePlayerTurn(
-                    viewModel.gladiatorActions.value.values.toList().filterNotNull()
-                )
-                resetActions()
-                onActingGladiatorChange(findNextAvailableGladiator())
-            }
-        }
-    }
-
     if (combat.value != null) {
         LongPressDraggable(modifier = Modifier) {
             Column(
@@ -90,9 +75,6 @@ fun CombatScreen(
                             resetActions = resetActions,
                             findNextAvailableGladiator = findNextAvailableGladiator,
                             onActingGladiatorChange = { actingGladiator = it },
-                            handleCardDrop = { chosenAction, gladiator, onActingGladiatorChange ->
-                                handleCardDrop(chosenAction, gladiator, { actingGladiator = it })
-                            }
                         )
                         if (isInBound && data != null) {
                             Log.d(TAG, "targetless card drapped ${data}")
@@ -101,7 +83,15 @@ fun CombatScreen(
                                 actingGladiatorID = actingGladiator!!.gladiatorId,
                                 targetGladiatorID = 0
                             )
-                            handleCardDrop(chosenAction, actingGladiator, { actingGladiator = it })
+                            CombatUtils.handleAction(
+                                chosenAction = chosenAction,
+                                actingGladiator = actingGladiator!!,
+                                viewModel = viewModel,
+                                onTurnEnded = makePlayerTurn,
+                                resetActions = resetActions,
+                                findNextAvailableGladiator = findNextAvailableGladiator,
+                                onActingGladiatorChange = { actingGladiator = it }
+                            )
                         }
                     }
                 }
@@ -111,7 +101,7 @@ fun CombatScreen(
 
                 // Action Cards
                 CardRow(
-                    EnumToAction.combatEnumListToActionList(
+                    CombatUtils.combatEnumListToActionList(
                         listOf(
                             CombatActions.BASIC_ATTACK,
                             CombatActions.TIRED_ATTACK,

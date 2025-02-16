@@ -3,7 +3,7 @@ package com.doorxii.ludus.utils.combat
 import android.util.Log
 import com.doorxii.ludus.data.models.actions.combatactions.CombatActionResult
 import com.doorxii.ludus.data.models.animal.Gladiator
-import com.doorxii.ludus.utils.combat.EnumToAction.combatEnumToAction
+import com.doorxii.ludus.utils.combat.CombatUtils.combatEnumToAction
 import com.doorxii.ludus.utils.dice.Dice
 import com.doorxii.ludus.utils.dice.DiceTypes
 import kotlinx.serialization.Serializable

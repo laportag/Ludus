@@ -16,6 +16,7 @@ import com.doorxii.ludus.data.models.animal.Gladiator
 import com.doorxii.ludus.ui.activities.CombatActivityViewModel
 import com.doorxii.ludus.ui.components.cards.EnemyGladiatorCardWithDropTarget
 import com.doorxii.ludus.utils.combat.Combat
+import com.doorxii.ludus.utils.combat.CombatUtils
 
 @Composable
 fun EnemyGladiatorGrid (
@@ -27,7 +28,6 @@ fun EnemyGladiatorGrid (
     findNextAvailableGladiator: () -> Gladiator?,
     onActingGladiatorChange: (Gladiator?) -> Unit,
     modifier: Modifier,
-    handleCardDrop: (ChosenAction, Gladiator?, (Gladiator?) -> Unit) -> Unit
 ) {
     val TAG = "EnemyGladiatorGrid"
 
@@ -46,9 +46,18 @@ fun EnemyGladiatorGrid (
                         TAG,
                         "actor: ${actingGladiator.name} action: $action target: ${target.name}"
                     )
-                    val chosenAct =
-                        ChosenAction(actingGladiator.gladiatorId, target.gladiatorId, action)
-                    handleCardDrop(chosenAct, gladiator, onActingGladiatorChange)
+                    val chosenAct = ChosenAction(actingGladiator.gladiatorId, target.gladiatorId, action)
+
+                    CombatUtils.handleAction(
+                        chosenAction = chosenAct,
+                        actingGladiator = actingGladiator,
+                        viewModel = viewModel,
+                        onTurnEnded = makePlayerTurn,
+                        resetActions = resetActions,
+                        findNextAvailableGladiator = findNextAvailableGladiator,
+                        onActingGladiatorChange = onActingGladiatorChange
+                    )
+//                    handleCardDrop(chosenAct, gladiator, {})
 //                    viewModel.updateGladiatorAction(actingGladiator, chosenAct)
 //                    onActingGladiatorChange(findNextAvailableGladiator())
 //                    if (viewModel.haveAllGladiatorsHadATurn()) {

@@ -1,13 +1,16 @@
 package com.doorxii.ludus.utils.combat
 
 import com.doorxii.ludus.data.models.actions.combatactions.BasicAttack
+import com.doorxii.ludus.data.models.actions.combatactions.ChosenAction
 import com.doorxii.ludus.data.models.actions.combatactions.CombatAction
 import com.doorxii.ludus.data.models.actions.combatactions.CombatActions
 import com.doorxii.ludus.data.models.actions.combatactions.Missio
 import com.doorxii.ludus.data.models.actions.combatactions.TiredAttack
 import com.doorxii.ludus.data.models.actions.combatactions.Wait
+import com.doorxii.ludus.data.models.animal.Gladiator
+import com.doorxii.ludus.ui.activities.CombatActivityViewModel
 
-object EnumToAction {
+object CombatUtils {
     fun combatEnumToAction(choice: CombatActions): CombatAction {
         return when (choice) {
             CombatActions.BASIC_ATTACK -> BasicAttack()
@@ -30,5 +33,25 @@ object EnumToAction {
 
     fun combatEnumListToActionList(list: List<CombatActions>): List<CombatAction> {
         return list.map { combatEnumToAction(it) }
+    }
+
+    fun handleAction(
+        chosenAction: ChosenAction,
+        actingGladiator: Gladiator,
+        viewModel: CombatActivityViewModel,
+        onTurnEnded: (List<ChosenAction>) -> Unit,
+        resetActions: () -> Unit,
+        findNextAvailableGladiator: () -> Gladiator?,
+        onActingGladiatorChange: (Gladiator?) -> Unit
+    ) {
+        viewModel.updateGladiatorAction(actingGladiator, chosenAction)
+        onActingGladiatorChange(findNextAvailableGladiator())
+        if (viewModel.haveAllGladiatorsHadATurn()) {
+            onTurnEnded(
+                viewModel.gladiatorActions.value.values.toList().filterNotNull()
+            )
+            resetActions()
+            onActingGladiatorChange(findNextAvailableGladiator())
+        }
     }
 }
