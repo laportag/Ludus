@@ -3,11 +3,9 @@ package com.doorxii.ludus.ui.components.screens
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -22,7 +20,6 @@ import com.doorxii.ludus.ui.components.popups.CombatResultAlertDialogue
 @Composable
 fun LudusManagementCombatSelectScreen(
     viewModel: LudusManagementActivityViewModel,
-    parentPadding: PaddingValues
 ) {
     val TAG = "LudusManagementCombatSelectScreen"
 
@@ -33,7 +30,6 @@ fun LudusManagementCombatSelectScreen(
     Column(
         Modifier
             .fillMaxSize()
-            .padding(parentPadding)
 
     ) {
         Column(modifier = Modifier.weight(0.1f)) {

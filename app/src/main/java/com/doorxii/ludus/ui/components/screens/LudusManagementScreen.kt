@@ -35,7 +35,6 @@ fun LudusManagementScreen(
         ) {
             composable(LudusManagementRoutes.Home.route) {
                     LudusManagementHomeScreen(
-                        parentPadding = innerPadding,
                         viewModel = viewModel,
                         navController=navController
                     )
@@ -43,15 +42,14 @@ fun LudusManagementScreen(
             }
             composable(LudusManagementRoutes.Market.route) {
                 LudusManagementMarketScreen(
-                    viewModel = viewModel,
-                    parentPadding = innerPadding
+                    viewModel = viewModel
                 )
             }
             composable(LudusManagementRoutes.Barracks.route) {
-                LudusManagementBarracksScreen(viewModel = viewModel, innerPadding)
+                LudusManagementBarracksScreen(viewModel = viewModel)
             }
             composable(LudusManagementRoutes.CombatSelect.route) {
-                LudusManagementCombatSelectScreen(viewModel = viewModel, innerPadding)
+                LudusManagementCombatSelectScreen(viewModel = viewModel)
             }
             composable(LudusManagementRoutes.Settings.route) {
                 SettingsScreen()
