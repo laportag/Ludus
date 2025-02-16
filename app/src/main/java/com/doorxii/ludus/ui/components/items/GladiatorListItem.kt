@@ -1,4 +1,4 @@
-package com.doorxii.ludus.ui.components.lists
+package com.doorxii.ludus.ui.components.items
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column

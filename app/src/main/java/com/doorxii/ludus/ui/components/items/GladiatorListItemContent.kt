@@ -1,4 +1,4 @@
-package com.doorxii.ludus.ui.components.lists
+package com.doorxii.ludus.ui.components.items
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable

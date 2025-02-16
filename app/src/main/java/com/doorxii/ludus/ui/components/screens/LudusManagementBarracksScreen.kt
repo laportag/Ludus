@@ -13,9 +13,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.doorxii.ludus.ui.activities.LudusManagementActivityViewModel
-import com.doorxii.ludus.ui.components.lists.GladiatorItemContentBarracks
+import com.doorxii.ludus.ui.components.items.GladiatorItemContentBarracks
 import com.doorxii.ludus.ui.components.lists.GladiatorList
-import com.doorxii.ludus.ui.components.lists.GladiatorListItem
+import com.doorxii.ludus.ui.components.items.GladiatorListItem
 
 
 @Composable

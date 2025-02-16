@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.doorxii.ludus.ui.activities.LudusManagementActivityViewModel
 import com.doorxii.ludus.ui.components.bars.LudusManagementNavBar
+import com.doorxii.ludus.ui.components.bars.LudusManagementTopBar
 
 @Composable
 fun LudusManagementScreen(
@@ -20,6 +21,9 @@ fun LudusManagementScreen(
     val navController = rememberNavController()
     Log.d(TAG, "player ludus on create: ${viewModel.playerLudus.collectAsState().value}")
     Scaffold(
+        topBar = {
+            LudusManagementTopBar(navController, viewModel.playerLudus.collectAsState().value?.name ?: "Ludus")
+        },
         bottomBar = {
             LudusManagementNavBar(navController)
         }
@@ -48,6 +52,9 @@ fun LudusManagementScreen(
             }
             composable(LudusManagementRoutes.CombatSelect.route) {
                 LudusManagementCombatSelectScreen(viewModel = viewModel, innerPadding)
+            }
+            composable(LudusManagementRoutes.Settings.route) {
+                SettingsScreen()
             }
         }
     }

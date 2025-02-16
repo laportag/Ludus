@@ -31,12 +31,11 @@ fun LudusManagementNavBar(navController: NavHostController) {
         }) {
             Text("Market")
         }
-        Row {
-            Button(onClick = {
-                navController.navigate(LudusManagementRoutes.CombatSelect.route)
-            }) {
-                Text("Combat")
-            }
+        Button(onClick = {
+            navController.navigate(LudusManagementRoutes.CombatSelect.route)
+        }) {
+            Text("Combat")
         }
+
     }
 }

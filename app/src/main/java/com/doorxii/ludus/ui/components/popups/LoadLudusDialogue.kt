@@ -77,7 +77,7 @@ fun LoadLudusDialogue(
                                             context
                                         )
                                         launchLudusManagement(database, db)
-                                        visibleCallback(false)
+//                                        visibleCallback(false)
                                     }) { Text("Load") }
                                     Button(onClick = {
                                         Log.d(TAG, "deleting: $database")

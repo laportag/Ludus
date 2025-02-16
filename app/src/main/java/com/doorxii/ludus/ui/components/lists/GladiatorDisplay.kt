@@ -7,6 +7,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.doorxii.ludus.data.models.animal.Gladiator
+import com.doorxii.ludus.ui.components.items.GladiatorItemContentShort
+import com.doorxii.ludus.ui.components.items.GladiatorListItem
 
 @Composable
 fun GladiatorDisplay(
