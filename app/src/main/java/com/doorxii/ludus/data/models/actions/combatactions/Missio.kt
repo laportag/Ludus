@@ -11,7 +11,7 @@ class Missio: CombatAction {
     override val actionEnum: CombatActions = CombatActions.MISSIO
     override val cardType: CombatActionType = CombatActionType.Targetless
 
-    override fun act(actor: Gladiator, target: Gladiator): CombatActionResult {
+    override fun act(actor: Gladiator, target: Gladiator?): CombatActionResult {
         actor.morale = 0.0
         return CombatActionResult(
             actor,

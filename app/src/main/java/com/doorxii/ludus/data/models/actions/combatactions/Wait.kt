@@ -11,7 +11,7 @@ class Wait : CombatAction {
     override val actionEnum: CombatActions = CombatActions.WAIT
     override val cardType = CombatActionType.Targetless
 
-    override fun act(actor: Gladiator, target: Gladiator): CombatActionResult {
+    override fun act(actor: Gladiator, target: Gladiator?): CombatActionResult {
         return CombatActionResult(
             actor,
             target,

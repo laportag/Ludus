@@ -9,7 +9,7 @@ interface CombatAction: Action {
     val staminaCost: Double
     val actionEnum: CombatActions
     val cardType: CombatActionType
-    fun act(actor: Gladiator, target: Gladiator): CombatActionResult
+    fun act(actor: Gladiator, target: Gladiator?): CombatActionResult
 
     fun reduceStamina(aggressor: Gladiator){
         aggressor.stamina -= staminaCost

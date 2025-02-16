@@ -72,23 +72,43 @@ class CombatRound {
             if (gladiator == null) {
                 Log.d(TAG, "retrieved gladiator from round order is null ")
             } else {
-                Log.d(TAG, "gladiator: ${gladiator.gladiatorId} ${gladiator.name} ${gladiator.action?.actionName ?: "no action"} ${gladiator.action?.targetGladiatorID ?: "no target"}")
+                Log.d(
+                    TAG,
+                    "gladiator: ${gladiator.gladiatorId} ${gladiator.name} ${gladiator.action?.actionName ?: "no action"} ${gladiator.action?.targetGladiatorID ?: "no target"}"
+                )
 
-                val target =
-                    playerGladiatorList.find { it.gladiatorId == gladiator.action?.targetGladiatorID }
-                    ?: enemyGladiatorList.find { it.gladiatorId == gladiator.action?.targetGladiatorID }
+                // targetless card
+                if (gladiator.action?.targetGladiatorID == 0) {
 
-                Log.d(TAG, "target: ${target?.gladiatorId ?: "no target"} ${target?.name ?: "no target"}")
-                // only act if target exists
-
-                if (target != null){
                     res = updateFromCombatActionResult(
                         combatEnumToAction(gladiator.action!!.action).act(
                             gladiator,
-                            target
+                            null
                         )
                     )
+
+                // targeted card
+                } else {
+                    val target =
+                        playerGladiatorList.find { it.gladiatorId == gladiator.action?.targetGladiatorID }
+                            ?: enemyGladiatorList.find { it.gladiatorId == gladiator.action?.targetGladiatorID }
+
+                    Log.d(
+                        TAG,
+                        "target: ${target?.gladiatorId ?: "no target"} ${target?.name ?: "no target"}"
+                    )
+                    // only act if target exists
+
+                    if (target != null) {
+                        res = updateFromCombatActionResult(
+                            combatEnumToAction(gladiator.action!!.action).act(
+                                gladiator,
+                                target
+                            )
+                        )
+                    }
                 }
+
                 isCombatStillGoing()
             }
         }
@@ -102,15 +122,18 @@ class CombatRound {
         Log.d(TAG, "updating from action result: $result")
 
         result.actor.stamina -= result.deltaStamina
-        result.target.health -= result.deltaHealth
-        result.target.morale -= result.deltaHealth/2
+        if (result.target != null){
+            result.target.health -= result.deltaHealth
+            result.target.morale -= result.deltaHealth / 2
+        }
 
         val submittedPlayerGladiatorList = mutableListOf<Gladiator>()
         val submittedEnemyGladiatorList = mutableListOf<Gladiator>()
 
         // Update player and enemy lists, removing dead and submitted gladiators
         playerGladiatorList = playerGladiatorList.filter { gladiator ->
-            val isAlive = gladiator.isAlive().also { alive -> if (!alive) appendReport("Gladiator ${gladiator.name} is dead") }
+            val isAlive = gladiator.isAlive()
+                .also { alive -> if (!alive) appendReport("Gladiator ${gladiator.name} is dead") }
             if (isAlive && gladiator.hasNoMorale()) {
                 submittedPlayerGladiatorList.add(gladiator)
                 false // false on the filter lambda will remove the gladiator from playerGladiatorList
@@ -120,7 +143,8 @@ class CombatRound {
         }
 
         enemyGladiatorList = enemyGladiatorList.filter { gladiator ->
-            val isAlive = gladiator.isAlive().also { alive -> if (!alive) appendReport("Gladiator ${gladiator.name} is dead") }
+            val isAlive = gladiator.isAlive()
+                .also { alive -> if (!alive) appendReport("Gladiator ${gladiator.name} is dead") }
             if (isAlive && gladiator.hasNoMorale()) {
                 submittedEnemyGladiatorList.add(gladiator)
                 false // Remove from enemyGladiatorList if submitted
@@ -129,7 +153,12 @@ class CombatRound {
             }
         }
 
-        return CombatRoundResult(playerGladiatorList, enemyGladiatorList, submittedPlayerGladiatorList, submittedEnemyGladiatorList)
+        return CombatRoundResult(
+            playerGladiatorList,
+            enemyGladiatorList,
+            submittedPlayerGladiatorList,
+            submittedEnemyGladiatorList
+        )
     }
 
 

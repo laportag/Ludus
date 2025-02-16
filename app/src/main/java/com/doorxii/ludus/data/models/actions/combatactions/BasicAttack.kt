@@ -14,10 +14,10 @@ class BasicAttack : CombatAction {
     override val actionEnum: CombatActions = CombatActions.BASIC_ATTACK
     override val cardType: CombatActionType = CombatActionType.Targeted
 
-    override fun act(actor: Gladiator, target: Gladiator): CombatActionResult {
-        Log.d(TAG, "Basic attack: ${actor.name} vs ${target.name}")
+    override fun act(actor: Gladiator, target: Gladiator?): CombatActionResult {
+        Log.d(TAG, "Basic attack: ${actor.name} vs ${target?.name}")
 
-        val combatDifference = actor.attack - target.defence
+        val combatDifference = actor.attack - (target?.defence ?: 0.0)
         Log.d(TAG, "Combat difference: $combatDifference")
 
         val defenderDamageTaken: Double = when (combatDifference) {

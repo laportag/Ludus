@@ -14,8 +14,8 @@ class TiredAttack: CombatAction {
     override val actionEnum: CombatActions = CombatActions.TIRED_ATTACK
     override val cardType= CombatActionType.Targeted
 
-    override fun act(actor: Gladiator, target: Gladiator): CombatActionResult {
-        val combatDifference = actor.attack - target.defence
+    override fun act(actor: Gladiator, target: Gladiator?): CombatActionResult {
+        val combatDifference = actor.attack - (target?.defence ?: 0.0)
         Log.d(TAG, "Combat difference: $combatDifference")
 
         var defenderDamageTaken: Double = when (combatDifference) {
